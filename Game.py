@@ -47,7 +47,8 @@ class Game():
             dim = yLength/350
             
         return dim
-    #these read and write files could be toolified
+    
+    #these read and write files could be toolified for more read and write variables
     def readInitialCardTheme(self):
         file = open("SavedVariables.txt")
         string = None
@@ -138,7 +139,7 @@ class Game():
             placeholder_add_to_selection_box=False
         )
         fpsSelector = menu.add.dropselect(
-            title="Fram Rate",
+            title="Frame Rate",
             items=allThemes,
             #placeholder=allThemes[defaultCardTheme][0],
             onchange=setTheme, 

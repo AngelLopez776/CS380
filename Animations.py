@@ -38,15 +38,14 @@ class Animations():
                     running = False
             return xDim, movedX
         
-        if((not cards[0].shown and showFront) or (cards[0].shown and not showFront)):
-            movedX = 0
-            xDimStore = xDim
-            xDim, movedX = halfFlip(cards, timeToFlip, movedX, xDim, xDim, yDim, minBorder, xSize, ySize, window, True)        
-            for card in cards:     
-                if(showFront):    
-                    card.show()
-                else:
-                    card.hide()
-                card.update()
-            halfFlip(cards, -timeToFlip, movedX, xDimStore, xDim, yDim, minBorder, xSize, ySize, window, False)
-        pygame.event.clear()
+        movedX = 0
+        xDimStore = xDim
+        xDim, movedX = halfFlip(cards, timeToFlip, movedX, xDim, xDim, yDim, minBorder, xSize, ySize, window, True)        
+        for card in cards:     
+            if(showFront):    
+                card.show()
+            else:
+                card.hide()
+            card.update()
+        halfFlip(cards, -timeToFlip, movedX, xDimStore, xDim, yDim, minBorder, xSize, ySize, window, False)
+        pygame.event.clear()#removes any clicks that may have occured during the flipping animation
