@@ -13,7 +13,7 @@ class Table():
         self.difficulty = difficulty
         self.table = [[0 for i in range(x)] for j in range(y)]
         self.selection = []
-        self.animate = Animations(clock)
+        self.animate = Animations()
         self.createTable(x, y)
     
     def createTable(self, x, y):
@@ -58,19 +58,8 @@ class Table():
             self.selection.clear()
             return True
         
-        elif self.selection[0].ID == "JOKER":
+        elif self.selection[0].ID == "JOKER" or self.selection[1].ID == "JOKER":
             match = self.selection[1].ID
-            self.selection.clear()
-            for r in self.table:
-                for c in r:
-                    if c.ID == match and not c.shown:
-                        cards = []
-                        cards.append(c)
-                        self.animate.flip(cards, timeToFlip, xDim, yDim, minBorder, xSize, ySize, window, True)
-            return True
-                        
-        elif self.selection[1].ID == "JOKER":
-            match = self.selection[0].ID
             self.selection.clear()
             for r in self.table:
                 for c in r:
@@ -83,10 +72,10 @@ class Table():
         else:
             time.sleep(1)
             
-            cards = []
-            cards.append(self.selection[0])
-            cards.append(self.selection[1])
-            self.animate.flip(cards, timeToFlip, xDim, yDim, minBorder, xSize, ySize, window, False)
+            #cards = []
+            #cards.append(self.selection[0])
+            #cards.append(self.selection[1])
+            self.animate.flip(self.selection, timeToFlip, xDim, yDim, minBorder, xSize, ySize, window, False)
     
             self.selection.clear()
             return False

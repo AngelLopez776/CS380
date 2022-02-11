@@ -11,7 +11,7 @@ class Game():
         self.screenWidth = screenHeight
         self.screenHeight = screenHeight
         self.mainClock = pygame.time.Clock()
-        self.animate = Animations(self.mainClock)
+        self.animate = Animations()
     
     def draw_text(self, text, font, color, x, y, window):
         img = font.render(text, True, color)
@@ -59,7 +59,8 @@ class Game():
             text_1 = font.render("Start Game", True, black)
             if button_1.collidepoint((mx, my)):
                 if click:
-                    if self.game(screen, 5, 5, "Mario", 10, 45, 0):
+                    screen.fill(black)
+                    if self.game(screen, 4, 3, "Mario", 10, 45, 0):
                         pygame.quit()
                         sys.exit()
             pygame.draw.rect(screen, white, button_1)
@@ -107,7 +108,7 @@ class Game():
             self.mainClock.tick(60)
     
     def game(self, window, x, y, theme, lives, matchTime, score):
-        t = Table(x, y, theme, lives, 0, self.mainClock, 0)
+        t = Table(x, y, theme, lives, 0, self.mainClock)#, 0)
         
         green = (0, 255, 0)
         red = (255, 0, 0)
@@ -121,26 +122,27 @@ class Game():
         minBorder = 40
         inBTween = 10
         scale = self.setCardScale(minBorder, x, y, inBTween)
-        xDim = int(250 * scale)
-        yDim = int(350 * scale)
+        xDim = 250 * scale
+        yDim = 350 * scale
         xSize = xDim + inBTween
         ySize = yDim + inBTween
-        timeToFlip = 8
+        timeToFlip = 12
         
         t.showAll()
         tempTable = []
-        
+        beingRevealed = False
         for i in range(x):
                 for j in range(y):
                     t.table[j][i].col = i
                     t.table[j][i].row = j
                     tempTable.append(t.table[j][i])
                     surface = t.table[j][i].image.convert()
-                    img = pygame.transform.smoothscale(surface, (xDim, yDim))
-                    window.blit(img, (minBorder + xSize * t.table[j][i].col, minBorder + ySize * t.table[j][i].row))
+                    surface = pygame.transform.smoothscale(surface = surface, size =(xDim, yDim))
+                    window.blit(surface, (minBorder + xSize * t.table[j][i].col, minBorder + ySize * t.table[j][i].row))
         pygame.display.update()
         
         time.sleep(2)
+        beingRevealed = True
         
         self.animate.flip(tempTable, timeToFlip, xDim, yDim, minBorder, xSize, ySize, window, False)
         
@@ -157,10 +159,10 @@ class Game():
             
             mouse = pygame.mouse.get_pos()    
             
-            window.fill(black)
+            window.fill(black, (0,0,200,40)) #so cards show during lose screen
             self.draw_text("Lives: " + str(t.lives), lifeFont, white, 5, 0, window)
             self.draw_text("Time: " + str(timeLeft) + "s", lifeFont, white, 5, 18, window)
-            self.draw_text("Score: " + str(t.score), lifeFont, white, 105, 0, window)
+            #self.draw_text("Score: " + str(t.score), lifeFont, white, 105, 0, window)
             
             if (t.checkWin()):
                 t.update()
@@ -236,9 +238,9 @@ class Game():
                 for i in range(x):
                     for j in range(y):
                         surface = t.table[j][i].image.convert()
-                        img = pygame.transform.smoothscale(surface, (xDim, yDim))  
-                        window.blit(img, (minBorder + xSize * i, minBorder + ySize * j))
-                        t.table[j][i].rect = img.get_rect()
+                        surface = pygame.transform.smoothscale(surface, (xDim, yDim))  
+                        #window.blit(surface, (minBorder + xSize * i, minBorder + ySize * j))
+                        t.table[j][i].rect = surface.get_rect()
                         t.table[j][i].makeRect(minBorder + xSize * i, minBorder + ySize * j)
                 pygame.display.update()
             
@@ -249,8 +251,8 @@ class Game():
                     if len(t.selection) >= 2:
                         if not t.checkMatch(timeToFlip, xDim, yDim, minBorder, xSize, ySize, window):
                             t.lives = t.lives - 1
-                        else:
-                            t.score = t.score + 100
+                        #else:
+                            #t.score = t.score + 100
                 
                 for row in t.table:
                     for c in row:
@@ -258,9 +260,12 @@ class Game():
                             for event in pygame.event.get():
                                 if event.type == pygame.MOUSEBUTTONDOWN:
                                     cards = [c]
-                                    self.animate.flip(cards, timeToFlip, xDim, yDim, minBorder, xSize, ySize, window, True)
-
-                                    t.selection.append(c)
+                                    inAnimation = True
+                                    inAnimation = self.animate.flip(cards, timeToFlip, xDim, yDim, minBorder, xSize, ySize, window, True)
+                                    print(inAnimation)
+                                    if(not inAnimation):
+                                        t.selection.append(c)
+                                        print(t.selection)
         
                     
             for event in pygame.event.get():
