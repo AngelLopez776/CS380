@@ -59,7 +59,7 @@ class Game():
             text_1 = font.render("Start Game", True, black)
             if button_1.collidepoint((mx, my)):
                 if click:
-                    if self.game(screen, 5, 5, "Mario", 10, 45):
+                    if self.game(screen, 5, 5, "Mario", 10, 45, 0):
                         pygame.quit()
                         sys.exit()
             pygame.draw.rect(screen, white, button_1)
@@ -106,14 +106,15 @@ class Game():
             pygame.display.update()
             self.mainClock.tick(60)
     
-    def game(self, window, x, y, theme, lives, matchTime):
-        t = Table(x, y, theme, lives, 0, self.mainClock)
+    def game(self, window, x, y, theme, lives, matchTime, score):
+        t = Table(x, y, theme, lives, 0, self.mainClock, 0)
         
         green = (0, 255, 0)
         red = (255, 0, 0)
         white = (255, 255, 255)
         black = (0, 0, 0)
         
+        buttonFont = pygame.font.SysFont('Times New Roman', 20)
         lifeFont = pygame.font.SysFont('Times New Roman', 20)
         endFont = pygame.font.SysFont('Times New Roman', 32)
         
@@ -148,6 +149,7 @@ class Game():
 
         timeLeft = int(timer - (time.time() - sTime))
         
+        click = False
         running = True
         quitG = False
         while running:
@@ -158,11 +160,22 @@ class Game():
             window.fill(black)
             self.draw_text("Lives: " + str(t.lives), lifeFont, white, 5, 0, window)
             self.draw_text("Time: " + str(timeLeft) + "s", lifeFont, white, 5, 18, window)
+            self.draw_text("Score: " + str(t.score), lifeFont, white, 105, 0, window)
             
             if (t.checkWin()):
                 t.update()
                 
                 self.draw_text_center("You win!", endFont, green, self.screenWidth / 2, self.screenHeight / 2, window)
+                
+                retryButton = pygame.Rect((self.screenWidth / 2) - 100, (self.screenHeight / 2) + 50, 200, 50)
+                retryButtonText = buttonFont.render("Press R to Restart", True, black)
+                if retryButton.collidepoint((mouse)):
+                    if click:
+                        Game.game(self, window, 5, 5, "Mario", 10, 45, 0)
+                pygame.draw.rect(window, (127,127,127), retryButton)
+                retryButtonTextRect = retryButtonText.get_rect()
+                retryButtonTextRect.center=retryButton.center
+                window.blit(retryButtonText, retryButtonTextRect)
                 pygame.display.update()
                 
                 end = True
@@ -175,7 +188,11 @@ class Game():
                         elif event.type == pygame.KEYDOWN:
                             if event.key == pygame.K_ESCAPE:
                                 running = False
-                
+                                Game.main_menu(self)
+                            if event.key == pygame.K_r: 
+                                running = False
+                                Game.game(self, window, 5, 5, "Mario", 10, 45, 0)
+                            
             elif (t.lives == 0 or timeLeft <= 0):
                 hiddenTable = []
                 for card in tempTable:
@@ -185,7 +202,19 @@ class Game():
                 self.animate.flip(hiddenTable, 3, xDim, yDim, minBorder, xSize, ySize, window, True)
                                 
                 self.draw_text_center("You lose!", endFont, red, self.screenWidth / 2, self.screenHeight / 2, window)
+                
+                
+                retryButton = pygame.Rect((self.screenWidth / 2) - 100, (self.screenHeight / 2) + 50, 200, 50)
+                retryButtonText = buttonFont.render("Press R to Restart", True, black)
+                if retryButton.collidepoint((mouse)):
+                    if click:
+                        Game.game(self, window, 5, 5, "Mario", 10, 45, 0)     
+                pygame.draw.rect(window, (127,127,127), retryButton)
+                retryButtonTextRect = retryButtonText.get_rect()
+                retryButtonTextRect.center=retryButton.center
+                window.blit(retryButtonText, retryButtonTextRect)
                 pygame.display.update()
+                
                 
                 end = True
                 while end:
@@ -197,6 +226,10 @@ class Game():
                         elif event.type == pygame.KEYDOWN:
                             if event.key == pygame.K_ESCAPE:
                                 running = False
+                                Game.main_menu(self)
+                            if event.key == pygame.K_r: 
+                                running = False
+                                Game.game(self, window, 5, 5, "Mario", 10, 45, 0)
             
             else:
                 t.update()
@@ -216,6 +249,8 @@ class Game():
                     if len(t.selection) >= 2:
                         if not t.checkMatch(timeToFlip, xDim, yDim, minBorder, xSize, ySize, window):
                             t.lives = t.lives - 1
+                        else:
+                            t.score = t.score + 100
                 
                 for row in t.table:
                     for c in row:
@@ -235,6 +270,7 @@ class Game():
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         running = False
+                        Game.main_menu(self)
                         
         return quitG
     
