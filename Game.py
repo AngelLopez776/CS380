@@ -228,7 +228,7 @@ class Game():
             if button_1.collidepoint((mx, my)):
                 if click:
                     screen.fill(black)
-                    if self.game(screen, 4, 4, 10, 1000000, 0):
+                    if self.game(screen, 3, 3, 10, 1000000, 0):
                         pygame.quit()
                         sys.exit()
             pygame.draw.rect(screen, white, button_1)
