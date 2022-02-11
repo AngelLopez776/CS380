@@ -26,7 +26,7 @@ class Animations():
                 movedX += timeToFlip/2
                 for card in cards:
                     window.fill((0,0,0,0),rect[i])
-                    surface =  card.image.convert()
+                    surface = card.image.convert()
                     surface = pygame.transform.smoothscale(surface, (xDim, yDim))       
                     window.blit(surface, (minBorder + xSize * card.col + movedX, minBorder + ySize * card.row))  
                     i += 1
@@ -49,5 +49,4 @@ class Animations():
                     card.hide()
                 card.update()
             halfFlip(cards, -timeToFlip, movedX, xDimStore, xDim, yDim, minBorder, xSize, ySize, window, False)
-            return False
-        return True
+        pygame.event.clear()

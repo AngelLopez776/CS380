@@ -5,13 +5,22 @@ import sys
 from Table import Table
 import time
 from Animations import Animations
+import pygame_menu
 
 class Game():
     def __init__(self, screenWidth, screenHeight):
-        self.screenWidth = screenHeight
+        self.selectedTheme = self.readInitialCardTheme()
+        self.screenWidth = screenWidth
         self.screenHeight = screenHeight
         self.mainClock = pygame.time.Clock()
         self.animate = Animations()
+        self.green = (0, 255, 0)
+        self.red = (255, 0, 0)
+        self.white = (255, 255, 255)
+        self.black = (0, 0, 0)
+        self.buttonFont = pygame.font.SysFont('Times New Roman', 20)
+        self.lifeFont = pygame.font.SysFont('Times New Roman', 20)
+        self.endFont = pygame.font.SysFont('Times New Roman', 32)
     
     def draw_text(self, text, font, color, x, y, window):
         img = font.render(text, True, color)
@@ -38,7 +47,191 @@ class Game():
             dim = yLength/350
             
         return dim
-    
+    #these read and write files could be toolified
+    def readInitialCardTheme(self):
+        file = open("SavedVariables.txt")
+        string = None
+        for line in file:
+            if(line.startswith("selectedTheme")):
+                string = line
+                break
+        string = string.replace("selectedTheme=theme_","")
+        print(string)
+        file.close()
+        return string
+
+
+    #not perfect: deletes whole file!
+    def saveInitialCardTheme(self, newTheme):
+        #file = open("SavedVariables.txt", "r")
+        #string = self.readInitialCardTheme()
+        #file.close()
+        file = open("SavedVariables.txt", "w")
+        self.selectedTheme = newTheme
+        file.write("selectedTheme=theme_"+self.selectedTheme)
+        
+    def options(self):
+        
+        global selectedTheme
+        optionsMenu = pygame.display.set_mode((self.screenWidth, self.screenHeight), 0, 32)
+        #This function has a lot about it that doesn't make sense, but it seems to need to be this way
+        def setTheme(newThemeName, newThemeIndex, **kwargs):
+            #global selectedTheme
+            value_tuple, index = newThemeName
+            #selectedTheme = value_tuple[0]
+            self.saveInitialCardTheme(value_tuple[0])
+            
+        
+        menuTheme = pygame_menu.themes.Theme(
+            background_color=(0,0,0,0),
+            title_background_color = (0,0,0,0),
+            )
+        
+        menu = pygame_menu.Menu(
+            title="", 
+            height=self.screenHeight, 
+            width=self.screenWidth,
+            theme=menuTheme)
+        
+        allThemes = [('Tarrot', 'Tarrot'),
+                 ('Pokemon', 'Pokemon'),
+                 ('Mario', 'Mario'),
+                 ('Poker', 'Poker')]
+        
+        selector = menu.add.dropselect(
+            title="Card Theme",
+            items=allThemes,
+            #placeholder=allThemes[defaultCardTheme][0],
+            onchange=setTheme, 
+            scrollbar_thick=5,
+            selection_option_font=self.lifeFont,
+            #selection_box_border_color=(0,0,0,0),
+            selection_box_width=250,
+            selection_box_height=250,
+            placeholder=self.selectedTheme,
+            placeholder_add_to_selection_box=False
+        )
+        selector2 = menu.add.dropselect(
+            title="Card Theme",
+            items=allThemes,
+            #placeholder=allThemes[defaultCardTheme][0],
+            onchange=setTheme, 
+            scrollbar_thick=5,
+            selection_option_font=self.lifeFont,
+            #selection_box_border_color=(0,0,0,0),
+            selection_box_width=250,
+            selection_box_height=250,
+            placeholder=self.selectedTheme,
+            placeholder_add_to_selection_box=False
+        )
+        selector3 = menu.add.dropselect(
+            title="Card Theme",
+            items=allThemes,
+            #placeholder=allThemes[defaultCardTheme][0],
+            onchange=setTheme, 
+            scrollbar_thick=5,
+            selection_option_font=self.lifeFont,
+            #selection_box_border_color=(0,0,0,0),
+            selection_box_width=250,
+            selection_box_height=250,
+            placeholder=self.selectedTheme,
+            placeholder_add_to_selection_box=False
+        )
+        selector4 = menu.add.dropselect(
+            title="Card Theme",
+            items=allThemes,
+            #placeholder=allThemes[defaultCardTheme][0],
+            onchange=setTheme, 
+            scrollbar_thick=5,
+            selection_option_font=self.lifeFont,
+            #selection_box_border_color=(0,0,0,0),
+            selection_box_width=250,
+            selection_box_height=250,
+            placeholder=self.selectedTheme,
+            placeholder_add_to_selection_box=False
+        )
+        selector5 = menu.add.dropselect(
+            title="Card Theme",
+            items=allThemes,
+            #placeholder=allThemes[defaultCardTheme][0],
+            onchange=setTheme, 
+            scrollbar_thick=5,
+            selection_option_font=self.lifeFont,
+            #selection_box_border_color=(0,0,0,0),
+            selection_box_width=250,
+            selection_box_height=250,
+            placeholder=self.selectedTheme,
+            placeholder_add_to_selection_box=False
+        )
+        selector6 = menu.add.dropselect(
+            title="Card Theme",
+            items=allThemes,
+            #placeholder=allThemes[defaultCardTheme][0],
+            onchange=setTheme, 
+            scrollbar_thick=5,
+            selection_option_font=self.lifeFont,
+            #selection_box_border_color=(0,0,0,0),
+            selection_box_width=250,
+            selection_box_height=250,
+            placeholder=self.selectedTheme,
+            placeholder_add_to_selection_box=False
+        )
+        selector7 = menu.add.dropselect(
+            title="Card Theme",
+            items=allThemes,
+            #placeholder=allThemes[defaultCardTheme][0],
+            onchange=setTheme, 
+            scrollbar_thick=5,
+            selection_option_font=self.lifeFont,
+            #selection_box_border_color=(0,0,0,0),
+            selection_box_width=250,
+            selection_box_height=250,
+            placeholder=self.selectedTheme,
+            placeholder_add_to_selection_box=False
+        )
+        selector8 = menu.add.dropselect(
+            title="Card Theme",
+            items=allThemes,
+            #placeholder=allThemes[defaultCardTheme][0],
+            onchange=setTheme, 
+            scrollbar_thick=5,
+            selection_option_font=self.lifeFont,
+            #selection_box_border_color=(0,0,0,0),
+            selection_box_width=250,
+            selection_box_height=250,
+            placeholder=self.selectedTheme,
+            placeholder_add_to_selection_box=False
+        )
+        
+        selector.add_self_to_kwargs()  # Callbacks will receive widget as parameter
+        selector2.add_self_to_kwargs()  # Callbacks will receive widget as parameter
+        selector3.add_self_to_kwargs()  # Callbacks will receive widget as parameter
+        selector4.add_self_to_kwargs()  # Callbacks will receive widget as parameter
+        selector5.add_self_to_kwargs()  # Callbacks will receive widget as parameter
+        selector6.add_self_to_kwargs()  # Callbacks will receive widget as parameter
+        selector7.add_self_to_kwargs()  # Callbacks will receive widget as parameter
+        selector8.add_self_to_kwargs()  # Callbacks will receive widget as parameter
+        
+        #running = True
+        while True: 
+            optionsMenu.fill(self.black)
+            self.draw_text_center(
+                "Press escape to go back to main menu", 
+                self.lifeFont, self.white, 
+                self.screenWidth/2, self.screenHeight/6,
+                optionsMenu
+                )
+            events = pygame.event.get()
+            #events2 = pygame.event.get()
+            menu.draw(optionsMenu)
+            menu.update(events)
+            for event in events:
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        return
+            pygame.display.update()
+            self.mainClock.tick(60) 
+            
     def main_menu(self):
         screen = pygame.display.set_mode((self.screenWidth, self.screenHeight), 0, 32)
         
@@ -60,7 +253,7 @@ class Game():
             if button_1.collidepoint((mx, my)):
                 if click:
                     screen.fill(black)
-                    if self.game(screen, 4, 3, "Mario", 10, 45, 0):
+                    if self.game(screen, 1, 1, 10, 45, 0):
                         pygame.quit()
                         sys.exit()
             pygame.draw.rect(screen, white, button_1)
@@ -107,8 +300,8 @@ class Game():
             pygame.display.update()
             self.mainClock.tick(60)
     
-    def game(self, window, x, y, theme, lives, matchTime, score):
-        t = Table(x, y, theme, lives, 0, self.mainClock)#, 0)
+    def game(self, window, x, y, lives, matchTime, score):
+        t = Table(x, y, self.selectedTheme, lives, 0, self.mainClock)#, 0)
         
         green = (0, 255, 0)
         red = (255, 0, 0)
@@ -126,11 +319,10 @@ class Game():
         yDim = 350 * scale
         xSize = xDim + inBTween
         ySize = yDim + inBTween
-        timeToFlip = 12
+        timeToFlip = int(40 * scale) #can't be too fast or frames don't register
         
         t.showAll()
         tempTable = []
-        beingRevealed = False
         for i in range(x):
                 for j in range(y):
                     t.table[j][i].col = i
@@ -141,9 +333,7 @@ class Game():
                     window.blit(surface, (minBorder + xSize * t.table[j][i].col, minBorder + ySize * t.table[j][i].row))
         pygame.display.update()
         
-        time.sleep(2)
-        beingRevealed = True
-        
+        time.sleep(2)        
         self.animate.flip(tempTable, timeToFlip, xDim, yDim, minBorder, xSize, ySize, window, False)
         
         timer = matchTime
@@ -173,7 +363,8 @@ class Game():
                 retryButtonText = buttonFont.render("Press R to Restart", True, black)
                 if retryButton.collidepoint((mouse)):
                     if click:
-                        Game.game(self, window, 5, 5, "Mario", 10, 45, 0)
+                        window.fill(black) #so cards show during lose screen
+                        Game.game(self, window, x, y, lives, matchTime, score)
                 pygame.draw.rect(window, (127,127,127), retryButton)
                 retryButtonTextRect = retryButtonText.get_rect()
                 retryButtonTextRect.center=retryButton.center
@@ -192,8 +383,9 @@ class Game():
                                 running = False
                                 Game.main_menu(self)
                             if event.key == pygame.K_r: 
+                                window.fill(black) #so cards show during lose screen
                                 running = False
-                                Game.game(self, window, 5, 5, "Mario", 10, 45, 0)
+                                Game.game(self, window, x, y, lives, matchTime, score)
                             
             elif (t.lives == 0 or timeLeft <= 0):
                 hiddenTable = []
@@ -210,7 +402,8 @@ class Game():
                 retryButtonText = buttonFont.render("Press R to Restart", True, black)
                 if retryButton.collidepoint((mouse)):
                     if click:
-                        Game.game(self, window, 5, 5, "Mario", 10, 45, 0)     
+                        window.fill(black) #so cards show during lose screen
+                        Game.game(self, window, x, y, lives, matchTime, score)
                 pygame.draw.rect(window, (127,127,127), retryButton)
                 retryButtonTextRect = retryButtonText.get_rect()
                 retryButtonTextRect.center=retryButton.center
@@ -231,7 +424,7 @@ class Game():
                                 Game.main_menu(self)
                             if event.key == pygame.K_r: 
                                 running = False
-                                Game.game(self, window, 5, 5, "Mario", 10, 45, 0)
+                                Game.game(self, window, x, y, lives, matchTime, score)
             
             else:
                 t.update()
@@ -239,7 +432,6 @@ class Game():
                     for j in range(y):
                         surface = t.table[j][i].image.convert()
                         surface = pygame.transform.smoothscale(surface, (xDim, yDim))  
-                        #window.blit(surface, (minBorder + xSize * i, minBorder + ySize * j))
                         t.table[j][i].rect = surface.get_rect()
                         t.table[j][i].makeRect(minBorder + xSize * i, minBorder + ySize * j)
                 pygame.display.update()
@@ -253,21 +445,15 @@ class Game():
                             t.lives = t.lives - 1
                         #else:
                             #t.score = t.score + 100
-                
                 for row in t.table:
                     for c in row:
                         if (c.rect.collidepoint(mouse) and not c.shown):
                             for event in pygame.event.get():
                                 if event.type == pygame.MOUSEBUTTONDOWN:
                                     cards = [c]
-                                    inAnimation = True
-                                    inAnimation = self.animate.flip(cards, timeToFlip, xDim, yDim, minBorder, xSize, ySize, window, True)
-                                    print(inAnimation)
-                                    if(not inAnimation):
-                                        t.selection.append(c)
-                                        print(t.selection)
+                                    self.animate.flip(cards, timeToFlip, xDim, yDim, minBorder, xSize, ySize, window, True)
+                                    t.selection.append(c)
         
-                    
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False

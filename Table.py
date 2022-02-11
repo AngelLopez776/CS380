@@ -70,14 +70,14 @@ class Table():
             return True
         
         else:
-            time.sleep(1)
             
-            #cards = []
-            #cards.append(self.selection[0])
-            #cards.append(self.selection[1])
-            self.animate.flip(self.selection, timeToFlip, xDim, yDim, minBorder, xSize, ySize, window, False)
-    
+            cards = []
+            cards.append(self.selection[0])
+            cards.append(self.selection[1])
             self.selection.clear()
+            time.sleep(1)
+            self.animate.flip(cards, timeToFlip, xDim, yDim, minBorder, xSize, ySize, window, False)
+
             return False
         
     def checkBomb(self, timeToFlip, xDim, yDim, minBorder, xSize, ySize, window):
