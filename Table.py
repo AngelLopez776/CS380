@@ -59,7 +59,7 @@ class Table():
             return True
         
         elif self.selection[0].ID == "JOKER" or self.selection[1].ID == "JOKER":
-            match = self.selection[1].ID if self.selection[1].ID != "JOKER" else self.selection[0]
+            match = self.selection[1].ID if self.selection[1].ID != "JOKER" else self.selection[0].ID
             self.selection.clear()
             for r in self.table:
                 for c in r:
