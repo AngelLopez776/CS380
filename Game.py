@@ -98,8 +98,8 @@ class Game():
                  ('Mario', 'Mario'),
                  ('Poker', 'Poker')]
         
-        selector = menu.add.dropselect(
-            title="Card Theme",
+        themeSelector = menu.add.dropselect(
+            title="Deck Theme",
             items=allThemes,
             #placeholder=allThemes[defaultCardTheme][0],
             onchange=setTheme, 
@@ -111,8 +111,8 @@ class Game():
             placeholder=self.selectedTheme,
             placeholder_add_to_selection_box=False
         )
-        selector2 = menu.add.dropselect(
-            title="Card Theme",
+        difficultySelector = menu.add.dropselect(
+            title="Diffuclty",
             items=allThemes,
             #placeholder=allThemes[defaultCardTheme][0],
             onchange=setTheme, 
@@ -124,8 +124,8 @@ class Game():
             placeholder=self.selectedTheme,
             placeholder_add_to_selection_box=False
         )
-        selector3 = menu.add.dropselect(
-            title="Card Theme",
+        resolutionSelector = menu.add.dropselect(
+            title="Resolution",
             items=allThemes,
             #placeholder=allThemes[defaultCardTheme][0],
             onchange=setTheme, 
@@ -137,8 +137,8 @@ class Game():
             placeholder=self.selectedTheme,
             placeholder_add_to_selection_box=False
         )
-        selector4 = menu.add.dropselect(
-            title="Card Theme",
+        fpsSelector = menu.add.dropselect(
+            title="Fram Rate",
             items=allThemes,
             #placeholder=allThemes[defaultCardTheme][0],
             onchange=setTheme, 
@@ -150,8 +150,8 @@ class Game():
             placeholder=self.selectedTheme,
             placeholder_add_to_selection_box=False
         )
-        selector5 = menu.add.dropselect(
-            title="Card Theme",
+        fullScreenSelector = menu.add.dropselect(
+            title="Full Screen",
             items=allThemes,
             #placeholder=allThemes[defaultCardTheme][0],
             onchange=setTheme, 
@@ -163,8 +163,8 @@ class Game():
             placeholder=self.selectedTheme,
             placeholder_add_to_selection_box=False
         )
-        selector6 = menu.add.dropselect(
-            title="Card Theme",
+        volumeSelector = menu.add.dropselect(
+            title="Volume",
             items=allThemes,
             #placeholder=allThemes[defaultCardTheme][0],
             onchange=setTheme, 
@@ -176,41 +176,15 @@ class Game():
             placeholder=self.selectedTheme,
             placeholder_add_to_selection_box=False
         )
-        selector7 = menu.add.dropselect(
-            title="Card Theme",
-            items=allThemes,
-            #placeholder=allThemes[defaultCardTheme][0],
-            onchange=setTheme, 
-            scrollbar_thick=5,
-            selection_option_font=self.lifeFont,
-            #selection_box_border_color=(0,0,0,0),
-            selection_box_width=250,
-            selection_box_height=250,
-            placeholder=self.selectedTheme,
-            placeholder_add_to_selection_box=False
-        )
-        selector8 = menu.add.dropselect(
-            title="Card Theme",
-            items=allThemes,
-            #placeholder=allThemes[defaultCardTheme][0],
-            onchange=setTheme, 
-            scrollbar_thick=5,
-            selection_option_font=self.lifeFont,
-            #selection_box_border_color=(0,0,0,0),
-            selection_box_width=250,
-            selection_box_height=250,
-            placeholder=self.selectedTheme,
-            placeholder_add_to_selection_box=False
-        )
+
         
-        selector.add_self_to_kwargs()  # Callbacks will receive widget as parameter
-        selector2.add_self_to_kwargs()  # Callbacks will receive widget as parameter
-        selector3.add_self_to_kwargs()  # Callbacks will receive widget as parameter
-        selector4.add_self_to_kwargs()  # Callbacks will receive widget as parameter
-        selector5.add_self_to_kwargs()  # Callbacks will receive widget as parameter
-        selector6.add_self_to_kwargs()  # Callbacks will receive widget as parameter
-        selector7.add_self_to_kwargs()  # Callbacks will receive widget as parameter
-        selector8.add_self_to_kwargs()  # Callbacks will receive widget as parameter
+        themeSelector.add_self_to_kwargs()  # Callbacks will receive widget as parameter
+        difficultySelector.add_self_to_kwargs()  # Callbacks will receive widget as parameter
+        resolutionSelector.add_self_to_kwargs()  # Callbacks will receive widget as parameter
+        fpsSelector.add_self_to_kwargs()  # Callbacks will receive widget as parameter
+        fullScreenSelector.add_self_to_kwargs()  # Callbacks will receive widget as parameter
+        volumeSelector.add_self_to_kwargs()  # Callbacks will receive widget as parameter
+        
         
         #running = True
         while True: 
@@ -253,7 +227,7 @@ class Game():
             if button_1.collidepoint((mx, my)):
                 if click:
                     screen.fill(black)
-                    if self.game(screen, 1, 1, 10, 45, 0):
+                    if self.game(screen, 4, 4, 10, 1000000, 0):
                         pygame.quit()
                         sys.exit()
             pygame.draw.rect(screen, white, button_1)
@@ -301,6 +275,7 @@ class Game():
             self.mainClock.tick(60)
     
     def game(self, window, x, y, lives, matchTime, score):
+        window.fill(self.black) 
         t = Table(x, y, self.selectedTheme, lives, 0, self.mainClock)#, 0)
         
         green = (0, 255, 0)
@@ -363,7 +338,6 @@ class Game():
                 retryButtonText = buttonFont.render("Press R to Restart", True, black)
                 if retryButton.collidepoint((mouse)):
                     if click:
-                        window.fill(black) #so cards show during lose screen
                         Game.game(self, window, x, y, lives, matchTime, score)
                 pygame.draw.rect(window, (127,127,127), retryButton)
                 retryButtonTextRect = retryButtonText.get_rect()
@@ -402,7 +376,6 @@ class Game():
                 retryButtonText = buttonFont.render("Press R to Restart", True, black)
                 if retryButton.collidepoint((mouse)):
                     if click:
-                        window.fill(black) #so cards show during lose screen
                         Game.game(self, window, x, y, lives, matchTime, score)
                 pygame.draw.rect(window, (127,127,127), retryButton)
                 retryButtonTextRect = retryButtonText.get_rect()
