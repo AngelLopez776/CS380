@@ -331,35 +331,12 @@ class Game():
             #self.draw_text("Score: " + str(t.score), lifeFont, white, 105, 0, window)
             
             if (t.checkWin()):
-                t.update()
-                
                 self.draw_text_center("You win!", endFont, green, self.screenWidth / 2, self.screenHeight / 2, window)
                 
-                retryButton = pygame.Rect((self.screenWidth / 2) - 100, (self.screenHeight / 2) + 50, 200, 50)
-                retryButtonText = buttonFont.render("Press R to Restart", True, black)
-                if retryButton.collidepoint((mouse)):
-                    if click:
-                        Game.game(self, window, x, y, lives, matchTime, score)
-                pygame.draw.rect(window, (127,127,127), retryButton)
-                retryButtonTextRect = retryButtonText.get_rect()
-                retryButtonTextRect.center=retryButton.center
-                window.blit(retryButtonText, retryButtonTextRect)
-                pygame.display.update()
+                running, quitG, playAgain = self.endScreen(window)
                 
-                end = True
-                while end:
-                    for event in pygame.event.get():
-                        if event.type == pygame.QUIT:
-                            end = False
-                            running = False
-                            quitG = True
-                        elif event.type == pygame.KEYDOWN:
-                            if event.key == pygame.K_ESCAPE:
-                                running = False
-                            if event.key == pygame.K_r: 
-                                window.fill(black) #so cards show during lose screen
-                                running = False
-                                return Game.game(self, window, x, y, lives, matchTime, score)
+                if playAgain:
+                    return Game.game(self, window, x, y, lives, matchTime, score)
                             
             elif (t.lives == 0 or timeLeft <= 0):
                 hiddenTable = []
@@ -372,31 +349,10 @@ class Game():
                 self.draw_text_center("You lose!", endFont, red, self.screenWidth / 2, self.screenHeight / 2, window)
                 
                 
-                retryButton = pygame.Rect((self.screenWidth / 2) - 100, (self.screenHeight / 2) + 50, 200, 50)
-                retryButtonText = buttonFont.render("Press R to Restart", True, black)
-                if retryButton.collidepoint((mouse)):
-                    if click:
-                        return Game.game(self, window, x, y, lives, matchTime, score)
-                pygame.draw.rect(window, (127,127,127), retryButton)
-                retryButtonTextRect = retryButtonText.get_rect()
-                retryButtonTextRect.center=retryButton.center
-                window.blit(retryButtonText, retryButtonTextRect)
-                pygame.display.update()
+                running, quitG, playAgain = self.endScreen(window)
                 
-                
-                end = True
-                while end:
-                    for event in pygame.event.get():
-                        if event.type == pygame.QUIT:
-                            end = False
-                            running = False
-                            quitG = True
-                        elif event.type == pygame.KEYDOWN:
-                            if event.key == pygame.K_ESCAPE:
-                                running = False
-                            if event.key == pygame.K_r: 
-                                running = False
-                                return Game.game(self, window, x, y, lives, matchTime, score)
+                if playAgain:
+                    return Game.game(self, window, x, y, lives, matchTime, score)
             
             else:
                 t.update()
@@ -436,3 +392,27 @@ class Game():
                         
         return quitG
     
+    def endScreen(self, window):
+        retryButton = pygame.Rect((self.screenWidth / 2) - 100, (self.screenHeight / 2) + 50, 200, 50)
+        retryButtonText = self.buttonFont.render("Press R to Restart", True, self.black)
+        pygame.draw.rect(window, (127,127,127), retryButton)
+        retryButtonTextRect = retryButtonText.get_rect()
+        retryButtonTextRect.center=retryButton.center
+        window.blit(retryButtonText, retryButtonTextRect)
+        pygame.display.update()
+        
+        while True:
+            mouse = pygame.mouse.get_pos()
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    return [False, True, False] #[Running, quitgame, playagain]
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        return [False, False, False]
+                    if event.key == pygame.K_r: 
+                        window.fill(self.black) #so cards show during lose screen
+                        return [False, False, True]
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    if retryButton.collidepoint(mouse):
+                        window.fill(self.black)
+                        return [False, False, True]

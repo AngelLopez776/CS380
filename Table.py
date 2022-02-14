@@ -93,21 +93,7 @@ class Table():
             
                 self.lives = self.lives - 1
                 self.selection.clear()
-    """    
-    def drawBoard(self, window):
-        self.update()
-        i = 0
-        j = 0
-        for row in self.table:
-            for c in row:
-                window.blit(c.image, (35 + (140 * i), 40 + (190 * j)))
-                c.makeRect(35 + (140 * i), 40 + (190 * j))
-                j = j + 1
-            i = i + 1
-            j = 0
-            
-        pygame.display.update()
-    """    
+                
     def checkWin(self):
         for row in self.table:
             for c in row:
