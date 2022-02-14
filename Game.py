@@ -291,8 +291,8 @@ class Game():
         minBorder = 40
         inBTween = 10
         scale = self.setCardScale(minBorder, x, y, inBTween)
-        xDim = 250 * scale
-        yDim = 350 * scale
+        xDim = int(250 * scale)
+        yDim = int(350 * scale)
         xSize = xDim + inBTween
         ySize = yDim + inBTween
         timeToFlip = int(40 * scale) #can't be too fast or frames don't register
@@ -305,7 +305,7 @@ class Game():
                     t.table[j][i].row = j
                     tempTable.append(t.table[j][i])
                     surface = t.table[j][i].image.convert()
-                    surface = pygame.transform.smoothscale(surface = surface, size =(xDim, yDim))
+                    surface = pygame.transform.scale(surface, (xDim, yDim))
                     window.blit(surface, (minBorder + xSize * t.table[j][i].col, minBorder + ySize * t.table[j][i].row))
         pygame.display.update()
         
@@ -356,11 +356,10 @@ class Game():
                         elif event.type == pygame.KEYDOWN:
                             if event.key == pygame.K_ESCAPE:
                                 running = False
-                                Game.main_menu(self)
                             if event.key == pygame.K_r: 
                                 window.fill(black) #so cards show during lose screen
                                 running = False
-                                Game.game(self, window, x, y, lives, matchTime, score)
+                                return Game.game(self, window, x, y, lives, matchTime, score)
                             
             elif (t.lives == 0 or timeLeft <= 0):
                 hiddenTable = []
@@ -377,7 +376,7 @@ class Game():
                 retryButtonText = buttonFont.render("Press R to Restart", True, black)
                 if retryButton.collidepoint((mouse)):
                     if click:
-                        Game.game(self, window, x, y, lives, matchTime, score)
+                        return Game.game(self, window, x, y, lives, matchTime, score)
                 pygame.draw.rect(window, (127,127,127), retryButton)
                 retryButtonTextRect = retryButtonText.get_rect()
                 retryButtonTextRect.center=retryButton.center
@@ -395,10 +394,9 @@ class Game():
                         elif event.type == pygame.KEYDOWN:
                             if event.key == pygame.K_ESCAPE:
                                 running = False
-                                Game.main_menu(self)
                             if event.key == pygame.K_r: 
                                 running = False
-                                Game.game(self, window, x, y, lives, matchTime, score)
+                                return Game.game(self, window, x, y, lives, matchTime, score)
             
             else:
                 t.update()
@@ -435,7 +433,6 @@ class Game():
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         running = False
-                        Game.main_menu(self)
                         
         return quitG
     

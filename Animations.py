@@ -17,7 +17,7 @@ class Animations():
             #xDimStore = xDim
             for card in cards:
                 blackSurfaceArea = card.image.convert()
-                blackSurfaceArea = pygame.transform.smoothscale(surface = blackSurfaceArea, size = (xDim, yDim))  
+                blackSurfaceArea = pygame.transform.smoothscale(blackSurfaceArea, (xDim, yDim))  
                 rect.append(blackSurfaceArea.get_rect(topleft = (minBorder + xSize * card.col + movedX, minBorder + ySize * card.row)))
             while running:
                 i = 0
