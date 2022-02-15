@@ -10,6 +10,7 @@ class Table():
     def __init__(self, x, y, theme, lives, difficulty, fps):
         self.theme = theme
         self.lives = lives
+        self.score = 0
         self.difficulty = difficulty
         self.table = [[0 for i in range(x)] for j in range(y)]
         self.selection = []
