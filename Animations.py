@@ -22,7 +22,7 @@ class Animations():
             #xDimStore = xDim
             for card in cards:
                 blackSurfaceArea = card.image.convert()
-                blackSurfaceArea = pygame.transform.smoothscale(blackSurfaceArea, (xDim, yDim))  
+                blackSurfaceArea = pygame.transform.smoothscale(blackSurfaceArea, (int(xDim), int(yDim)))  
                 rect.append(blackSurfaceArea.get_rect(topleft = (minBorder + xSize * card.col + movedX, minBorder + ySize * card.row)))
             while running:
                 i = 0
@@ -32,7 +32,7 @@ class Animations():
                 for card in cards:
                     window.fill((0,0,0,0),rect[i])
                     surface = card.image.convert()
-                    surface = pygame.transform.smoothscale(surface, (xDim, yDim))       
+                    surface = pygame.transform.smoothscale(surface, (int(xDim), int(yDim)))       
                     window.blit(surface, (minBorder + xSize * card.col + movedX, minBorder + ySize * card.row))  
                     i += 1
                 pygame.display.update()

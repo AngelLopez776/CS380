@@ -275,7 +275,7 @@ class Game():
                 if click:
                     pygame.mixer.music.stop()
                     screen.fill(black)
-                    if self.game(screen, 3, 3, 3, 1000000, 0):
+                    if self.game(screen, 3, 3, 3, 1000000):
                         pygame.quit()
                         sys.exit()
             pygame.draw.rect(screen, white, button_1)
@@ -325,7 +325,7 @@ class Game():
             pygame.display.update()
             self.mainClock.tick(self.FPS)
     
-    def game(self, window, x, y, lives, matchTime, score):
+    def game(self, window, x, y, lives, matchTime):
         window.fill(self.black) 
         t = Table(x, y, self.selectedTheme, lives, 0, self.FPS)#, 0)
         
@@ -367,6 +367,8 @@ class Game():
 
         timeLeft = int(timer - (time.time() - sTime))
         
+        streak = 0
+        
         click = False
         running = True
         quitG = False
@@ -375,21 +377,35 @@ class Game():
             
             mouse = pygame.mouse.get_pos()    
             
-            window.fill(black, (0,0,200,40)) #so cards show during lose screen
+            window.fill(black, (0,0,400,40)) #so cards show during lose screen
             self.draw_text("Lives: " + str(t.lives), lifeFont, white, 5, 0, window)
             self.draw_text("Time: " + str(timeLeft) + "s", lifeFont, white, 5, 18, window)
-            #self.draw_text("Score: " + str(t.score), lifeFont, white, 105, 0, window)
+            self.draw_text("Score: " + str(t.score), lifeFont, white, 105, 0, window)
             
             if (t.checkWin()):
+                window.fill(black, (0,0,400,40))
+                
+                if len(t.selection) >= 2:
+                    t.score = t.score + 100 + (50 * streak)
+                
+                t.score = t.score + (timeLeft)
+                t.score = t.score + (t.lives * 100)
+                
+                self.draw_text("Lives: " + str(t.lives), lifeFont, white, 5, 0, window)
+                self.draw_text("Time: " + str(timeLeft) + "s", lifeFont, white, 5, 18, window)
+                self.draw_text("Score: " + str(t.score), lifeFont, white, 105, 0, window)
+                
                 self.draw_text_center("You win!", endFont, green, self.screenWidth / 2, self.screenHeight / 2, window)
+                
                 mixer.init()
                 mixer.music.load('Sounds/winner.mp3')
                 mixer.music.play()
+                
                 running, quitG, playAgain = self.endScreen(window)
                 
                 if playAgain:
                     pygame.mixer.music.stop() 
-                    return Game.game(self, window, x, y, lives, matchTime, score)
+                    return Game.game(self, window, x, y, lives, matchTime)
                             
             elif (t.lives == 0 or timeLeft <= 0):
                 hiddenTable = []
@@ -397,7 +413,7 @@ class Game():
                     if (not card.shown):
                         hiddenTable.append(card)
                         
-                self.animate.flip(hiddenTable, 3, xDim, yDim, minBorder, xSize, ySize, window, True)
+                self.animate.flip(hiddenTable, 4, xDim, yDim, minBorder, xSize, ySize, window, True)
                                 
                 self.draw_text_center("You lose!", endFont, red, self.screenWidth / 2, self.screenHeight / 2, window)
                 mixer.init()
@@ -408,7 +424,7 @@ class Game():
                 
                 if playAgain:
                     pygame.mixer.music.stop() 
-                    return Game.game(self, window, x, y, lives, matchTime, score)
+                    return Game.game(self, window, x, y, lives, matchTime)
             
             else:
                 t.update()
@@ -427,8 +443,11 @@ class Game():
                     if len(t.selection) >= 2:
                         if not t.checkMatch(timeToFlip, xDim, yDim, minBorder, xSize, ySize, window):
                             t.lives = t.lives - 1
-                        #else:
-                            #t.score = t.score + 100
+                            streak = 0
+                        else:
+                            t.score = t.score + 100 + (50 * streak)
+                            streak = streak + 1
+                            
                 for row in t.table:
                     for c in row:
                         if (c.rect.collidepoint(mouse) and not c.shown):
@@ -446,6 +465,7 @@ class Game():
                     if event.key == pygame.K_ESCAPE:
                         running = False
                         
+        pygame.mixer.music.stop()
         return quitG
     
     def endScreen(self, window):
