@@ -17,6 +17,8 @@ class Animations():
         def halfFlip( cards, timeToFlip, movedX, maxSize, xDim, yDim, minBorder, xSize, ySize, window, firstHalf):
             global frames
             
+            deltaTime = 1000/frames/1000
+            print(deltaTime)
             running = True
             rect = []
             blackSurfaceArea = None
@@ -28,7 +30,6 @@ class Animations():
             while running:
                 i = 0
                 mainClock.tick(frames)
-                deltaTime = 1000/frames/1000
                 #print(deltaTime)
                 xDim -= timeToFlip * deltaTime
                 movedX += timeToFlip/2 * deltaTime
