@@ -143,7 +143,7 @@ class Game():
                  ('Medium', 1),
                  ('Hard', 2)]
         difficultySelector = menu.add.dropselect(
-            title="Diffuclty",
+            title="Difficulty",
             items=allDificulties,
             #placeholder=allThemes[defaultCardTheme][0],
             onchange=setDifficulty, 
@@ -246,6 +246,7 @@ class Game():
     def main_menu(self):
         screen = pygame.display.set_mode((self.screenWidth, self.screenHeight), 0, 32)
         
+        titleFont = pygame.font.Font("assets/font.ttf", 50)
         font = pygame.font.SysFont(None, 20)
         
         #Main Menu Music
@@ -258,13 +259,14 @@ class Game():
         
         click = False
         while True: 
-            screen.fill(black)
-            self.draw_text('main menu', font, white, 50, 20, screen)
+            screen.fill((255,0,0))
+            self.draw_text('Place Holder', titleFont, white, 350, 220, screen)
+            self.draw_text('Title', titleFont, white, 500, 270, screen)
      
             mx, my = pygame.mouse.get_pos()
      
             #Start Game Button
-            button_1 = pygame.Rect(50, 100, 200, 50)
+            button_1 = pygame.Rect(500, 350, 200, 50)
             text_1 = font.render("Start Game", True, black)
             if button_1.collidepoint((mx, my)):
                 if click:
@@ -279,7 +281,7 @@ class Game():
             screen.blit(text_1, text_1Rect)
             
             #Options buttons
-            button_2 = pygame.Rect(50, 200, 200, 50)
+            button_2 = pygame.Rect(500, 450, 200, 50)
             text_2 = font.render("Options", True, black)
             if button_2.collidepoint((mx, my)):
                 if click:
@@ -293,7 +295,7 @@ class Game():
             screen.blit(text_2, text_2Rect)
             
             #Quit Game Button
-            button_3 = pygame.Rect(50, 300, 200, 50)
+            button_3 = pygame.Rect(500, 550, 200, 50)
             text_3 = font.render("Quit Game", True, black)
             if button_3.collidepoint((mx, my)):
                 if click:
