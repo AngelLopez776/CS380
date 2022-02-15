@@ -1,1 +1,3 @@
 selectedTheme=theme_Mario
+FPS=140
+

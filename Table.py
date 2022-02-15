@@ -7,13 +7,13 @@ import pygame
 from Animations import Animations
 
 class Table():
-    def __init__(self, x, y, theme, lives, difficulty, clock):
+    def __init__(self, x, y, theme, lives, difficulty, fps):
         self.theme = theme
         self.lives = lives
         self.difficulty = difficulty
         self.table = [[0 for i in range(x)] for j in range(y)]
         self.selection = []
-        self.animate = Animations()
+        self.animate = Animations(fps)
         self.createTable(x, y)
     
     def createTable(self, x, y):

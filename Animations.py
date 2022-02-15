@@ -5,12 +5,17 @@ mainClock = pygame.time.Clock()
 
 
 class Animations():
-    def __init__(self):
-        self.fps = 60
-        
+    frames = 2
+    def __init__(self, fps):
+        global frames
+        self.fps = fps
+        frames = self.fps
+
     def flip(self, cards, timeToFlip, xDim, yDim, minBorder, xSize, ySize, window, showFront):
         
         def halfFlip( cards, timeToFlip, movedX, maxSize, xDim, yDim, minBorder, xSize, ySize, window, firstHalf):
+            global frames
+            
             running = True
             rect = []
             blackSurfaceArea = None
@@ -21,9 +26,9 @@ class Animations():
                 rect.append(blackSurfaceArea.get_rect(topleft = (minBorder + xSize * card.col + movedX, minBorder + ySize * card.row)))
             while running:
                 i = 0
-                mainClock.tick(self.fps)
-                xDim -= timeToFlip
-                movedX += timeToFlip/2
+                mainClock.tick(frames)
+                xDim -= timeToFlip/frames 
+                movedX += timeToFlip/2/frames
                 for card in cards:
                     window.fill((0,0,0,0),rect[i])
                     surface = card.image.convert()
@@ -31,8 +36,7 @@ class Animations():
                     window.blit(surface, (minBorder + xSize * card.col + movedX, minBorder + ySize * card.row))  
                     i += 1
                 pygame.display.update()
-        
-                if(firstHalf and xDim <= timeToFlip):
+                if(firstHalf and xDim <= timeToFlip/frames):
                     running = False
                 if(not firstHalf and xDim >= maxSize):
                     running = False

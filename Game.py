@@ -12,11 +12,12 @@ from pygame import mixer
 
 class Game():
     def __init__(self, screenWidth, screenHeight):
-        self.selectedTheme = self.readInitialCardTheme()
+        self.selectedTheme = self.readCardTheme()
+        self.FPS = int(self.readSettingFromFile("FPS"))
         self.screenWidth = screenWidth
         self.screenHeight = screenHeight
         self.mainClock = pygame.time.Clock()
-        self.animate = Animations()
+        self.animate = Animations(self.FPS)
         self.green = (0, 255, 0)
         self.red = (255, 0, 0)
         self.white = (255, 255, 255)
@@ -49,42 +50,54 @@ class Game():
             yLength = screenHeight/rows - inBTween
             dim = yLength/350
             
-        return dim
-    
-    #these read and write files could be toolified for more read and write variables
-    def readInitialCardTheme(self):
+        return dim    
+
+        
+    def readSettingFromFile(self, sName):
         file = open("SavedVariables.txt")
         string = None
         for line in file:
-            if(line.startswith("selectedTheme")):
+            if(line.startswith(sName)):
                 string = line
                 break
-        string = string.replace("selectedTheme=theme_","")
-        print(string)
+        string = string.replace(sName+"=", "")
+        string = string.replace("\n", "")
         file.close()
         return string
+    
+    def saveSettingToFile(self, sName, sValue):
+        file = open("SavedVariables.txt", "r")
+        settings = []
+        for line in file:
+            if(line.startswith(sName)):
+                oldVal = line.replace(sName+"=", "")
+                line = line.replace(oldVal, sValue)
+            if(line != "\n"):
+                settings.append(line)
+        file.close()
+        print(settings)
+        file = open("SavedVariables.txt", "w")
+        for setting in settings:
+            file.write(setting+"\n")
+        file.close()
 
+            
+    def readCardTheme(self):
+        InitialCardSetting = self.readSettingFromFile("selectedTheme")
+        InitialCardSetting = InitialCardSetting.replace("theme_","")
+        print(InitialCardSetting)
+        return InitialCardSetting
 
     #not perfect: deletes whole file!
     def saveInitialCardTheme(self, newTheme):
-        #file = open("SavedVariables.txt", "r")
-        #string = self.readInitialCardTheme()
-        #file.close()
-        file = open("SavedVariables.txt", "w")
         self.selectedTheme = newTheme
-        file.write("selectedTheme=theme_"+self.selectedTheme)
+        newTheme = "theme_"+newTheme
+        self.saveSettingToFile("selectedTheme", newTheme)
         
     def options(self):
-        
-        global selectedTheme
         optionsMenu = pygame.display.set_mode((self.screenWidth, self.screenHeight), 0, 32)
         #This function has a lot about it that doesn't make sense, but it seems to need to be this way
-        def setTheme(newThemeName, newThemeIndex, **kwargs):
-            #global selectedTheme
-            value_tuple, index = newThemeName
-            #selectedTheme = value_tuple[0]
-            self.saveInitialCardTheme(value_tuple[0])
-            
+        
         
         menuTheme = pygame_menu.themes.Theme(
             background_color=(0,0,0,0),
@@ -97,16 +110,20 @@ class Game():
             width=self.screenWidth,
             theme=menuTheme)
         
-        allThemes = [('Tarrot', 'Tarrot'),
+        def setCardTheme(newThemeName, newThemeIndex, **kwargs):
+            #global selectedTheme
+            value_tuple, index = newThemeName
+            #selectedTheme = value_tuple[0]
+            self.saveInitialCardTheme(value_tuple[0])
+        allCardThemes = [('Tarrot', 'Tarrot'),
                  ('Pokemon', 'Pokemon'),
                  ('Mario', 'Mario'),
                  ('Poker', 'Poker')]
-        
         themeSelector = menu.add.dropselect(
             title="Deck Theme",
-            items=allThemes,
+            items=allCardThemes,
             #placeholder=allThemes[defaultCardTheme][0],
-            onchange=setTheme, 
+            onchange=setCardTheme, 
             scrollbar_thick=5,
             selection_option_font=self.lifeFont,
             #selection_box_border_color=(0,0,0,0),
@@ -115,11 +132,21 @@ class Game():
             placeholder=self.selectedTheme,
             placeholder_add_to_selection_box=False
         )
+        
+        def setDifficulty(newThemeName, newThemeIndex, **kwargs):
+            #global selectedTheme
+            value_tuple, index = newThemeName
+            #selectedTheme = value_tuple[0]
+            self.saveInitialCardTheme(value_tuple[0])
+            
+        allDificulties = [('Easy', 0),
+                 ('Medium', 1),
+                 ('Hard', 2)]
         difficultySelector = menu.add.dropselect(
             title="Diffuclty",
-            items=allThemes,
+            items=allDificulties,
             #placeholder=allThemes[defaultCardTheme][0],
-            onchange=setTheme, 
+            onchange=setDifficulty, 
             scrollbar_thick=5,
             selection_option_font=self.lifeFont,
             #selection_box_border_color=(0,0,0,0),
@@ -128,11 +155,22 @@ class Game():
             placeholder=self.selectedTheme,
             placeholder_add_to_selection_box=False
         )
+        
+        def setResolution(newRes, newResIndex, **kwargs):
+            #global selectedTheme
+            value_tuple, index = newRes
+            #selectedTheme = value_tuple[0]
+            self.saveInitialCardTheme(value_tuple[0])
+            
+        allResolutions = [('1280 x 950', 0),
+                 ('1000 x 1000', 1),
+                 ('650 x 480', 2),
+                 ('Full Screen', 3)]
         resolutionSelector = menu.add.dropselect(
             title="Resolution",
-            items=allThemes,
+            items=allResolutions,
             #placeholder=allThemes[defaultCardTheme][0],
-            onchange=setTheme, 
+            onchange=setResolution, 
             scrollbar_thick=5,
             selection_option_font=self.lifeFont,
             #selection_box_border_color=(0,0,0,0),
@@ -141,37 +179,38 @@ class Game():
             placeholder=self.selectedTheme,
             placeholder_add_to_selection_box=False
         )
+        
+        def setFPS(newFPS, newFPSIndex, **kwargs):
+            #global selectedTheme
+            value_tuple, index = newFPS
+            #selectedTheme = value_tuple[0]
+            self.FPS = value_tuple[1]
+            self.animate.frames = value_tuple[1]
+            self.saveSettingToFile("FPS", value_tuple[0])
+        allFPS = [('1', 1),
+                  ('140', 140),
+                 ('60', 60),
+                 ('30', 30),
+                 ('Custom', 360)]
         fpsSelector = menu.add.dropselect(
             title="Frame Rate",
-            items=allThemes,
+            items=allFPS,
             #placeholder=allThemes[defaultCardTheme][0],
-            onchange=setTheme, 
+            onchange=setFPS, 
             scrollbar_thick=5,
             selection_option_font=self.lifeFont,
             #selection_box_border_color=(0,0,0,0),
             selection_box_width=250,
             selection_box_height=250,
-            placeholder=self.selectedTheme,
+            placeholder=str(self.FPS),
             placeholder_add_to_selection_box=False
         )
-        fullScreenSelector = menu.add.dropselect(
-            title="Full Screen",
-            items=allThemes,
-            #placeholder=allThemes[defaultCardTheme][0],
-            onchange=setTheme, 
-            scrollbar_thick=5,
-            selection_option_font=self.lifeFont,
-            #selection_box_border_color=(0,0,0,0),
-            selection_box_width=250,
-            selection_box_height=250,
-            placeholder=self.selectedTheme,
-            placeholder_add_to_selection_box=False
-        )
+        
         volumeSelector = menu.add.dropselect(
             title="Volume",
-            items=allThemes,
+            items=allCardThemes,
             #placeholder=allThemes[defaultCardTheme][0],
-            onchange=setTheme, 
+            onchange=setCardTheme, 
             scrollbar_thick=5,
             selection_option_font=self.lifeFont,
             #selection_box_border_color=(0,0,0,0),
@@ -186,7 +225,6 @@ class Game():
         difficultySelector.add_self_to_kwargs()  # Callbacks will receive widget as parameter
         resolutionSelector.add_self_to_kwargs()  # Callbacks will receive widget as parameter
         fpsSelector.add_self_to_kwargs()  # Callbacks will receive widget as parameter
-        fullScreenSelector.add_self_to_kwargs()  # Callbacks will receive widget as parameter
         volumeSelector.add_self_to_kwargs()  # Callbacks will receive widget as parameter
         
         
@@ -208,7 +246,7 @@ class Game():
                     if event.key == pygame.K_ESCAPE:
                         return
             pygame.display.update()
-            self.mainClock.tick(60) 
+            self.mainClock.tick(self.FPS) 
             
     def main_menu(self):
         screen = pygame.display.set_mode((self.screenWidth, self.screenHeight), 0, 32)
@@ -285,11 +323,11 @@ class Game():
                         click = True
      
             pygame.display.update()
-            self.mainClock.tick(60)
+            self.mainClock.tick(self.FPS)
     
     def game(self, window, x, y, lives, matchTime, score):
         window.fill(self.black) 
-        t = Table(x, y, self.selectedTheme, lives, 0, self.mainClock)#, 0)
+        t = Table(x, y, self.selectedTheme, lives, 0, self.FPS)#, 0)
         
         green = (0, 255, 0)
         red = (255, 0, 0)
@@ -307,7 +345,7 @@ class Game():
         yDim = int(350 * scale)
         xSize = xDim + inBTween
         ySize = yDim + inBTween
-        timeToFlip = int(40 * scale) #can't be too fast or frames don't register
+        timeToFlip = int(3000 * scale) #can't be too fast or frames don't register
         
         t.showAll()
         tempTable = []
@@ -333,7 +371,7 @@ class Game():
         running = True
         quitG = False
         while running:
-            self.mainClock.tick(60)
+            self.mainClock.tick(self.FPS)
             
             mouse = pygame.mouse.get_pos()    
             
@@ -420,6 +458,7 @@ class Game():
         pygame.display.update()
         
         while True:
+            self.mainClock.tick(self.FPS)
             mouse = pygame.mouse.get_pos()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
