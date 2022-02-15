@@ -27,8 +27,10 @@ class Animations():
             while running:
                 i = 0
                 mainClock.tick(frames)
-                xDim -= timeToFlip/frames 
-                movedX += timeToFlip/2/frames
+                deltaTime = 1000/frames/1000
+                #print(deltaTime)
+                xDim -= timeToFlip * deltaTime
+                movedX += timeToFlip/2 * deltaTime
                 for card in cards:
                     window.fill((0,0,0,0),rect[i])
                     surface = card.image.convert()
@@ -36,7 +38,7 @@ class Animations():
                     window.blit(surface, (minBorder + xSize * card.col + movedX, minBorder + ySize * card.row))  
                     i += 1
                 pygame.display.update()
-                if(firstHalf and xDim <= timeToFlip/frames):
+                if(firstHalf and xDim <= (timeToFlip * deltaTime)):
                     running = False
                 if(not firstHalf and xDim >= maxSize):
                     running = False
