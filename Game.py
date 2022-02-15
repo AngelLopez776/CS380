@@ -338,8 +338,8 @@ class Game():
         minBorder = 40
         inBTween = 10
         scale = self.setCardScale(minBorder, x, y, inBTween)
-        xDim = int(250 * scale)
-        yDim = int(350 * scale)
+        xDim = 250 * scale
+        yDim = 350 * scale
         xSize = xDim + inBTween
         ySize = yDim + inBTween
         timeToFlip = int(3000 * scale) #can't be too fast or frames don't register
@@ -366,7 +366,6 @@ class Game():
         
         streak = 0
         
-        click = False
         running = True
         quitG = False
         while running:
