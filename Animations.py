@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import pygame
+import time
 mainClock = pygame.time.Clock()
 
 
@@ -22,8 +23,8 @@ class Animations():
             #xDimStore = xDim
             for card in cards:
                 blackSurfaceArea = card.image.convert()
-                blackSurfaceArea = pygame.transform.smoothscale(blackSurfaceArea, (xDim, yDim))  
-                rect.append(blackSurfaceArea.get_rect(topleft = (minBorder + xSize * card.col + movedX, minBorder + ySize * card.row)))
+                blackSurfaceArea = pygame.transform.smoothscale(blackSurfaceArea, (xDim + 10, yDim))  
+                rect.append(blackSurfaceArea.get_rect(topleft = (minBorder - 5 + xSize * card.col + movedX, minBorder + ySize * card.row)))
             while running:
                 i = 0
                 mainClock.tick(frames)
@@ -44,6 +45,7 @@ class Animations():
                     running = False
             return xDim, movedX
         
+        t0 = time.time()
         movedX = 0
         xDimStore = xDim
         xDim, movedX = halfFlip(cards, timeToFlip, movedX, xDim, xDim, yDim, minBorder, xSize, ySize, window, True)        
@@ -54,4 +56,6 @@ class Animations():
                 card.hide()
             card.update()
         halfFlip(cards, -timeToFlip, movedX, xDimStore, xDim, yDim, minBorder, xSize, ySize, window, False)
+        t1 = time.time()
+        print(t1-t0)
         pygame.event.clear()#removes any clicks that may have occured during the flipping animation

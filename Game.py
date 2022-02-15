@@ -340,7 +340,7 @@ class Game():
         yDim = int(350 * scale)
         xSize = xDim + inBTween
         ySize = yDim + inBTween
-        timeToFlip = int(3000 * scale) #can't be too fast or frames don't register
+        timeToFlip = int(2000 * scale) #can't be too fast or frames don't register
         
         t.showAll()
         tempTable = []
@@ -392,7 +392,7 @@ class Game():
                     if (not card.shown):
                         hiddenTable.append(card)
                         
-                self.animate.flip(hiddenTable, 3, xDim, yDim, minBorder, xSize, ySize, window, True)
+                self.animate.flip(hiddenTable, 1000, xDim, yDim, minBorder, xSize, ySize, window, True)
                                 
                 self.draw_text_center("You lose!", endFont, red, self.screenWidth / 2, self.screenHeight / 2, window)
                 mixer.init()
