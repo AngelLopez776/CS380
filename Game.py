@@ -6,6 +6,9 @@ from Table import Table
 import time
 from Animations import Animations
 import pygame_menu
+from pygame.locals import *
+from pygame import mixer
+
 
 class Game():
     def __init__(self, screenWidth, screenHeight):
@@ -212,6 +215,11 @@ class Game():
         
         font = pygame.font.SysFont(None, 20)
         
+        #Main Menu Music
+        mixer.init()
+        mixer.music.load('Sounds/mainmenu.mp3')
+        mixer.music.play(-1)
+        
         white = (255, 255, 255)
         black = (0, 0, 0)
         
@@ -227,8 +235,9 @@ class Game():
             text_1 = font.render("Start Game", True, black)
             if button_1.collidepoint((mx, my)):
                 if click:
+                    pygame.mixer.music.stop()
                     screen.fill(black)
-                    if self.game(screen, 3, 3, 10, 1000000, 0):
+                    if self.game(screen, 3, 3, 3, 1000000, 0):
                         pygame.quit()
                         sys.exit()
             pygame.draw.rect(screen, white, button_1)
@@ -241,6 +250,9 @@ class Game():
             text_2 = font.render("Options", True, black)
             if button_2.collidepoint((mx, my)):
                 if click:
+                    mixer.init()
+                    mixer.music.load('Sounds/settings.mp3')
+                    mixer.music.play(-1)
                     self.options()
             pygame.draw.rect(screen, white, button_2)
             text_2Rect = text_2.get_rect()
@@ -332,10 +344,13 @@ class Game():
             
             if (t.checkWin()):
                 self.draw_text_center("You win!", endFont, green, self.screenWidth / 2, self.screenHeight / 2, window)
-                
+                mixer.init()
+                mixer.music.load('Sounds/winner.mp3')
+                mixer.music.play()
                 running, quitG, playAgain = self.endScreen(window)
                 
                 if playAgain:
+                    pygame.mixer.music.stop() 
                     return Game.game(self, window, x, y, lives, matchTime, score)
                             
             elif (t.lives == 0 or timeLeft <= 0):
@@ -347,11 +362,14 @@ class Game():
                 self.animate.flip(hiddenTable, 3, xDim, yDim, minBorder, xSize, ySize, window, True)
                                 
                 self.draw_text_center("You lose!", endFont, red, self.screenWidth / 2, self.screenHeight / 2, window)
-                
+                mixer.init()
+                mixer.music.load('Sounds/gameover.mp3')
+                mixer.music.play()
                 
                 running, quitG, playAgain = self.endScreen(window)
                 
                 if playAgain:
+                    pygame.mixer.music.stop() 
                     return Game.game(self, window, x, y, lives, matchTime, score)
             
             else:
