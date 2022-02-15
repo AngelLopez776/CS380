@@ -143,7 +143,7 @@ class Game():
                  ('Medium', 1),
                  ('Hard', 2)]
         difficultySelector = menu.add.dropselect(
-            title="Diffuclty",
+            title="Difficulty",
             items=allDificulties,
             #placeholder=allThemes[defaultCardTheme][0],
             onchange=setDifficulty, 
@@ -152,7 +152,7 @@ class Game():
             #selection_box_border_color=(0,0,0,0),
             selection_box_width=250,
             selection_box_height=250,
-            placeholder=self.selectedTheme,
+            placeholder='Medium',
             placeholder_add_to_selection_box=False
         )
         
@@ -162,10 +162,10 @@ class Game():
             #selectedTheme = value_tuple[0]
             self.saveInitialCardTheme(value_tuple[0])
             
-        allResolutions = [('1280 x 950', 0),
-                 ('1000 x 1000', 1),
-                 ('650 x 480', 2),
-                 ('Full Screen', 3)]
+        allResolutions = [('1280 x 950', 1280, 950),
+                 ('1000 x 1000', 1000, 1000),
+                 ('650 x 480', 650, 480),
+                 ('Full Screen', 1200, 700)]
         resolutionSelector = menu.add.dropselect(
             title="Resolution",
             items=allResolutions,
@@ -176,7 +176,7 @@ class Game():
             #selection_box_border_color=(0,0,0,0),
             selection_box_width=250,
             selection_box_height=250,
-            placeholder=self.selectedTheme,
+            placeholder='1000 x 1000',
             placeholder_add_to_selection_box=False
         )
         
@@ -187,7 +187,8 @@ class Game():
             self.FPS = value_tuple[1]
             self.animate.frames = value_tuple[1]
             self.saveSettingToFile("FPS", value_tuple[0])
-        allFPS = [('1', 1),
+        allFPS = [('10', 10),
+                  ('360', 360),
                   ('140', 140),
                  ('60', 60),
                  ('30', 30),
@@ -206,18 +207,12 @@ class Game():
             placeholder_add_to_selection_box=False
         )
         
-        volumeSelector = menu.add.dropselect(
+        volumeSlider = menu.add.range_slider(
             title="Volume",
-            items=allCardThemes,
-            #placeholder=allThemes[defaultCardTheme][0],
-            onchange=setCardTheme, 
-            scrollbar_thick=5,
-            selection_option_font=self.lifeFont,
-            #selection_box_border_color=(0,0,0,0),
-            selection_box_width=250,
-            selection_box_height=250,
-            placeholder=self.selectedTheme,
-            placeholder_add_to_selection_box=False
+            default=0,
+            range_values=(0,100),
+            increment = 1,
+            value_format=lambda x: str(int(x))
         )
 
         
@@ -225,7 +220,7 @@ class Game():
         difficultySelector.add_self_to_kwargs()  # Callbacks will receive widget as parameter
         resolutionSelector.add_self_to_kwargs()  # Callbacks will receive widget as parameter
         fpsSelector.add_self_to_kwargs()  # Callbacks will receive widget as parameter
-        volumeSelector.add_self_to_kwargs()  # Callbacks will receive widget as parameter
+        volumeSlider.add_self_to_kwargs()  # Callbacks will receive widget as parameter
         
         
         #running = True
@@ -251,6 +246,7 @@ class Game():
     def main_menu(self):
         screen = pygame.display.set_mode((self.screenWidth, self.screenHeight), 0, 32)
         
+        titleFont = pygame.font.Font("assets/font.ttf", 50)
         font = pygame.font.SysFont(None, 20)
         
         #Main Menu Music
@@ -263,13 +259,14 @@ class Game():
         
         click = False
         while True: 
-            screen.fill(black)
-            self.draw_text('main menu', font, white, 50, 20, screen)
+            screen.fill((255,0,0))
+            self.draw_text('Place Holder', titleFont, white, 350, 220, screen)
+            self.draw_text('Title', titleFont, white, 500, 270, screen)
      
             mx, my = pygame.mouse.get_pos()
      
             #Start Game Button
-            button_1 = pygame.Rect(50, 100, 200, 50)
+            button_1 = pygame.Rect(500, 350, 200, 50)
             text_1 = font.render("Start Game", True, black)
             if button_1.collidepoint((mx, my)):
                 if click:
@@ -284,7 +281,7 @@ class Game():
             screen.blit(text_1, text_1Rect)
             
             #Options buttons
-            button_2 = pygame.Rect(50, 200, 200, 50)
+            button_2 = pygame.Rect(500, 450, 200, 50)
             text_2 = font.render("Options", True, black)
             if button_2.collidepoint((mx, my)):
                 if click:
@@ -298,7 +295,7 @@ class Game():
             screen.blit(text_2, text_2Rect)
             
             #Quit Game Button
-            button_3 = pygame.Rect(50, 300, 200, 50)
+            button_3 = pygame.Rect(500, 550, 200, 50)
             text_3 = font.render("Quit Game", True, black)
             if button_3.collidepoint((mx, my)):
                 if click:
