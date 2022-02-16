@@ -289,7 +289,7 @@ class Game():
                 if click:
                     pygame.mixer.music.stop()
                     screen.fill(black)
-                    if self.game(screen, 4, 4, 3, 1000000):
+                    if self.game(screen, 1000000):
                         pygame.quit()
                         sys.exit()
             pygame.draw.rect(screen, white, button_1)
@@ -347,9 +347,9 @@ class Game():
         toXCenter /= 2
         return toXCenter
         
-    def game(self, window, x, y, lives, matchTime):
+    def game(self, window, matchTime):
         window.fill(self.black)
-        t = Table(x, y, self.selectedTheme, lives, 0, self.FPS)  # , 0)
+        t = self.createTable(1)
 
         green = (0, 255, 0)
         red = (255, 0, 0)
@@ -362,18 +362,18 @@ class Game():
 
         minBorder = 70
         inBTween = 10
-        scale = self.setCardScale(minBorder, x, y, inBTween)
-        xDim = 250 * scale
-        yDim = 350 * scale
+        scale = self.setCardScale(minBorder, t.x, t.y, inBTween)
+        xDim = int(250 * scale)
+        yDim = int(350 * scale)
         xSize = xDim + inBTween
         ySize = yDim + inBTween
-        toXCenter = self.centerDeckX(xSize, x, self.screenWidth, minBorder)
+        toXCenter = self.centerDeckX(xSize, t.x, self.screenWidth, minBorder)
         timeToFlip = int(3000 * scale)  # can't be too fast or frames don't register
 
         t.showAll()
         tempTable = []
-        for i in range(x):
-            for j in range(y):
+        for i in range(t.x):
+            for j in range(t.y):
                 t.table[j][i].col = i
                 t.table[j][i].row = j
                 tempTable.append(t.table[j][i])
@@ -404,7 +404,7 @@ class Game():
             self.draw_text("Time: " + str(timeLeft) + "s", lifeFont, white, 5, 18, window)
             self.draw_text("Score: " + str(t.score), lifeFont, white, 105, 0, window)
 
-            if (t.checkWin()):
+            if (t.checkWin(timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window)):
                 window.fill(black, (0, 0, 400, 40))
 
                 if len(t.selection) >= 2:
@@ -428,7 +428,7 @@ class Game():
 
                 if playAgain:
                     pygame.mixer.music.stop()
-                    return Game.game(self, window, x, y, lives, matchTime)
+                    return Game.game(self, window, matchTime)
 
             elif (t.lives == 0 or timeLeft <= 0):
                 hiddenTable = []
@@ -447,12 +447,12 @@ class Game():
 
                 if playAgain:
                     pygame.mixer.music.stop()
-                    return Game.game(self, window, x, y, lives, matchTime)
+                    return Game.game(self, window, matchTime)
 
             else:
                 t.update()
-                for i in range(x):
-                    for j in range(y):
+                for i in range(t.x):
+                    for j in range(t.y):
                         surface = t.table[j][i].image.convert()
                         surface = pygame.transform.smoothscale(surface, (xDim, yDim))
                         t.table[j][i].rect = surface.get_rect()
@@ -518,3 +518,11 @@ class Game():
                     if retryButton.collidepoint(mouse):
                         window.fill(self.black)
                         return [False, False, True]
+                    
+    def createTable(self, difficulty):
+        if difficulty == 0:
+            return Table(4, 3, self.selectedTheme, 5, difficulty, self.FPS)
+        elif difficulty == 1:
+            return Table(5, 5, self.selectedTheme, 10, difficulty, self.FPS)
+        else:
+            return Table(5, 5, self.selectedTheme, 6, difficulty, self.FPS)

@@ -8,6 +8,8 @@ from Animations import Animations
 
 class Table():
     def __init__(self, x, y, theme, lives, difficulty, fps):
+        self.x = x
+        self.y = y
         self.theme = theme
         self.lives = lives
         self.score = 0
@@ -25,7 +27,7 @@ class Table():
             cards.append(Card(self.theme, c))
             
         if ((x * y) % 2 == 1):
-            if self.difficulty == 0:
+            if self.difficulty == 1:
                 cards.append(Card(self.theme, "JOKER"))
             else:
                 cards.append(Card(self.theme, "BOMB"))
@@ -95,9 +97,19 @@ class Table():
                 self.lives = self.lives - 1
                 self.selection.clear()
                 
-    def checkWin(self):
+    def checkWin(self, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window):
+        extra = []
         for row in self.table:
             for c in row:
                 if c.shown == False:
-                    return False
+                    if c.ID == "BOMB" or c.ID == "JOKER":
+                        extra.append(c)
+                    else:
+                        return False
+        
+        for card in extra:
+            card.show()
+        
+        self.animate.flip(extra, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, True)
+        
         return True

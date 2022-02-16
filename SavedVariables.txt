@@ -1,9 +1,9 @@
-selectedTheme=theme_Pokemon
-
+selectedTheme=theme_Mario
 FPS=30
 
 screenWidth=1280
 
 screenHeight=950
 
-volume=10
+volume=37
+
