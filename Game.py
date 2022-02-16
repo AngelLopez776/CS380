@@ -289,7 +289,7 @@ class Game():
                 if click:
                     pygame.mixer.music.stop()
                     screen.fill(black)
-                    if self.game(screen, 1, 2, 3, 1000000):
+                    if self.game(screen, 4, 4, 3, 1000000):
                         pygame.quit()
                         sys.exit()
             pygame.draw.rect(screen, white, button_1)
@@ -304,6 +304,7 @@ class Game():
                 if click:
                     mixer.init()
                     mixer.music.load('Sounds/settings.mp3')
+                    mixer.music.set_volume(self.volume/100)
                     mixer.music.play(-1)
                     self.options(screen)
             pygame.draw.rect(screen, white, button_2)
@@ -420,7 +421,7 @@ class Game():
 
                 mixer.init()
                 mixer.music.load('Sounds/winner.mp3')
-                mixer.music.set_volume(self.volume)
+                mixer.music.set_volume(self.volume/100)
                 mixer.music.play()
 
                 running, quitG, playAgain = self.endScreen(window)
