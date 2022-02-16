@@ -135,7 +135,7 @@ class Game():
             # global selectedTheme
             value_tuple, index = newThemeName
             # selectedTheme = value_tuple[0]
-            self.saveInitialCardTheme(value_tuple[0])
+            #self.saveInitialCardTheme(value_tuple[0])
 
         allDificulties = [('Easy', 0),
                           ('Medium', 1),
@@ -158,7 +158,7 @@ class Game():
             # global selectedTheme
             value_tuple, index = newRes
             # selectedTheme = value_tuple[0]
-            self.saveInitialCardTheme(value_tuple[0])
+            #self.saveInitialCardTheme(value_tuple[0])
 
         allResolutions = [('1280 x 950', 1280, 950),
                           ('1000 x 1000', 1000, 1000),
@@ -457,9 +457,6 @@ class Game():
                                     cards = [c]
                                     self.animate.flip(cards, timeToFlip, xDim, yDim, minBorder, xSize, ySize, window,
                                                       True)
-
-                                    mixer.music.load('Sounds/cardflip.mp3')
-                                    mixer.music.play(0)
 
                                     t.selection.append(c)
 

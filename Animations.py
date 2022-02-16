@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 import pygame
+from pygame import mixer
+
 mainClock = pygame.time.Clock()
 
 
@@ -12,7 +14,8 @@ class Animations():
         frames = self.fps
 
     def flip(self, cards, timeToFlip, xDim, yDim, minBorder, xSize, ySize, window, showFront):
-        
+        mixer.music.load('Sounds/cardflip.mp3')
+        mixer.music.play(0)
         def halfFlip( cards, timeToFlip, movedX, maxSize, xDim, yDim, minBorder, xSize, ySize, window, firstHalf):
             global frames
             deltaTime = 1000/frames/1000
