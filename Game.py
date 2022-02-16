@@ -186,8 +186,7 @@ class Game():
             self.animate.frames = value_tuple[1]
             self.saveSettingToFile("FPS", value_tuple[0])
 
-        allFPS = [('10', 10),
-                  ('360', 360),
+        allFPS = [('360', 360),
                   ('140', 140),
                   ('60', 60),
                   ('30', 30),
@@ -265,19 +264,20 @@ class Game():
         click = False
         while True:
             screen.fill((255, 0, 0))
-            self.draw_text('Place Holder', titleFont, white, 350, 220, screen)
-            self.draw_text('Title', titleFont, white, 500, 270, screen)
+            self.draw_text_center('Place Holder', titleFont, white,  self.screenWidth / 2, self.screenHeight / 6, screen)
+            self.draw_text_center('Title', titleFont, white,  self.screenWidth / 2, self.screenHeight / 4, screen)
 
             mx, my = pygame.mouse.get_pos()
 
             # Start Game Button
-            button_1 = pygame.Rect(500, 350, 200, 50)
+            butHalfX = 100
+            button_1 = pygame.Rect(self.screenWidth/2 - butHalfX, self.screenHeight*3/8, 200, 50)
             text_1 = font.render("Start Game", True, black)
             if button_1.collidepoint((mx, my)):
                 if click:
                     pygame.mixer.music.stop()
                     screen.fill(black)
-                    if self.game(screen, 3, 3, 3, 1000000):
+                    if self.game(screen, 8, 8, 3, 1000000):
                         pygame.quit()
                         sys.exit()
             pygame.draw.rect(screen, white, button_1)
@@ -286,7 +286,7 @@ class Game():
             screen.blit(text_1, text_1Rect)
 
             # Options buttons
-            button_2 = pygame.Rect(500, 450, 200, 50)
+            button_2 = pygame.Rect(self.screenWidth/2 - butHalfX, self.screenHeight*4/8, 200, 50)
             text_2 = font.render("Options", True, black)
             if button_2.collidepoint((mx, my)):
                 if click:
@@ -300,7 +300,7 @@ class Game():
             screen.blit(text_2, text_2Rect)
 
             # Quit Game Button
-            button_3 = pygame.Rect(500, 550, 200, 50)
+            button_3 = pygame.Rect(self.screenWidth/2 - butHalfX, self.screenHeight*5/8, 200, 50)
             text_3 = font.render("Quit Game", True, black)
             if button_3.collidepoint((mx, my)):
                 if click:
@@ -326,7 +326,14 @@ class Game():
 
             pygame.display.update()
             self.mainClock.tick(self.FPS)
-
+            
+    def centerDeckX(self, xSize, col, screenWidth, minBorder):
+        deckX = xSize * col
+        availableSpace = screenWidth - minBorder * 2
+        toXCenter = availableSpace - deckX
+        toXCenter /= 2
+        return toXCenter
+        
     def game(self, window, x, y, lives, matchTime):
         window.fill(self.black)
         t = Table(x, y, self.selectedTheme, lives, 0, self.FPS)  # , 0)
@@ -347,6 +354,7 @@ class Game():
         yDim = 350 * scale
         xSize = xDim + inBTween
         ySize = yDim + inBTween
+        toXCenter = self.centerDeckX(xSize, x, self.screenWidth, minBorder)
         timeToFlip = int(3000 * scale)  # can't be too fast or frames don't register
 
         t.showAll()
@@ -358,11 +366,11 @@ class Game():
                 tempTable.append(t.table[j][i])
                 surface = t.table[j][i].image.convert()
                 surface = pygame.transform.scale(surface, (xDim, yDim))
-                window.blit(surface, (minBorder + xSize * t.table[j][i].col, minBorder + ySize * t.table[j][i].row))
+                window.blit(surface, ((minBorder + toXCenter) + xSize * t.table[j][i].col, minBorder + ySize * t.table[j][i].row))
         pygame.display.update()
 
         time.sleep(2)
-        self.animate.flip(tempTable, timeToFlip, xDim, yDim, minBorder, xSize, ySize, window, False)
+        self.animate.flip(tempTable, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, False)
 
         timer = matchTime
         sTime = time.time()
@@ -414,7 +422,7 @@ class Game():
                     if (not card.shown):
                         hiddenTable.append(card)
 
-                self.animate.flip(hiddenTable, 1000, xDim, yDim, minBorder, xSize, ySize, window, True)
+                self.animate.flip(hiddenTable, 1000, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, True)
 
                 self.draw_text_center("You lose!", endFont, red, self.screenWidth / 2, self.screenHeight / 2, window)
                 mixer.init()
@@ -434,15 +442,15 @@ class Game():
                         surface = t.table[j][i].image.convert()
                         surface = pygame.transform.smoothscale(surface, (xDim, yDim))
                         t.table[j][i].rect = surface.get_rect()
-                        t.table[j][i].makeRect(minBorder + xSize * i, minBorder + ySize * j)
+                        t.table[j][i].makeRect((minBorder + toXCenter) + xSize * i, minBorder + ySize * j)
                 pygame.display.update()
 
                 timeLeft = int(timer - (time.time() - sTime))
 
                 if len(t.selection) >= 1:
-                    t.checkBomb(timeToFlip, xDim, yDim, minBorder, xSize, ySize, window)
+                    t.checkBomb(timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window)
                     if len(t.selection) >= 2:
-                        if not t.checkMatch(timeToFlip, xDim, yDim, minBorder, xSize, ySize, window):
+                        if not t.checkMatch(timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window):
                             t.lives = t.lives - 1
                             streak = 0
                         else:
@@ -455,7 +463,7 @@ class Game():
                             for event in pygame.event.get():
                                 if event.type == pygame.MOUSEBUTTONDOWN:
                                     cards = [c]
-                                    self.animate.flip(cards, timeToFlip, xDim, yDim, minBorder, xSize, ySize, window,
+                                    self.animate.flip(cards, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window,
                                                       True)
 
                                     t.selection.append(c)

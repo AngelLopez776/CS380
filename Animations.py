@@ -13,10 +13,10 @@ class Animations():
         self.fps = fps
         frames = self.fps
 
-    def flip(self, cards, timeToFlip, xDim, yDim, minBorder, xSize, ySize, window, showFront):
+    def flip(self, cards, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, showFront):
         mixer.music.load('Sounds/cardflip.mp3')
         mixer.music.play(0)
-        def halfFlip( cards, timeToFlip, movedX, maxSize, xDim, yDim, minBorder, xSize, ySize, window, firstHalf):
+        def halfFlip(cards, timeToFlip, movedX, maxSize, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, firstHalf):
             global frames
             deltaTime = 1000/frames/1000
             running = True
@@ -26,7 +26,7 @@ class Animations():
             for card in cards:
                 blackSurfaceArea = card.image.convert()
                 blackSurfaceArea = pygame.transform.smoothscale(blackSurfaceArea, (int(xDim), int(yDim)))  
-                rect.append(blackSurfaceArea.get_rect(topleft = (minBorder + xSize * card.col + movedX, minBorder + ySize * card.row)))
+                rect.append(blackSurfaceArea.get_rect(topleft = ((minBorder + toXCenter) + xSize * card.col + movedX, minBorder + ySize * card.row)))
             while running:
                 i = 0
                 mainClock.tick(frames)
@@ -37,7 +37,7 @@ class Animations():
                     window.fill((0,0,0,0),rect[i])
                     surface = card.image.convert()
                     surface = pygame.transform.smoothscale(surface, (int(xDim), int(yDim)))       
-                    window.blit(surface, (minBorder + xSize * card.col + movedX, minBorder + ySize * card.row))  
+                    window.blit(surface, ((minBorder + toXCenter) + xSize * card.col + movedX, minBorder + ySize * card.row))  
                     i += 1
                 pygame.display.update()
                 if(firstHalf and xDim <= (timeToFlip * deltaTime)):
@@ -48,12 +48,12 @@ class Animations():
         
         movedX = 0
         xDimStore = xDim
-        xDim, movedX = halfFlip(cards, timeToFlip, movedX, xDim, xDim, yDim, minBorder, xSize, ySize, window, True)        
+        xDim, movedX = halfFlip(cards, timeToFlip, movedX, xDim, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, True)        
         for card in cards:     
             if(showFront):    
                 card.show()
             else:
                 card.hide()
             card.update()
-        halfFlip(cards, -timeToFlip, movedX, xDimStore, xDim, yDim, minBorder, xSize, ySize, window, False)
+        halfFlip(cards, -timeToFlip, movedX, xDimStore, xDim, yDim, minBorder, xSize, ySize,toXCenter, window, False)
         pygame.event.clear()#removes any clicks that may have occured during the flipping animation

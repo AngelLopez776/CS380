@@ -54,7 +54,7 @@ class Table():
             for c in r:
                 c.update()
             
-    def checkMatch(self, timeToFlip, xDim, yDim, minBorder, xSize, ySize, window):
+    def checkMatch(self, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window):
         if self.selection[0].ID == self.selection[1].ID:
             self.selection.clear()
             return True
@@ -67,7 +67,7 @@ class Table():
                     if c.ID == match and not c.shown:
                         cards = []
                         cards.append(c)
-                        self.animate.flip(cards, timeToFlip, xDim, yDim, minBorder, xSize, ySize, window, True)
+                        self.animate.flip(cards, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, True)
             return True
         
         else:
@@ -77,11 +77,11 @@ class Table():
             cards.append(self.selection[1])
             self.selection.clear()
             time.sleep(1)
-            self.animate.flip(cards, timeToFlip, xDim, yDim, minBorder, xSize, ySize, window, False)
+            self.animate.flip(cards, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, False)
 
             return False
         
-    def checkBomb(self, timeToFlip, xDim, yDim, minBorder, xSize, ySize, window):
+    def checkBomb(self, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window):
         for c in self.selection:
             if c.ID == "BOMB":
                 time.sleep(1)
@@ -89,7 +89,7 @@ class Table():
                     if not (c.ID == "BOMB"):
                         cards = []
                         cards.append(c)
-                        self.animate.flip(cards, timeToFlip, xDim, yDim, minBorder, xSize, ySize, window, False)
+                        self.animate.flip(cards, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, False)
 
             
                 self.lives = self.lives - 1
