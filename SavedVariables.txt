@@ -1,3 +1,9 @@
-selectedTheme=theme_Mario
-FPS=30
+selectedTheme=theme_Tarrot
 
+FPS=360
+
+screenWidth=1280
+
+screenHeight=950
+
+volume=2

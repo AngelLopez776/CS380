@@ -11,11 +11,13 @@ from pygame import mixer
 
 
 class Game():
-    def __init__(self, screenWidth, screenHeight):
+    screen = None
+    def __init__(self):
+        self.volume = int(self.readSettingFromFile("volume"))
         self.selectedTheme = self.readCardTheme()
         self.FPS = int(self.readSettingFromFile("FPS"))
-        self.screenWidth = screenWidth
-        self.screenHeight = screenHeight
+        self.screenWidth = int(self.readSettingFromFile("screenWidth"))
+        self.screenHeight = int(self.readSettingFromFile("screenHeight"))
         self.mainClock = pygame.time.Clock()
         self.animate = Animations(self.FPS)
         self.green = (0, 255, 0)
@@ -49,7 +51,6 @@ class Game():
         else:
             yLength = screenHeight / rows - inBTween
             dim = yLength / 350
-
         return dim
 
     def readSettingFromFile(self, sName):
@@ -92,8 +93,8 @@ class Game():
         newTheme = "theme_" + newTheme
         self.saveSettingToFile("selectedTheme", newTheme)
 
-    def options(self):
-        optionsMenu = pygame.display.set_mode((self.screenWidth, self.screenHeight), 0, 32)
+    def options(self, screen):
+        optionsMenu = screen
         # This function has a lot about it that doesn't make sense, but it seems to need to be this way
 
         menuTheme = pygame_menu.themes.Theme(
@@ -107,7 +108,7 @@ class Game():
             width=self.screenWidth,
             theme=menuTheme)
 
-        def setCardTheme(newThemeName, newThemeIndex, **kwargs):
+        def setCardTheme(newThemeName, newThemeNameButLike___Again, **kwargs):
             # global selectedTheme
             value_tuple, index = newThemeName
             # selectedTheme = value_tuple[0]
@@ -131,7 +132,7 @@ class Game():
             placeholder_add_to_selection_box=False
         )
 
-        def setDifficulty(newThemeName, newThemeIndex, **kwargs):
+        def setDifficulty(difficulty, difficultyIndex, **kwargs):
             # global selectedTheme
             value_tuple, index = newThemeName
             # selectedTheme = value_tuple[0]
@@ -154,9 +155,16 @@ class Game():
             placeholder_add_to_selection_box=False
         )
 
-        def setResolution(newRes, newResIndex, **kwargs):
-            # global selectedTheme
+        def setResolution(newRes, resX, resY, **kwargs):
+            global screen
             value_tuple, index = newRes
+            self.screenWidth = resX
+            self.screenHeight = resY
+            screen = pygame.display.set_mode((self.screenWidth, self.screenHeight), 0, 32)
+            menu.resize(resX, resY)
+            self.saveSettingToFile("screenWidth", str(resX))
+            self.saveSettingToFile("screenHeight", str(resY))
+
             # selectedTheme = value_tuple[0]
             #self.saveInitialCardTheme(value_tuple[0])
 
@@ -174,16 +182,16 @@ class Game():
             # selection_box_border_color=(0,0,0,0),
             selection_box_width=250,
             selection_box_height=250,
-            placeholder='1000 x 1000',
+            placeholder= str(self.screenWidth) + " x " + str(self.screenHeight),
             placeholder_add_to_selection_box=False
         )
 
-        def setFPS(newFPS, newFPSIndex, **kwargs):
+        def setFPS(newFPSData, newFPSNum, **kwargs):
             # global selectedTheme
-            value_tuple, index = newFPS
+            value_tuple, index = newFPSData
             # selectedTheme = value_tuple[0]
-            self.FPS = value_tuple[1]
-            self.animate.frames = value_tuple[1]
+            self.FPS = newFPSNum
+            self.animate.frames = newFPSNum
             self.saveSettingToFile("FPS", value_tuple[0])
 
         allFPS = [('360', 360),
@@ -206,17 +214,19 @@ class Game():
         )
 
 
-        def set_vol():
-            val = mixer.music.get_volume()
-            volume = int(val)/100
-            mixer.music.set_volume(volume)
+        def set_vol(range, **kwargs):
+            val = int(range)
+            self.volume = int(val)
+            mixer.music.set_volume(self.volume/100)
+            self.saveSettingToFile("volume", str(val))
             #set volume of mixer takes value only from 0 to 1, val is divided by 100
 
         volumeSlider = menu.add.range_slider(
             title="Volume",
-            default=0,
+            default=self.volume,
             range_values=(0, 100),
             increment=1,
+            onchange = set_vol,
             value_format=lambda x: str(int(x)),
            # command = set_vol()
         )
@@ -248,6 +258,7 @@ class Game():
             self.mainClock.tick(self.FPS)
 
     def main_menu(self):
+        global screen
         screen = pygame.display.set_mode((self.screenWidth, self.screenHeight), 0, 32)
 
         titleFont = pygame.font.Font("assets/font.ttf", 50)
@@ -256,6 +267,7 @@ class Game():
         # Main Menu Music
         mixer.init()
         mixer.music.load('Sounds/mainmenu.mp3')
+        mixer.music.set_volume(self.volume/100)
         mixer.music.play(-1)
 
         white = (255, 255, 255)
@@ -277,7 +289,7 @@ class Game():
                 if click:
                     pygame.mixer.music.stop()
                     screen.fill(black)
-                    if self.game(screen, 8, 8, 3, 1000000):
+                    if self.game(screen, 1, 2, 3, 1000000):
                         pygame.quit()
                         sys.exit()
             pygame.draw.rect(screen, white, button_1)
@@ -293,7 +305,7 @@ class Game():
                     mixer.init()
                     mixer.music.load('Sounds/settings.mp3')
                     mixer.music.play(-1)
-                    self.options()
+                    self.options(screen)
             pygame.draw.rect(screen, white, button_2)
             text_2Rect = text_2.get_rect()
             text_2Rect.center = button_2.center
@@ -408,6 +420,7 @@ class Game():
 
                 mixer.init()
                 mixer.music.load('Sounds/winner.mp3')
+                mixer.music.set_volume(self.volume)
                 mixer.music.play()
 
                 running, quitG, playAgain = self.endScreen(window)

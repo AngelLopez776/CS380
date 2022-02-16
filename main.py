@@ -5,6 +5,6 @@ import pygame
 
 pygame.init()
 pygame.display.set_caption("Card matching game")
-game = Game(1200, 950)
+game = Game()
 
 game.main_menu()
