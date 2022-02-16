@@ -1,9 +1,9 @@
-selectedTheme=theme_Tarrot
+selectedTheme=theme_Pokemon
 
 FPS=30
 
 screenWidth=1280
 
 screenHeight=950
-volume=0
 
+volume=10

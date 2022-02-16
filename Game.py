@@ -98,7 +98,7 @@ class Game():
         # This function has a lot about it that doesn't make sense, but it seems to need to be this way
 
         menuTheme = pygame_menu.themes.Theme(
-            background_color=(0, 0, 0, 0),
+            background_color=(202, 228, 241),
             title_background_color=(0, 0, 0, 0),
         )
 
@@ -275,7 +275,7 @@ class Game():
 
         click = False
         while True:
-            screen.fill((255, 0, 0))
+            screen.fill((202, 228, 241))
             self.draw_text_center('Place Holder', titleFont, white,  self.screenWidth / 2, self.screenHeight / 6, screen)
             self.draw_text_center('Title', titleFont, white,  self.screenWidth / 2, self.screenHeight / 4, screen)
 
