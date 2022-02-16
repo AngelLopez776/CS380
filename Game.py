@@ -134,7 +134,7 @@ class Game():
 
         def setDifficulty(difficulty, difficultyIndex, **kwargs):
             # global selectedTheme
-            value_tuple, index = newThemeName
+            value_tuple, index = difficulty
             # selectedTheme = value_tuple[0]
             #self.saveInitialCardTheme(value_tuple[0])
 
@@ -360,7 +360,7 @@ class Game():
         lifeFont = pygame.font.SysFont('Times New Roman', 20)
         endFont = pygame.font.SysFont('Times New Roman', 32)
 
-        minBorder = 40
+        minBorder = 70
         inBTween = 10
         scale = self.setCardScale(minBorder, x, y, inBTween)
         xDim = 250 * scale
