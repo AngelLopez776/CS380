@@ -561,9 +561,9 @@ class Game():
                     
     def createTable(self, difficulty):
         if difficulty == 0:
-            return Table(4, 3, self.selectedTheme, 5, difficulty)
+            return Table(4, 3, self.selectedTheme, 5, difficulty, self.FPS)
         elif difficulty == 1:
-            return Table(5, 5, self.selectedTheme, 10, difficulty)
+            return Table(5, 5, self.selectedTheme, 10, difficulty, self.FPS)
         else:
-            return Table(5, 5, self.selectedTheme, 6, difficulty)
+            return Table(5, 5, self.selectedTheme, 6, difficulty, self.FPS)
         
