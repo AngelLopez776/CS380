@@ -77,10 +77,7 @@ class Table():
             cards = []
             cards.append(self.selection[0])
             cards.append(self.selection[1])
-            self.selection.clear()
-            time.sleep(1)
-            self.animate.flip(cards, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, False)
-
+            
             return False
         
     def checkBomb(self, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window):

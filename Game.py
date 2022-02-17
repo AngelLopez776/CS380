@@ -8,7 +8,10 @@ from Animations import Animations
 import pygame_menu
 from pygame.locals import *
 from pygame import mixer
+import threading
+import keyboard
 
+running = True
 
 class Game():
     screen = None
@@ -274,7 +277,7 @@ class Game():
         black = (0, 0, 0)
 
         click = False
-        while True:
+        while True:       
             screen.fill((202, 228, 241))
             self.draw_text_center('Place Holder', titleFont, white,  self.screenWidth / 2, self.screenHeight / 6, screen)
             self.draw_text_center('Title', titleFont, white,  self.screenWidth / 2, self.screenHeight / 4, screen)
@@ -346,8 +349,31 @@ class Game():
         toXCenter = availableSpace - deckX
         toXCenter /= 2
         return toXCenter
-        
+    
+    def stopAllFor(self, seconds):
+        global running
+        startTime = time.perf_counter()
+        timeSinceStart = 0
+        while timeSinceStart <= seconds and running:
+            timeSinceStart = time.perf_counter()
+            timeSinceStart -= startTime
+            time.sleep(0.05)
+           
     def game(self, window, matchTime):
+        
+        def parallelEscape():
+            global running
+            while True:
+                if keyboard.is_pressed("Esc"):
+                    running = False
+                time.sleep(0.05)
+        
+                
+        global running
+        running = True
+        
+        es = threading.Thread(target=parallelEscape)
+        es.start()
         window.fill(self.black)
         t = self.createTable(1)
 
@@ -381,9 +407,14 @@ class Game():
                 surface = pygame.transform.scale(surface, (xDim, yDim))
                 window.blit(surface, ((minBorder + toXCenter) + xSize * t.table[j][i].col, minBorder + ySize * t.table[j][i].row))
         pygame.display.update()
-
-        time.sleep(2)
+        
+        self.stopAllFor(2)
+        if(not running):
+            pygame.event.clear()
+            return False
         self.animate.flip(tempTable, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, False)
+        
+
 
         timer = matchTime
         sTime = time.time()
@@ -392,11 +423,12 @@ class Game():
 
         streak = 0
 
-        running = True
         quitG = False
+        
         while running:
             self.mainClock.tick(self.FPS)
-
+            #if es.is_alive():
+            #    print("fart")
             mouse = pygame.mouse.get_pos()
 
             window.fill(black, (0, 0, 400, 40))  # so cards show during lose screen
@@ -465,8 +497,12 @@ class Game():
                     t.checkBomb(timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window)
                     if len(t.selection) >= 2:
                         if not t.checkMatch(timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window):
-                            t.lives = t.lives - 1
-                            streak = 0
+                            self.stopAllFor(1)
+                            if(running):
+                                self.animate.flip(t.selection, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, False)
+                                t.selection.clear()
+                                t.lives = t.lives - 1
+                                streak = 0
                         else:
                             t.score = t.score + 100 + (50 * streak)
                             streak = streak + 1
@@ -481,18 +517,17 @@ class Game():
                                                       True)
 
                                     t.selection.append(c)
-
+                                    
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    running = False
-                    quitG = True
-                elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_ESCAPE:
-                        running = False
+                    pygame.quit()
+                    sys.exit()  
+            
 
         pygame.mixer.music.stop()
+        es.join(0)
         return quitG
-
+        
     def endScreen(self, window):
         retryButton = pygame.Rect((self.screenWidth / 2) - 100, (self.screenHeight / 2) + 50, 200, 50)
         retryButtonText = self.buttonFont.render("Press R to Restart", True, self.black)
@@ -526,3 +561,4 @@ class Game():
             return Table(5, 5, self.selectedTheme, 10, difficulty, self.FPS)
         else:
             return Table(5, 5, self.selectedTheme, 6, difficulty, self.FPS)
+        

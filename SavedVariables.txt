@@ -1,9 +1,9 @@
 selectedTheme=theme_Mario
-FPS=30
 
+FPS=60
 screenWidth=1280
 
 screenHeight=950
 
-volume=37
+volume=0
 
