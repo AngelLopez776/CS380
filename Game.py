@@ -9,7 +9,7 @@ import pygame_menu
 from pygame.locals import *
 from pygame import mixer
 import threading
-import keyboard
+#import keyboard
 
 running = True
 
@@ -17,6 +17,7 @@ class Game():
     screen = None
     def __init__(self):
         self.difficulty = int(self.readSettingFromFile("difficulty"))
+        self.gamemode = 1 #Need to add setting for this, 0 for lives game and 1 for timed
         self.volume = int(self.readSettingFromFile("volume"))
         self.selectedTheme = self.readCardTheme()
         self.FPS = int(self.readSettingFromFile("FPS"))
@@ -297,7 +298,7 @@ class Game():
                 if click:
                     pygame.mixer.music.stop()
                     screen.fill(black)
-                    if self.game(screen, 1000000):
+                    if self.game(screen):
                         pygame.quit()
                         sys.exit()
             pygame.draw.rect(screen, white, button_1)
@@ -364,7 +365,7 @@ class Game():
             timeSinceStart -= startTime
             time.sleep(0.05)
            
-    def game(self, window, matchTime):
+    def game(self, window):
         
         def parallelEscape():
             global running
@@ -380,7 +381,7 @@ class Game():
         es = threading.Thread(target=parallelEscape)
         es.start()
         window.fill(self.black)
-        t = self.createTable(self.difficulty)
+        t = self.createTable()
 
         green = (0, 255, 0)
         red = (255, 0, 0)
@@ -419,6 +420,12 @@ class Game():
             return False
         self.animate.flip(tempTable, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, False)
         
+        if self.difficulty == 0:
+            matchTime = 30
+        elif self.difficulty == 1:
+            matchTime = 60
+        else:
+            matchTime = 45
 
 
         timer = matchTime
@@ -437,8 +444,10 @@ class Game():
             mouse = pygame.mouse.get_pos()
 
             window.fill(black, (0, 0, 400, 40))  # so cards show during lose screen
-            self.draw_text("Lives: " + str(t.lives), lifeFont, white, 5, 0, window)
-            self.draw_text("Time: " + str(timeLeft) + "s", lifeFont, white, 5, 18, window)
+            if self.gamemode == 0:
+                self.draw_text("Lives: " + str(t.lives), lifeFont, white, 5, 0, window)
+            elif self.gamemode == 1:
+                self.draw_text("Time: " + str(timeLeft) + "s", lifeFont, white, 5, 0, window)
             self.draw_text("Score: " + str(t.score), lifeFont, white, 105, 0, window)
 
             if (t.checkWin(timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window)):
@@ -446,12 +455,15 @@ class Game():
 
                 if len(t.selection) >= 2:
                     t.score = t.score + 100 + (50 * streak)
-
-                t.score = t.score + (timeLeft)
-                t.score = t.score + (t.lives * 100)
-
-                self.draw_text("Lives: " + str(t.lives), lifeFont, white, 5, 0, window)
-                self.draw_text("Time: " + str(timeLeft) + "s", lifeFont, white, 5, 18, window)
+                    
+                if self.gamemode == 0:
+                    t.score = t.score + (t.lives * 100)
+                    self.draw_text("Lives: " + str(t.lives), lifeFont, white, 5, 0, window)
+                    
+                elif self.gamemode == 1:
+                    t.score = t.score + (timeLeft * 10)
+                    self.draw_text("Time: " + str(timeLeft) + "s", lifeFont, white, 5, 0, window)                
+                
                 self.draw_text("Score: " + str(t.score), lifeFont, white, 105, 0, window)
 
                 self.draw_text_center("You win!", endFont, green, self.screenWidth / 2, self.screenHeight / 2, window)
@@ -465,7 +477,7 @@ class Game():
 
                 if playAgain:
                     pygame.mixer.music.stop()
-                    return Game.game(self, window, matchTime)
+                    return Game.game(self, window)
 
             elif (t.lives == 0 or timeLeft <= 0):
                 hiddenTable = []
@@ -484,7 +496,7 @@ class Game():
 
                 if playAgain:
                     pygame.mixer.music.stop()
-                    return Game.game(self, window, matchTime)
+                    return Game.game(self, window)
 
             else:
                 t.update()
@@ -495,20 +507,47 @@ class Game():
                         t.table[j][i].rect = surface.get_rect()
                         t.table[j][i].makeRect((minBorder + toXCenter) + xSize * i, minBorder + ySize * j)
                 pygame.display.update()
-
-                timeLeft = int(timer - (time.time() - sTime))
+                
+                if self.gamemode == 1:
+                    timeLeft = int(timer - (time.time() - sTime))
 
                 if len(t.selection) >= 1:
-                    t.checkBomb(timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window)
+                    if t.checkBomb(timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window):
+                        
+                        self.stopAllFor(1)
+                        for c in t.selection:
+                            if not (c.ID == "BOMB"):
+                                cards = []
+                                cards.append(c)
+                                self.animate.flip(cards, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, False)
+                        
+                        t.selection.clear()
+                        if self.gamemode == 0:
+                            t.lives = t.lives - 1
+                        elif self.gamemode == 1:
+                            sTime = sTime - 10
+                            
                     if len(t.selection) >= 2:
-                        if not t.checkMatch(timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window):
+                        isMatch = t.checkMatch(timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window)
+                        if isMatch == 2:
                             self.stopAllFor(1)
                             if(running):
                                 self.animate.flip(t.selection, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, False)
                                 t.selection.clear()
-                                t.lives = t.lives - 1
+                                if self.gamemode == 0:
+                                    t.lives = t.lives - 1
                                 streak = 0
                         else:
+                            if isMatch == 1:
+                                match = t.selection[1].ID if t.selection[1].ID != "JOKER" else t.selection[0].ID
+                                t.selection.clear()
+                                for r in t.table:
+                                    for c in r:
+                                        if c.ID == match and not c.shown:
+                                            cards = []
+                                            cards.append(c)
+                                            self.animate.flip(cards, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, True)
+                            t.selection.clear()
                             t.score = t.score + 100 + (50 * streak)
                             streak = streak + 1
 
@@ -559,11 +598,11 @@ class Game():
                         window.fill(self.black)
                         return [False, False, True]
                     
-    def createTable(self, difficulty):
-        if difficulty == 0:
-            return Table(4, 3, self.selectedTheme, 5, difficulty)
-        elif difficulty == 1:
-            return Table(5, 5, self.selectedTheme, 10, difficulty)
+    def createTable(self):
+        if self.difficulty == 0:
+            return Table(4, 3, self.selectedTheme, 5, self.difficulty)
+        elif self.difficulty == 1:
+            return Table(5, 5, self.selectedTheme, 10, self.difficulty)
         else:
-            return Table(5, 5, self.selectedTheme, 6, difficulty)
+            return Table(5, 5, self.selectedTheme, 6, self.difficulty)
         

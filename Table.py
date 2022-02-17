@@ -57,41 +57,19 @@ class Table():
             
     def checkMatch(self, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window):
         if self.selection[0].ID == self.selection[1].ID:
-            self.selection.clear()
-            return True
+            return 0
         
         elif self.selection[0].ID == "JOKER" or self.selection[1].ID == "JOKER":
-            match = self.selection[1].ID if self.selection[1].ID != "JOKER" else self.selection[0].ID
-            self.selection.clear()
-            for r in self.table:
-                for c in r:
-                    if c.ID == match and not c.shown:
-                        cards = []
-                        cards.append(c)
-                        self.animate.flip(cards, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, True)
-            return True
+            return 1
         
-        else:
-            
-            cards = []
-            cards.append(self.selection[0])
-            cards.append(self.selection[1])
-            
-            return False
+        else:       
+            return 2
         
     def checkBomb(self, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window):
         for c in self.selection:
             if c.ID == "BOMB":
-                time.sleep(1)
-                for c in self.selection:
-                    if not (c.ID == "BOMB"):
-                        cards = []
-                        cards.append(c)
-                        self.animate.flip(cards, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, False)
-
-            
-                self.lives = self.lives - 1
-                self.selection.clear()
+                return True
+                
                 
     def checkWin(self, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window):
         extra = []
@@ -102,10 +80,5 @@ class Table():
                         extra.append(c)
                     else:
                         return False
-        
-        for card in extra:
-            card.show()
-        
-        self.animate.flip(extra, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, True)
         
         return True
