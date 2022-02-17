@@ -16,6 +16,7 @@ running = True
 class Game():
     screen = None
     def __init__(self):
+        self.difficulty = int(self.readSettingFromFile("difficulty"))
         self.volume = int(self.readSettingFromFile("volume"))
         self.selectedTheme = self.readCardTheme()
         self.FPS = int(self.readSettingFromFile("FPS"))
@@ -136,17 +137,16 @@ class Game():
         )
 
         def setDifficulty(difficulty, difficultyIndex, **kwargs):
-            # global selectedTheme
             value_tuple, index = difficulty
-            # selectedTheme = value_tuple[0]
-            #self.saveInitialCardTheme(value_tuple[0])
+            self.difficulty = value_tuple[1]
+            self.saveSettingToFile("difficulty", str(value_tuple[1]))
 
-        allDificulties = [('Easy', 0),
+        allDifficulties = [('Easy', 0),
                           ('Medium', 1),
                           ('Hard', 2)]
         difficultySelector = menu.add.dropselect(
             title="Difficulty",
-            items=allDificulties,
+            items=allDifficulties,
             # placeholder=allThemes[defaultCardTheme][0],
             onchange=setDifficulty,
             scrollbar_thick=5,
@@ -154,7 +154,7 @@ class Game():
             # selection_box_border_color=(0,0,0,0),
             selection_box_width=250,
             selection_box_height=250,
-            placeholder='Medium',
+            placeholder= allDifficulties[self.difficulty][0],
             placeholder_add_to_selection_box=False
         )
 
@@ -171,10 +171,15 @@ class Game():
             # selectedTheme = value_tuple[0]
             #self.saveInitialCardTheme(value_tuple[0])
 
-        allResolutions = [('1280 x 950', 1280, 950),
-                          ('1000 x 1000', 1000, 1000),
-                          ('650 x 480', 650, 480),
-                          ('Full Screen', 1200, 700)]
+        allResolutions = [('2560 x 1440', 2560, 1440),
+                          ('1920 x 1200', 1920, 1200),
+                          ('1920 x 1080', 1920, 1080),
+                          ('1680 x 1050', 1680, 1050),
+                          ('1440 x 900', 1440, 900),
+                          ('1366 x 768', 1366, 768),
+                          ('1280 x 800', 1280, 800),
+                          ('1280 x 720', 1280, 720),
+                          ('1024 x 768', 1024, 768)]
         resolutionSelector = menu.add.dropselect(
             title="Resolution",
             items=allResolutions,
@@ -375,7 +380,7 @@ class Game():
         es = threading.Thread(target=parallelEscape)
         es.start()
         window.fill(self.black)
-        t = self.createTable(1)
+        t = self.createTable(self.difficulty)
 
         green = (0, 255, 0)
         red = (255, 0, 0)
@@ -556,9 +561,9 @@ class Game():
                     
     def createTable(self, difficulty):
         if difficulty == 0:
-            return Table(4, 3, self.selectedTheme, 5, difficulty, self.FPS)
+            return Table(4, 3, self.selectedTheme, 5, difficulty)
         elif difficulty == 1:
-            return Table(5, 5, self.selectedTheme, 10, difficulty, self.FPS)
+            return Table(5, 5, self.selectedTheme, 10, difficulty)
         else:
-            return Table(5, 5, self.selectedTheme, 6, difficulty, self.FPS)
+            return Table(5, 5, self.selectedTheme, 6, difficulty)
         
