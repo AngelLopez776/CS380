@@ -9,20 +9,19 @@ import pygame_menu
 from pygame.locals import *
 from pygame import mixer
 import threading
-import keyboard
+import keyboard #must be installed: pip install keyboard in anaconda cmd
 
 running = True
 
 class Game():
-    screen = None
     def __init__(self):
-        self.difficulty = int(self.readSettingFromFile("difficulty"))
+        self.difficulty = int(self.readSettingFromFile("SavedVariables.txt", "difficulty"))
         self.gamemode = 1 #Need to add setting for this, 0 for lives game and 1 for timed
-        self.volume = int(self.readSettingFromFile("volume"))
+        self.volume = int(self.readSettingFromFile("SavedVariables.txt", "volume"))
         self.selectedTheme = self.readCardTheme()
-        self.FPS = int(self.readSettingFromFile("FPS"))
-        self.screenWidth = int(self.readSettingFromFile("screenWidth"))
-        self.screenHeight = int(self.readSettingFromFile("screenHeight"))
+        self.FPS = int(self.readSettingFromFile("SavedVariables.txt", "FPS"))
+        self.screenWidth = int(self.readSettingFromFile("SavedVariables.txt", "screenWidth"))
+        self.screenHeight = int(self.readSettingFromFile("SavedVariables.txt", "screenHeight"))
         self.mainClock = pygame.time.Clock()
         self.animate = Animations(self.FPS)
         self.green = (0, 255, 0)
@@ -58,8 +57,8 @@ class Game():
             dim = yLength / 350
         return dim
 
-    def readSettingFromFile(self, sName):
-        file = open("SavedVariables.txt")
+    def readSettingFromFile(self, fName, sName):
+        file = open(fName, 'r')
         string = None
         for line in file:
             if (line.startswith(sName)):
@@ -70,8 +69,8 @@ class Game():
         file.close()
         return string
 
-    def saveSettingToFile(self, sName, sValue):
-        file = open("SavedVariables.txt", "r")
+    def saveSettingToFile(self, fName, sName, sValue):
+        file = open(fName, "r")
         settings = []
         for line in file:
             if (line.startswith(sName)):
@@ -81,13 +80,13 @@ class Game():
                 settings.append(line)
         file.close()
         print(settings)
-        file = open("SavedVariables.txt", "w")
+        file = open(fName, "w")
         for setting in settings:
             file.write(setting + "\n")
         file.close()
 
     def readCardTheme(self):
-        InitialCardSetting = self.readSettingFromFile("selectedTheme")
+        InitialCardSetting = self.readSettingFromFile("SavedVariables.txt", "selectedTheme")
         InitialCardSetting = InitialCardSetting.replace("theme_", "")
         print(InitialCardSetting)
         return InitialCardSetting
@@ -96,9 +95,22 @@ class Game():
     def saveInitialCardTheme(self, newTheme):
         self.selectedTheme = newTheme
         newTheme = "theme_" + newTheme
-        self.saveSettingToFile("selectedTheme", newTheme)
-
-    def options(self, screen):
+        self.saveSettingToFile("SavedVariables.txt", "selectedTheme", newTheme)
+        
+    def sOrMOptions(self, screen):
+        #here will be the options menu to choose singlePlayer or multiPlayer
+        #from here you will be able to start either multiplayer or singleplayer, or go into the options for either
+        pass
+    
+    def singlePlayerOptions(self, screen):
+        #here will be the singleplayer options: for now it is just difficulty; may be more in the future
+        pass
+    
+    def multiplayerOptions(self, screen):
+        #here will be the multiplayer options
+        pass
+    
+    def settingsOptions(self, screen):
         optionsMenu = screen
         # This function has a lot about it that doesn't make sense, but it seems to need to be this way
 
@@ -140,7 +152,7 @@ class Game():
         def setDifficulty(difficulty, difficultyIndex, **kwargs):
             value_tuple, index = difficulty
             self.difficulty = value_tuple[1]
-            self.saveSettingToFile("difficulty", str(value_tuple[1]))
+            self.saveSettingToFile("SavedVariables.txt", "difficulty", str(value_tuple[1]))
 
         allDifficulties = [('Easy', 0),
                           ('Medium', 1),
@@ -166,11 +178,8 @@ class Game():
             self.screenHeight = resY
             screen = pygame.display.set_mode((self.screenWidth, self.screenHeight), 0, 32)
             menu.resize(resX, resY)
-            self.saveSettingToFile("screenWidth", str(resX))
-            self.saveSettingToFile("screenHeight", str(resY))
-
-            # selectedTheme = value_tuple[0]
-            #self.saveInitialCardTheme(value_tuple[0])
+            self.saveSettingToFile("SavedVariables.txt", "screenWidth", str(resX))
+            self.saveSettingToFile("SavedVariables.txt", "screenHeight", str(resY))
 
         allResolutions = [('2560 x 1440', 2560, 1440),
                           ('1920 x 1200', 1920, 1200),
@@ -201,7 +210,7 @@ class Game():
             # selectedTheme = value_tuple[0]
             self.FPS = newFPSNum
             self.animate.frames = newFPSNum
-            self.saveSettingToFile("FPS", value_tuple[0])
+            self.saveSettingToFile("SavedVariables.txt", "FPS", value_tuple[0])
 
         allFPS = [('360', 360),
                   ('140', 140),
@@ -227,7 +236,7 @@ class Game():
             val = int(range)
             self.volume = int(val)
             mixer.music.set_volume(self.volume/100)
-            self.saveSettingToFile("volume", str(val))
+            self.saveSettingToFile("SavedVariables.txt", "volume", str(val))
             #set volume of mixer takes value only from 0 to 1, val is divided by 100
 
         volumeSlider = menu.add.range_slider(
@@ -267,7 +276,6 @@ class Game():
             self.mainClock.tick(self.FPS)
 
     def main_menu(self):
-        global screen
         screen = pygame.display.set_mode((self.screenWidth, self.screenHeight), 0, 32)
 
         titleFont = pygame.font.Font("assets/font.ttf", 50)
@@ -315,7 +323,7 @@ class Game():
                     mixer.music.load('Sounds/settings.mp3')
                     mixer.music.set_volume(self.volume/100)
                     mixer.music.play(-1)
-                    self.options(screen)
+                    self.settingsOptions(screen)
             pygame.draw.rect(screen, white, button_2)
             text_2Rect = text_2.get_rect()
             text_2Rect.center = button_2.center
@@ -439,8 +447,6 @@ class Game():
         
         while running:
             self.mainClock.tick(self.FPS)
-            #if es.is_alive():
-            #    print("fart")
             mouse = pygame.mouse.get_pos()
 
             window.fill(black, (0, 0, 400, 40))  # so cards show during lose screen
