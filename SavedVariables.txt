@@ -1,5 +1,4 @@
-selectedTheme=theme_Pokemon
-
+selectedTheme=theme_Tarrot
 FPS=140
 
 screenWidth=1280
@@ -11,3 +10,4 @@ volume=29
 difficulty=2
 
 gamemode=1
+
