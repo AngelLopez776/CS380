@@ -443,9 +443,10 @@ class Game():
                     if START_BUTTON.checkForInput(MENU_MOUSE_POS):
                         pygame.mixer.music.stop()
                         screen.fill(black)
-                        if self.game(screen):
-                            pygame.quit()
-                            sys.exit()
+                        self.sOrMOptions(screen)
+                        #if self.game(screen):
+                         #   pygame.quit()
+                          #  sys.exit()
                     
                     if OPTIONS_BUTTON.checkForInput(MENU_MOUSE_POS):
                         mixer.init()
