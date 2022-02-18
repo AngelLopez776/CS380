@@ -91,7 +91,6 @@ class Game():
         print(InitialCardSetting)
         return InitialCardSetting
 
-    # not perfect: deletes whole file!
     def saveInitialCardTheme(self, newTheme):
         self.selectedTheme = newTheme
         newTheme = "theme_" + newTheme
