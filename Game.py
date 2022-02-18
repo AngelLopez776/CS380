@@ -5,6 +5,7 @@ import sys
 from Table import Table
 import time
 from Animations import Animations
+from Button import Button
 import pygame_menu
 from pygame.locals import *
 from pygame import mixer
@@ -394,7 +395,6 @@ class Game():
         screen = pygame.display.set_mode((self.screenWidth, self.screenHeight), 0, 32)
 
         titleFont = pygame.font.Font("assets/font.ttf", 50)
-        font = pygame.font.SysFont(None, 20)
 
         # Main Menu Music
         mixer.init()
@@ -405,64 +405,30 @@ class Game():
         white = (255, 255, 255)
         black = (0, 0, 0)
 
-        click = False
+        
         while True:       
             screen.fill((202, 228, 241))
             self.draw_text_center('Memory Matching', titleFont, white,  self.screenWidth / 2, self.screenHeight / 6, screen)
             self.draw_text_center('Game', titleFont, white,  self.screenWidth / 2, self.screenHeight / 4, screen)
 
-            mx, my = pygame.mouse.get_pos()
+            MENU_MOUSE_POS = pygame.mouse.get_pos()
 
             # Start Game Button
-            butHalfX = 100
-            button_1 = pygame.Rect(self.screenWidth/2 - butHalfX, self.screenHeight*3/8, 200, 50)
-            text_1 = font.render("Start Game", True, black)
-            if button_1.collidepoint((mx, my)):
-                if click:
-                    pygame.mixer.music.pause()
-                    mixer.init()
-                    mixer.music.load('Sounds/'+str(self.selectedTheme)+'.mp3')
-                    mixer.music.set_volume(self.volume/100)
-                    mixer.music.play(-1)
-                    
-                    screen.fill(black)
-                    self.sOrMOptions(screen)
-                    #if self.game(screen):
-                     #   pygame.quit()
-                     #   sys.exit()
-            pygame.draw.rect(screen, white, button_1)
-            text_1Rect = text_1.get_rect()
-            text_1Rect.center = button_1.center
-            screen.blit(text_1, text_1Rect)
+            START_BUTTON = Button(image=pygame.image.load("Assets/ButtonBG.jpg"), pos=(self.screenWidth/2, self.screenHeight*3/8), 
+                            text_input="Start Game", font=pygame.font.Font("assets/font.ttf", 25), base_color="#d7fcd4", hovering_color="White")
 
             # Options buttons
-            button_2 = pygame.Rect(self.screenWidth/2 - butHalfX, self.screenHeight*4/8, 200, 50)
-            text_2 = font.render("Options", True, black)
-            if button_2.collidepoint((mx, my)):
-                if click:
-                    mixer.init()
-                    mixer.music.load('Sounds/settings.mp3')
-                    mixer.music.set_volume(self.volume/100)
-                    mixer.music.play(-1)
-                    self.settingsOptions(screen)
-            pygame.draw.rect(screen, white, button_2)
-            text_2Rect = text_2.get_rect()
-            text_2Rect.center = button_2.center
-            screen.blit(text_2, text_2Rect)
+            OPTIONS_BUTTON = Button(image=pygame.image.load("Assets/ButtonBG.jpg"), pos=(self.screenWidth/2, self.screenHeight*5/8), 
+                            text_input="Options", font=pygame.font.Font("assets/font.ttf", 25), base_color="#d7fcd4", hovering_color="White")
 
             # Quit Game Button
-            button_3 = pygame.Rect(self.screenWidth/2 - butHalfX, self.screenHeight*5/8, 200, 50)
-            text_3 = font.render("Quit Game", True, black)
-            if button_3.collidepoint((mx, my)):
-                if click:
-                    pygame.quit()
-                    sys.exit()
-            pygame.draw.rect(screen, white, button_3)
-            text_3Rect = text_3.get_rect()
-            text_3Rect.center = button_3.center
-            screen.blit(text_3, text_3Rect)
+            QUIT_BUTTON = Button(image=pygame.image.load("Assets/ButtonBG.jpg"), pos=(self.screenWidth/2, self.screenHeight*7/8), 
+                            text_input="Quit", font=pygame.font.Font("assets/font.ttf", 25), base_color="#d7fcd4", hovering_color="White")
 
-            click = False
+            for button in [START_BUTTON, OPTIONS_BUTTON, QUIT_BUTTON]:
+                button.changeColor(MENU_MOUSE_POS)
+                button.update(screen)
+        
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
@@ -473,9 +439,25 @@ class Game():
                         pygame.quit()
                         sys.exit()
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    if event.button == 1:
-                        click = True
-
+                    # Button events when specific buttons are clicked
+                    if START_BUTTON.checkForInput(MENU_MOUSE_POS):
+                        pygame.mixer.music.stop()
+                        screen.fill(black)
+                        if self.game(screen):
+                            pygame.quit()
+                            sys.exit()
+                    
+                    if OPTIONS_BUTTON.checkForInput(MENU_MOUSE_POS):
+                        mixer.init()
+                        mixer.music.load('Sounds/settings.mp3')
+                        mixer.music.set_volume(self.volume/100)
+                        mixer.music.play(-1)
+                        self.settingsOptions(screen)
+                    
+                    if QUIT_BUTTON.checkForInput(MENU_MOUSE_POS):
+                        pygame.quit()
+                        sys.exit()
+            
             pygame.display.update()
             self.mainClock.tick(self.FPS)
             
