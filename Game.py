@@ -16,7 +16,7 @@ running = True
 class Game():
     def __init__(self):
         self.difficulty = int(self.readSettingFromFile("SavedVariables.txt", "difficulty"))
-        self.gamemode = 1 #Need to add setting for this, 0 for lives game and 1 for timed
+        self.gamemode = int(self.readSettingFromFile("SavedVariables.txt", "gamemode"))
         self.volume = int(self.readSettingFromFile("SavedVariables.txt", "volume"))
         self.selectedTheme = self.readCardTheme()
         self.FPS = int(self.readSettingFromFile("SavedVariables.txt", "FPS"))
@@ -98,13 +98,149 @@ class Game():
         self.saveSettingToFile("SavedVariables.txt", "selectedTheme", newTheme)
         
     def sOrMOptions(self, screen):
-        #here will be the options menu to choose singlePlayer or multiPlayer
-        #from here you will be able to start either multiplayer or singleplayer, or go into the options for either
-        pass
+        optionsMenu = screen
+        # This function has a lot about it that doesn't make sense, but it seems to need to be this way
+
+        menuTheme = pygame_menu.themes.Theme(
+            background_color=(202, 228, 241),
+            title_background_color=(202, 228, 241),
+        )
+        
+        menu = pygame_menu.Menu(
+            title="",
+            height=self.screenHeight,
+            width=self.screenWidth,
+            columns=2,
+            rows=2,
+            theme=menuTheme)
+
+        def singlePlayer(**kwargs):
+            self.game(screen)
+            #self.main_menu()#returns to main menu instead of options menu
+        
+        playSBut = menu.add.button('Single-Player', singlePlayer)
+        playSBut.add_self_to_kwargs()
+        
+        def singlePlayerOptions(**kwargs):
+            self.singlePlayerOptions(screen)
+        
+        optionsSBut = menu.add.button('Single-Player Options', singlePlayerOptions)
+        optionsSBut.add_self_to_kwargs()
+        
+        def multiPlayer(**kwargs):
+            self.game(screen)
+            #self.main_menu()#returns to main menu instead of options menu
+        
+        playMBut = menu.add.button('Multi-Player', multiPlayer)
+        playMBut.add_self_to_kwargs()
+        
+        def multiPlayerOptions(**kwargs):
+            self.multiplayerOptions(screen)
+        
+        optionsMBut = menu.add.button('Multi-Player Options', multiPlayerOptions)
+        optionsMBut.add_self_to_kwargs()
+        
+        while True:
+            optionsMenu.fill((202, 228, 241))
+            self.draw_text_center(
+                "Press escape to go back to main menu",
+                self.lifeFont, self.white,
+                self.screenWidth / 2, self.screenHeight / 6,
+                optionsMenu
+            )
+            events = pygame.event.get()
+            # events2 = pygame.event.get()
+            menu.draw(optionsMenu)
+            menu.update(events)
+            for event in events:
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        return
+            pygame.display.update()
+            self.mainClock.tick(self.FPS)
     
     def singlePlayerOptions(self, screen):
-        #here will be the singleplayer options: for now it is just difficulty; may be more in the future
-        pass
+       optionsMenu = screen
+       # This function has a lot about it that doesn't make sense, but it seems to need to be this way
+
+       menuTheme = pygame_menu.themes.Theme(
+           background_color=(202, 228, 241),
+           title_background_color=(0, 0, 0, 0),
+       )
+
+       menu = pygame_menu.Menu(
+           title="",
+           height=self.screenHeight,
+           width=self.screenWidth,
+           theme=menuTheme)
+       
+       livesOn = int(self.gamemode) & 0x01
+       timeOn = (int(self.gamemode) & 0x02) >> 1
+       
+       def setLivesOption(isLives, **kwargs):
+           if(isLives):
+               self.gamemode |= 0x1
+           else:
+               self.gamemode &= 0xE
+           self.saveSettingToFile('SavedVariables.txt', 'gamemode', str(self.gamemode))
+           print(livesOn, " ", timeOn, " ", self.gamemode)
+
+
+       def setTimeOption(isTime, **kwargs):
+           if(isTime):
+               self.gamemode |= 0x2
+           else:
+               self.gamemode &= 0xD
+           self.saveSettingToFile('SavedVariables.txt', 'gamemode', str(self.gamemode))
+           print(livesOn, " ", timeOn, " ", self.gamemode)
+       livesSwitch = menu.add.toggle_switch("Lives", onchange=setLivesOption, default=livesOn)
+       timeSwitch = menu.add.toggle_switch("Timer", onchange=setTimeOption, default=timeOn)
+
+       def setDifficulty(difficulty, difficultyIndex, **kwargs):
+           value_tuple, index = difficulty
+           self.difficulty = value_tuple[1]
+           self.saveSettingToFile("SavedVariables.txt", "difficulty", str(value_tuple[1]))
+
+       allDifficulties = [('Easy', 0),
+                         ('Medium', 1),
+                         ('Hard', 2)]
+       difficultySelector = menu.add.dropselect(
+           title="Difficulty",
+           items=allDifficulties,
+           # placeholder=allThemes[defaultCardTheme][0],
+           onchange=setDifficulty,
+           scrollbar_thick=5,
+           selection_option_font=self.lifeFont,
+           # selection_box_border_color=(0,0,0,0),
+           selection_box_width=250,
+           selection_box_height=250,
+           placeholder= allDifficulties[self.difficulty][0],
+           placeholder_add_to_selection_box=False
+       )
+       
+       livesSwitch.add_self_to_kwargs()
+       timeSwitch.add_self_to_kwargs()
+       difficultySelector.add_self_to_kwargs()  # Callbacks will receive widget as parameter
+       
+       # running = True
+       while True:
+           optionsMenu.fill(self.black)
+           self.draw_text_center(
+               "Press escape to go back to main menu",
+               self.lifeFont, self.white,
+               self.screenWidth / 2, self.screenHeight / 6,
+               optionsMenu
+           )
+           events = pygame.event.get()
+           # events2 = pygame.event.get()
+           menu.draw(optionsMenu)
+           menu.update(events)
+           for event in events:
+               if event.type == pygame.KEYDOWN:
+                   if event.key == pygame.K_ESCAPE:
+                       return
+           pygame.display.update()
+           self.mainClock.tick(self.FPS)
     
     def multiplayerOptions(self, screen):
         #here will be the multiplayer options
@@ -149,27 +285,6 @@ class Game():
             placeholder_add_to_selection_box=False
         )
 
-        def setDifficulty(difficulty, difficultyIndex, **kwargs):
-            value_tuple, index = difficulty
-            self.difficulty = value_tuple[1]
-            self.saveSettingToFile("SavedVariables.txt", "difficulty", str(value_tuple[1]))
-
-        allDifficulties = [('Easy', 0),
-                          ('Medium', 1),
-                          ('Hard', 2)]
-        difficultySelector = menu.add.dropselect(
-            title="Difficulty",
-            items=allDifficulties,
-            # placeholder=allThemes[defaultCardTheme][0],
-            onchange=setDifficulty,
-            scrollbar_thick=5,
-            selection_option_font=self.lifeFont,
-            # selection_box_border_color=(0,0,0,0),
-            selection_box_width=250,
-            selection_box_height=250,
-            placeholder= allDifficulties[self.difficulty][0],
-            placeholder_add_to_selection_box=False
-        )
 
         def setResolution(newRes, resX, resY, **kwargs):
             global screen
@@ -250,7 +365,6 @@ class Game():
         )
 
         themeSelector.add_self_to_kwargs()  # Callbacks will receive widget as parameter
-        difficultySelector.add_self_to_kwargs()  # Callbacks will receive widget as parameter
         resolutionSelector.add_self_to_kwargs()  # Callbacks will receive widget as parameter
         fpsSelector.add_self_to_kwargs()  # Callbacks will receive widget as parameter
         volumeSlider.add_self_to_kwargs()  # Callbacks will receive widget as parameter
@@ -306,9 +420,10 @@ class Game():
                 if click:
                     pygame.mixer.music.stop()
                     screen.fill(black)
-                    if self.game(screen):
-                        pygame.quit()
-                        sys.exit()
+                    self.sOrMOptions(screen)
+                    #if self.game(screen):
+                     #   pygame.quit()
+                     #   sys.exit()
             pygame.draw.rect(screen, white, button_1)
             text_1Rect = text_1.get_rect()
             text_1Rect.center = button_1.center
@@ -450,10 +565,14 @@ class Game():
             mouse = pygame.mouse.get_pos()
 
             window.fill(black, (0, 0, 400, 40))  # so cards show during lose screen
-            if self.gamemode == 0:
+            if self.gamemode == 1:
                 self.draw_text("Lives: " + str(t.lives), lifeFont, white, 5, 0, window)
-            elif self.gamemode == 1:
+            elif self.gamemode == 2:
                 self.draw_text("Time: " + str(timeLeft) + "s", lifeFont, white, 5, 0, window)
+            elif self.gamemode == 3:
+                self.draw_text("Lives: " + str(t.lives), lifeFont, white, 5, 0, window)
+                self.draw_text("Time: " + str(timeLeft) + "s", lifeFont, white, 5, 20, window)
+
             self.draw_text("Score: " + str(t.score), lifeFont, white, 105, 0, window)
 
             if (t.checkWin(timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window)):
@@ -462,13 +581,17 @@ class Game():
                 if len(t.selection) >= 2:
                     t.score = t.score + 100 + (50 * streak)
                     
-                if self.gamemode == 0:
+                if self.gamemode == 1:
                     t.score = t.score + (t.lives * 100)
                     self.draw_text("Lives: " + str(t.lives), lifeFont, white, 5, 0, window)
-                    
-                elif self.gamemode == 1:
+                elif self.gamemode == 2:
                     t.score = t.score + (timeLeft * 10)
-                    self.draw_text("Time: " + str(timeLeft) + "s", lifeFont, white, 5, 0, window)                
+                    self.draw_text("Time: " + str(timeLeft) + "s", lifeFont, white, 5, 0, window)    
+                elif self.gamemode == 3:
+                    t.score = t.score + (t.lives * 100) + (timeLeft * 10)
+                    self.draw_text("Lives: " + str(t.lives), lifeFont, white, 5, 0, window)
+                    self.draw_text("Time: " + str(timeLeft) + "s", lifeFont, white, 5, 20, window)
+
                 
                 self.draw_text("Score: " + str(t.score), lifeFont, white, 105, 0, window)
 
@@ -514,7 +637,7 @@ class Game():
                         t.table[j][i].makeRect((minBorder + toXCenter) + xSize * i, minBorder + ySize * j)
                 pygame.display.update()
                 
-                if self.gamemode == 1:
+                if self.gamemode == 2 or self.gamemode == 3:
                     timeLeft = int(timer - (time.time() - sTime))
 
                 if len(t.selection) >= 1:
@@ -528,9 +651,12 @@ class Game():
                                 self.animate.flip(cards, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, False)
                         
                         t.selection.clear()
-                        if self.gamemode == 0:
+                        if self.gamemode == 1:
                             t.lives = t.lives - 1
-                        elif self.gamemode == 1:
+                        elif self.gamemode == 2:
+                            sTime = sTime - 10
+                        elif self.gamemode == 3:
+                            t.lives = t.lives - 1
                             sTime = sTime - 10
                             
                     if len(t.selection) >= 2:
@@ -540,7 +666,7 @@ class Game():
                             if(running):
                                 self.animate.flip(t.selection, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, False)
                                 t.selection.clear()
-                                if self.gamemode == 0:
+                                if self.gamemode == 1 or self.gamemode == 3:
                                     t.lives = t.lives - 1
                                 streak = 0
                         else:
