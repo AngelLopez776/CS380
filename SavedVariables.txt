@@ -6,8 +6,8 @@ screenWidth=1280
 
 screenHeight=720
 
-volume=0
+volume=29
 
 difficulty=2
 
-gamemode=0
+gamemode=1
