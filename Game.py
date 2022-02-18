@@ -408,8 +408,8 @@ class Game():
         click = False
         while True:       
             screen.fill((202, 228, 241))
-            self.draw_text_center('Place Holder', titleFont, white,  self.screenWidth / 2, self.screenHeight / 6, screen)
-            self.draw_text_center('Title', titleFont, white,  self.screenWidth / 2, self.screenHeight / 4, screen)
+            self.draw_text_center('Memory Matching', titleFont, white,  self.screenWidth / 2, self.screenHeight / 6, screen)
+            self.draw_text_center('Game', titleFont, white,  self.screenWidth / 2, self.screenHeight / 4, screen)
 
             mx, my = pygame.mouse.get_pos()
 
@@ -420,6 +420,11 @@ class Game():
             if button_1.collidepoint((mx, my)):
                 if click:
                     pygame.mixer.music.pause()
+                    mixer.init()
+                    mixer.music.load('Sounds/'+str(self.selectedTheme)+'.mp3')
+                    mixer.music.set_volume(self.volume/100)
+                    mixer.music.play(-1)
+                    
                     screen.fill(black)
                     self.sOrMOptions(screen)
                     #if self.game(screen):
