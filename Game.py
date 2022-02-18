@@ -9,7 +9,7 @@ import pygame_menu
 from pygame.locals import *
 from pygame import mixer
 import threading
-#import keyboard
+import keyboard
 
 running = True
 
@@ -600,9 +600,9 @@ class Game():
                     
     def createTable(self):
         if self.difficulty == 0:
-            return Table(4, 3, self.selectedTheme, 5, self.difficulty)
+            return Table(4, 3, self.selectedTheme, 5, self.difficulty, self.FPS)
         elif self.difficulty == 1:
-            return Table(5, 5, self.selectedTheme, 10, self.difficulty)
+            return Table(5, 5, self.selectedTheme, 10, self.difficulty, self.FPS)
         else:
-            return Table(5, 5, self.selectedTheme, 6, self.difficulty)
+            return Table(5, 5, self.selectedTheme, 6, self.difficulty, self.FPS)
         

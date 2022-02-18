@@ -2,10 +2,10 @@ selectedTheme=theme_Mario
 
 FPS=140
 
-screenWidth=1920
+screenWidth=1024
 
-screenHeight=1080
+screenHeight=768
 
-volume=11
-
+volume=0
 difficulty=1
+
