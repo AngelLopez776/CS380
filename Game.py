@@ -454,7 +454,6 @@ class Game():
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     # Button events when specific buttons are clicked
                     if START_BUTTON.checkForInput(MENU_MOUSE_POS):
-                        pygame.mixer.music.stop()
                         mixer.init()
                         mixer.music.load('Sounds/loading.mp3')
                         mixer.music.set_volume(self.volume/100)
@@ -536,7 +535,12 @@ class Game():
         ySize = yDim + inBTween
         toXCenter = self.centerDeckX(xSize, t.x, self.screenWidth, minBorder)
         timeToFlip = int(3000 * scale)  # can't be too fast or frames don't register
-
+        
+        mixer.init()
+        mixer.music.load('Sounds/'+str(self.selectedTheme)+'.mp3')
+        mixer.music.set_volume(self.volume/100)
+        mixer.music.play(-1)
+        
         t.showAll()
         tempTable = []
         for i in range(t.x):
@@ -634,6 +638,7 @@ class Game():
                 self.draw_text_center("You lose!", endFont, red, self.screenWidth / 2, self.screenHeight / 2, window)
                 mixer.init()
                 mixer.music.load('Sounds/gameover.mp3')
+                mixer.music.set_volume(self.volume/100)
                 mixer.music.play()
 
                 running, quitG, playAgain = self.endScreen(window)
@@ -717,8 +722,6 @@ class Game():
                     pygame.quit()
                     sys.exit()  
             
-
-        pygame.mixer.music.pause()
         es.join(0)
         return quitG
         
