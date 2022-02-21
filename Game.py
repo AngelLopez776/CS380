@@ -155,6 +155,10 @@ class Game():
             for event in events:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
+                        mixer.init()
+                        mixer.music.load('Sounds/mainmenu.mp3')
+                        mixer.music.set_volume(self.volume/100)
+                        mixer.music.play(-1)
                         return
             pygame.display.update()
             self.mainClock.tick(self.FPS)
@@ -387,6 +391,10 @@ class Game():
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         pygame.mixer.music.pause()
+                        mixer.init()
+                        mixer.music.load('Sounds/mainmenu.mp3')
+                        mixer.music.set_volume(self.volume/100)
+                        mixer.music.play(-1)
                         return
             pygame.display.update()
             self.mainClock.tick(self.FPS)
