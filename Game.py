@@ -242,7 +242,10 @@ class Game():
            for event in events:
                if event.type == pygame.KEYDOWN:
                    if event.key == pygame.K_ESCAPE:
-                       pygame.mixer.music.stop()
+                       mixer.init()
+                       mixer.music.load('Sounds/mainmenu.mp3')
+                       mixer.music.set_volume(self.volume/100)
+                       mixer.music.play(-1)
                        return
            pygame.display.update()
            self.mainClock.tick(self.FPS)
@@ -390,7 +393,6 @@ class Game():
             for event in events:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
-                        pygame.mixer.music.pause()
                         mixer.init()
                         mixer.music.load('Sounds/mainmenu.mp3')
                         mixer.music.set_volume(self.volume/100)
@@ -443,13 +445,20 @@ class Game():
                     sys.exit()
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
-                        pygame.mixer.music.stop()
+                        mixer.init()
+                        mixer.music.load('Sounds/mainmenu.mp3')
+                        mixer.music.set_volume(self.volume/100)
+                        mixer.music.play(-1)
                         pygame.quit()
                         sys.exit()
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     # Button events when specific buttons are clicked
                     if START_BUTTON.checkForInput(MENU_MOUSE_POS):
                         pygame.mixer.music.stop()
+                        mixer.init()
+                        mixer.music.load('Sounds/loading.mp3')
+                        mixer.music.set_volume(self.volume/100)
+                        mixer.music.play()
                         screen.fill(black)
                         self.sOrMOptions(screen)
                         #if self.game(screen):
@@ -492,7 +501,11 @@ class Game():
             global running
             while True:
                 if keyboard.is_pressed("Esc"):
-                    pygame.mixer.music.pause()
+                    #when exiting game this will play main menu sound in the select screen, not finished
+                    mixer.init()
+                    mixer.music.load('Sounds/mainmenu.mp3')
+                    mixer.music.set_volume(self.volume/100)
+                    mixer.music.play(-1)
                     running = False
                 time.sleep(0.05)
         
@@ -604,7 +617,10 @@ class Game():
                 running, quitG, playAgain = self.endScreen(window)
 
                 if playAgain:
-                    pygame.mixer.music.pause()
+                    mixer.init()
+                    mixer.music.load('Sounds/'+str(self.selectedTheme)+'.mp3')
+                    mixer.music.set_volume(self.volume/100)
+                    mixer.music.play(-1)
                     return Game.game(self, window)
 
             elif (t.lives == 0 or timeLeft <= 0):
@@ -623,7 +639,10 @@ class Game():
                 running, quitG, playAgain = self.endScreen(window)
 
                 if playAgain:
-                    pygame.mixer.music.pause()
+                    mixer.init()
+                    mixer.music.load('Sounds/'+str(self.selectedTheme)+'.mp3')
+                    mixer.music.set_volume(self.volume/100)
+                    mixer.music.play(-1)
                     return Game.game(self, window)
 
             else:
@@ -720,7 +739,10 @@ class Game():
                     return [False, True, False]  # [Running, quitgame, playagain]
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
-                        pygame.mixer.music.pause()
+                        mixer.init()
+                        mixer.music.load('Sounds/loading.mp3')
+                        mixer.music.set_volume(self.volume/100)
+                        mixer.music.play()
                         return [False, False, False]
                     if event.key == pygame.K_r:
                         window.fill(self.black)  # so cards show during lose screen

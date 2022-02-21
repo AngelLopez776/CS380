@@ -1,12 +1,12 @@
 selectedTheme=theme_Pokemon
+
 FPS=140
 
 screenWidth=1280
 
 screenHeight=720
 
-volume=2
-
+volume=3
 difficulty=2
 
 gamemode=1
