@@ -244,8 +244,97 @@ class Game():
            self.mainClock.tick(self.FPS)
     
     def multiplayerOptions(self, screen):
-        #here will be the multiplayer options
-        pass
+        optionsMenu = screen
+        # This function has a lot about it that doesn't make sense, but it seems to need to be this way
+
+        menuTheme = pygame_menu.themes.Theme(
+            background_color=(202, 228, 241),
+            title_background_color=(0, 0, 0, 0),
+        )
+
+        menu = pygame_menu.Menu(
+            title="",
+            height=self.screenHeight,
+            width=self.screenWidth/2,
+            theme=menuTheme)
+        
+        livesOn = int(self.gamemode) & 0x01
+        timeOn = (int(self.gamemode) & 0x02) >> 1 
+      
+        
+        
+        def setLivesOption(isLives, **kwargs):
+            if(isLives):
+                self.gamemode |= 0x1
+                timeSwitch.show()
+
+            else:
+                self.gamemode &= 0xE
+                setTimeOption(False)
+                timeSwitch.hide()
+            self.saveSettingToFile('SavedVariables.txt', 'gamemode', str(self.gamemode))
+
+        def setTimeOption(isTime, **kwargs):
+            if(isTime):
+                self.gamemode |= 0x2
+            else:
+                self.gamemode &= 0xD
+            self.saveSettingToFile('SavedVariables.txt', 'gamemode', str(self.gamemode))
+            
+        livesSwitch = menu.add.toggle_switch("Lives", onchange=setLivesOption, default=livesOn)
+        timeSwitch = menu.add.toggle_switch("Timer", onchange=setTimeOption, default=timeOn, align=pygame_menu.locals.ALIGN_RIGHT)
+        
+        if(not livesOn):
+            setTimeOption(False)
+            timeSwitch.hide()
+            
+        def setDifficulty(difficulty, difficultyIndex, **kwargs):
+            value_tuple, index = difficulty
+            self.difficulty = value_tuple[1]
+            self.saveSettingToFile("SavedVariables.txt", "difficulty", str(value_tuple[1]))
+
+        allDifficulties = [('Easy', 0),
+                          ('Medium', 1),
+                          ('Hard', 2)]
+        difficultySelector = menu.add.dropselect(
+            title="Difficulty",
+            items=allDifficulties,
+            # placeholder=allThemes[defaultCardTheme][0],
+            onchange=setDifficulty,
+            scrollbar_thick=5,
+            selection_option_font=self.lifeFont,
+            # selection_box_border_color=(0,0,0,0),
+            selection_box_width=250,
+            selection_box_height=250,
+            placeholder= allDifficulties[self.difficulty][0],
+            placeholder_add_to_selection_box=False
+        )
+        
+        livesSwitch.add_self_to_kwargs()
+        timeSwitch.add_self_to_kwargs()
+        difficultySelector.add_self_to_kwargs()  # Callbacks will receive widget as parameter
+        
+        # running = True
+        while True:
+                
+            optionsMenu.fill((202, 228, 241))
+            self.draw_text_center(
+                "Press escape to go back to main menu",
+                self.lifeFont, self.white,
+                self.screenWidth / 2, self.screenHeight / 6,
+                optionsMenu
+            )
+            events = pygame.event.get()
+            # events2 = pygame.event.get()
+            menu.draw(optionsMenu)
+            menu.update(events)
+            for event in events:
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        pygame.mixer.music.stop()
+                        return
+            pygame.display.update()
+            self.mainClock.tick(self.FPS)
     
     def settingsOptions(self, screen):
         optionsMenu = screen
