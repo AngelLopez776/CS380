@@ -16,6 +16,11 @@ running = True
 
 class Game():
     def __init__(self):
+        #multiplayer-----------#eventually will batch be saved to File
+        self.flipTime = 2 
+        self.teamCount = 0
+        self.playerCount = 2
+        #multiplayer-----------
         self.difficulty = int(self.readSettingFromFile("SavedVariables.txt", "difficulty"))
         self.gamemode = int(self.readSettingFromFile("SavedVariables.txt", "gamemode"))
         self.volume = int(self.readSettingFromFile("SavedVariables.txt", "volume"))
@@ -99,8 +104,6 @@ class Game():
         
     def sOrMOptions(self, screen):
         optionsMenu = screen
-        # This function has a lot about it that doesn't make sense, but it seems to need to be this way
-
         menuTheme = pygame_menu.themes.Theme(
             background_color=(202, 228, 241),
             title_background_color=(202, 228, 241),
@@ -165,8 +168,6 @@ class Game():
     
     def singlePlayerOptions(self, screen):
        optionsMenu = screen
-       # This function has a lot about it that doesn't make sense, but it seems to need to be this way
-
        menuTheme = pygame_menu.themes.Theme(
            background_color=(202, 228, 241),
            title_background_color=(0, 0, 0, 0),
@@ -252,8 +253,6 @@ class Game():
     
     def multiplayerOptions(self, screen):
         optionsMenu = screen
-        # This function has a lot about it that doesn't make sense, but it seems to need to be this way
-
         menuTheme = pygame_menu.themes.Theme(
             background_color=(202, 228, 241),
             title_background_color=(0, 0, 0, 0),
@@ -265,63 +264,90 @@ class Game():
             width=self.screenWidth/2,
             theme=menuTheme)
         
-        livesOn = int(self.gamemode) & 0x01
-        timeOn = (int(self.gamemode) & 0x02) >> 1 
-      
+        def setTeamsOption(teamCountStr, teamCnt, **kwargs):
+            value_tuple, index = teamCountStr
+            self.teamCount = teamCnt
+            if(teamCnt <= 1):
+                for team in range(maxTeamsEver):
+                    teamCountSelectors[team].hide()
+                return
+            for team in range(teamCnt):
+                teamCountSelectors[team].show()
+            for team in range(maxTeamsEver - teamCnt):
+                teamCountSelectors[-1 * (team - maxTeamsEver) - 1].hide()
+            if(teamCnt > 1):
+                setPlayerCountPerTeamOptions(None, None)
+
+                
+        def setPlayerCountOptions(playerCountStr, playerCnt, **kwargs):
+            value_tuple, index = playerCountStr
+            print(teamCount)
+            teamCount.clear()
+            for player in range(playerCnt):
+                stringPC = str(player)
+                intPC = player
+                teamCount.append((stringPC, intPC))
+            teamSelector.update_items(teamCount)
+            self.playerCount = playerCnt
+
+
         
         
-        def setLivesOption(isLives, **kwargs):
-            if(isLives):
-                self.gamemode |= 0x1
-                timeSwitch.show()
-
-            else:
-                self.gamemode &= 0xE
-                setTimeOption(False)
-                timeSwitch.hide()
-            self.saveSettingToFile('SavedVariables.txt', 'gamemode', str(self.gamemode))
-
-        def setTimeOption(isTime, **kwargs):
-            if(isTime):
-                self.gamemode |= 0x2
-            else:
-                self.gamemode &= 0xD
-            self.saveSettingToFile('SavedVariables.txt', 'gamemode', str(self.gamemode))
+        def setPlayerCountPerTeamOptions(playerCountStr, playerCnt, **kwargs):
+            attemptedPlayerCnt = 0
+            for team in teamCountSelectors:
+                if int(team.get_id()) > self.teamCount - 1:
+                    break
+                #print(team.get_id())
+                #print(team.get_value()[1] + 1)
+                attemptedPlayerCnt += team.get_value()[1] + 1
+                #print(attemptedPlayerCnt)
+                print(self.playerCount)
+            if not errorPlayerCountLable.is_visible() and attemptedPlayerCnt != self.playerCount:
+                errorPlayerCountLable.show()
+            elif errorPlayerCountLable.is_visible() and attemptedPlayerCnt == self.playerCount:
+                errorPlayerCountLable.hide()
+        
+        maxTeamsEver = 7
             
-        livesSwitch = menu.add.toggle_switch("Lives", onchange=setLivesOption, default=livesOn)
-        timeSwitch = menu.add.toggle_switch("Timer", onchange=setTimeOption, default=timeOn, align=pygame_menu.locals.ALIGN_RIGHT)
-        
-        if(not livesOn):
-            setTimeOption(False)
-            timeSwitch.hide()
-            
-        def setDifficulty(difficulty, difficultyIndex, **kwargs):
-            value_tuple, index = difficulty
-            self.difficulty = value_tuple[1]
-            self.saveSettingToFile("SavedVariables.txt", "difficulty", str(value_tuple[1]))
+        playerCount = [("2", 2),("3", 3),("4", 4),("5", 5),("6", 6),("7", 7), ("8", 8)]
+        playerCountSelector = menu.add.selector("Total Player Count", 
+                                                items=playerCount, 
+                                                onchange=setPlayerCountOptions, 
+                                                style=pygame_menu.widgets.SELECTOR_STYLE_FANCY, 
+                                                align=pygame_menu.locals.ALIGN_LEFT
+                                                )
+        teamCount = []
+        for player in range(self.playerCount):
+            stringPC = str(player)
+            intPC = player
+            teamCount.append((stringPC, intPC))
+        teamSelector = menu.add.selector("Teams", items=teamCount, onchange=setTeamsOption, style=pygame_menu.widgets.SELECTOR_STYLE_FANCY, align=pygame_menu.locals.ALIGN_LEFT)
+        teamPlayerCount = [("1", 1),("2", 2),("3", 3),("4", 4),("5", 5),("6", 6),("7", 7)]
+        teamCountSelectors = []
+        for i in range(maxTeamsEver):
+            teamName = "Team " + str(i + 1) + " size"
+            teamCountSelector = menu.add.selector(
+                 teamName, 
+                 selector_id=str(i),
+                 items=teamPlayerCount, 
+                 onchange=setPlayerCountPerTeamOptions, 
+                 style=pygame_menu.widgets.SELECTOR_STYLE_FANCY, 
+                 align=pygame_menu.locals.ALIGN_RIGHT
+             )
+            teamCountSelectors.append(teamCountSelector)
+        errorPlayerCountLable = menu.add.label("Added Player Count of Individual Teams need to match Total Player Count", font_size=10, align=pygame_menu.locals.ALIGN_LEFT)
 
-        allDifficulties = [('Easy', 0),
-                          ('Medium', 1),
-                          ('Hard', 2)]
-        difficultySelector = menu.add.dropselect(
-            title="Difficulty",
-            items=allDifficulties,
-            # placeholder=allThemes[defaultCardTheme][0],
-            onchange=setDifficulty,
-            scrollbar_thick=5,
-            selection_option_font=self.lifeFont,
-            # selection_box_border_color=(0,0,0,0),
-            selection_box_width=250,
-            selection_box_height=250,
-            placeholder= allDifficulties[self.difficulty][0],
-            placeholder_add_to_selection_box=False
-        )
         
-        livesSwitch.add_self_to_kwargs()
-        timeSwitch.add_self_to_kwargs()
-        difficultySelector.add_self_to_kwargs()  # Callbacks will receive widget as parameter
-        
-        # running = True
+        playerCountSelector.add_self_to_kwargs()
+        teamSelector.add_self_to_kwargs()
+        for i in range(maxTeamsEver):
+            teamCountSelectors[i].add_self_to_kwargs()
+        for team in range(maxTeamsEver - self.teamCount):
+            #print(-1 * (teams - maxTeams) - 1) 
+            teamCountSelectors[-1 * (team - maxTeamsEver) - 1].hide()
+        errorPlayerCountLable.add_self_to_kwargs()
+        errorPlayerCountLable.hide()
         while True:
                 
             optionsMenu.fill((202, 228, 241))
