@@ -11,6 +11,7 @@ from pygame.locals import *
 from pygame import mixer
 import threading
 import keyboard #must be installed: pip install keyboard in anaconda cmd
+from Score import Score
 
 running = True
 
@@ -732,8 +733,8 @@ class Game():
                 mixer.music.load('Sounds/winner.mp3')
                 mixer.music.set_volume(self.volume/100)
                 mixer.music.play()
-
-                running, quitG, playAgain = self.endScreen(window)
+                               
+                running, quitG, playAgain = self.endScreen(window, t.score)
 
                 if playAgain:
                     mixer.init()
@@ -756,7 +757,7 @@ class Game():
                 mixer.music.set_volume(self.volume/100)
                 mixer.music.play()
 
-                running, quitG, playAgain = self.endScreen(window)
+                running, quitG, playAgain = self.endScreen(window, t.score)
 
                 if playAgain:
                     mixer.init()
@@ -840,18 +841,24 @@ class Game():
         es.join(0)
         return quitG
         
-    def endScreen(self, window):
-        retryButton = pygame.Rect((self.screenWidth / 2) - 100, (self.screenHeight / 2) + 50, 200, 50)
-        retryButtonText = self.buttonFont.render("Press R to Restart", True, self.black)
-        pygame.draw.rect(window, (127, 127, 127), retryButton)
-        retryButtonTextRect = retryButtonText.get_rect()
-        retryButtonTextRect.center = retryButton.center
-        window.blit(retryButtonText, retryButtonTextRect)
-        pygame.display.update()
+    def endScreen(self, window, score):
+        retryButton = Button(pygame.image.load("Assets/ButtonBG.jpg"), (self.screenWidth/2, self.screenHeight/2 + 100), "Restart", self.buttonFont, "White", "#d7fcd4")
+        scoresButton = Button(pygame.image.load("Assets/ButtonBG.jpg"), (self.screenWidth/2, self.screenHeight/2 + 200), "High scores", self.buttonFont, "White", "#d7fcd4")
+        
+        Score.saveScore(str(score))
 
         while True:
             self.mainClock.tick(self.FPS)
             mouse = pygame.mouse.get_pos()
+            
+            retryButton.update(window)
+            retryButton.changeColor(mouse)
+            
+            scoresButton.update(window)
+            scoresButton.changeColor(mouse)
+            
+            pygame.display.update()
+            
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     return [False, True, False]  # [Running, quitgame, playagain]
@@ -866,9 +873,11 @@ class Game():
                         window.fill(self.black)  # so cards show during lose screen
                         return [False, False, True]
                 elif event.type == pygame.MOUSEBUTTONDOWN:
-                    if retryButton.collidepoint(mouse):
+                    if retryButton.checkForInput(mouse):
                         window.fill(self.black)
                         return [False, False, True]
+                    elif scoresButton.checkForInput(mouse):
+                        self.showScores(window, str(score))
                     
     def createTable(self):
         if self.difficulty == 0:
@@ -878,3 +887,31 @@ class Game():
         else:
             return Table(5, 5, self.selectedTheme, 6, self.difficulty, self.FPS)
         
+    def showScores(self, window, pScore):
+        window.fill(self.black, (0, 40, self.screenWidth, self.screenHeight))
+        
+        self.draw_text_center("High scores", pygame.font.SysFont("Times New Roman", 40), self.white, self.screenWidth / 2, self.screenHeight / 10, window)
+        
+        scores = Score.readScores()
+        textArea = ((self.screenHeight / 10) * 9) / 10
+        pos = (self.screenHeight / 10) + 40
+        
+        for score in scores:
+            if score == pScore:
+                self.draw_text_center(score, self.buttonFont, self.green, self.screenWidth / 2, pos, window)
+            else:
+                self.draw_text_center(score, self.buttonFont, self.white, self.screenWidth / 2, pos, window)
+                
+            pos = pos + textArea
+        
+        while True:
+            self.mainClock.tick(self.FPS)
+            
+            pygame.display.update()
+            
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    return
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        return
