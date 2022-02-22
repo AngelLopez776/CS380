@@ -297,6 +297,7 @@ class Game():
                 setTeamsOption(None, playerCnt-1)
             teamSelector.update_items(teamCountList)
             self.playerCount = playerCnt
+            checkPlayerCountPerTeamOptions(None, None)
 
         def checkPlayerCountPerTeamOptions(playerCountStr, playerCnt, **kwargs):
             attemptedPlayerCnt = 0

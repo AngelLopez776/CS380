@@ -1,4 +1,4 @@
-selectedTheme=theme_Mario
+selectedTheme=theme_Pokemon
 FPS=140
 
 screenWidth=1280
