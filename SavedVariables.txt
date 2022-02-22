@@ -1,13 +1,13 @@
-selectedTheme=theme_Pokemon
-
+selectedTheme=theme_Mario
 FPS=140
 
 screenWidth=1280
 
 screenHeight=720
 
-volume=0
+volume=8
 
 difficulty=0
 
 gamemode=3
+

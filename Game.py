@@ -11,6 +11,7 @@ from pygame.locals import *
 from pygame import mixer
 import threading
 import keyboard #must be installed: pip install keyboard in anaconda cmd
+from Score import Score
 
 running = True
 
@@ -663,10 +664,6 @@ class Game():
         white = (255, 255, 255)
         black = (0, 0, 0)
 
-        buttonFont = pygame.font.SysFont('Times New Roman', 20)
-        lifeFont = pygame.font.SysFont('Times New Roman', 20)
-        endFont = pygame.font.SysFont('Times New Roman', 32)
-
         minBorder = 70
         inBTween = 10
         scale = self.setCardScale(minBorder, t.x, t.y, inBTween)
@@ -723,16 +720,16 @@ class Game():
 
             window.fill(black, (0, 0, 400, 40))  # so cards show during lose screen
             if self.gamemode == 1:
-                self.draw_text("Lives: " + str(t.lives), lifeFont, white, 5, 0, window)
+                self.draw_text("Lives: " + str(t.lives), self.lifeFont, white, 5, 0, window)
             elif self.gamemode == 2:
-                self.draw_text("Time: " + str(timeLeft) + "s", lifeFont, white, 5, 0, window)
+                self.draw_text("Time: " + str(timeLeft) + "s", self.lifeFont, white, 5, 0, window)
             elif self.gamemode == 3:
-                self.draw_text("Lives: " + str(t.lives), lifeFont, white, 5, 0, window)
-                self.draw_text("Time: " + str(timeLeft) + "s", lifeFont, white, 5, 20, window)
+                self.draw_text("Lives: " + str(t.lives), self.lifeFont, white, 5, 0, window)
+                self.draw_text("Time: " + str(timeLeft) + "s", self.lifeFont, white, 5, 20, window)
 
-            self.draw_text("Score: " + str(t.score), lifeFont, white, 105, 0, window)
+            self.draw_text("Score: " + str(t.score), self.lifeFont, white, 105, 0, window)
 
-            if (t.checkWin(timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window)):
+            if t.checkWin():
                 window.fill(black, (0, 0, 400, 40))
 
                 if len(t.selection) >= 2:
@@ -740,26 +737,26 @@ class Game():
                     
                 if self.gamemode == 1:
                     t.score = t.score + (t.lives * 100)
-                    self.draw_text("Lives: " + str(t.lives), lifeFont, white, 5, 0, window)
+                    self.draw_text("Lives: " + str(t.lives), self.lifeFont, white, 5, 0, window)
                 elif self.gamemode == 2:
                     t.score = t.score + (timeLeft * 10)
-                    self.draw_text("Time: " + str(timeLeft) + "s", lifeFont, white, 5, 0, window)    
+                    self.draw_text("Time: " + str(timeLeft) + "s", self.lifeFont, white, 5, 0, window)    
                 elif self.gamemode == 3:
                     t.score = t.score + (t.lives * 100) + (timeLeft * 10)
-                    self.draw_text("Lives: " + str(t.lives), lifeFont, white, 5, 0, window)
-                    self.draw_text("Time: " + str(timeLeft) + "s", lifeFont, white, 5, 20, window)
+                    self.draw_text("Lives: " + str(t.lives), self.lifeFont, white, 5, 0, window)
+                    self.draw_text("Time: " + str(timeLeft) + "s", self.lifeFont, white, 5, 20, window)
 
                 
-                self.draw_text("Score: " + str(t.score), lifeFont, white, 105, 0, window)
+                self.draw_text("Score: " + str(t.score), self.lifeFont, white, 105, 0, window)
 
-                self.draw_text_center("You win!", endFont, green, self.screenWidth / 2, self.screenHeight / 2, window)
+                self.draw_text_center("You win!", self.endFont, green, self.screenWidth / 2, self.screenHeight / 4, window)
 
                 mixer.init()
                 mixer.music.load('Sounds/winner.mp3')
                 mixer.music.set_volume(self.volume/100)
                 mixer.music.play()
-
-                running, quitG, playAgain = self.endScreen(window)
+                               
+                running, quitG, playAgain = self.endScreen(window, t.score)
 
                 if playAgain:
                     mixer.init()
@@ -776,13 +773,13 @@ class Game():
 
                 self.animate.flip(hiddenTable, 1000, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, True)
 
-                self.draw_text_center("You lose!", endFont, red, self.screenWidth / 2, self.screenHeight / 2, window)
+                self.draw_text_center("You lose!", self.endFont, red, self.screenWidth / 2, self.screenHeight / 4, window)
                 mixer.init()
                 mixer.music.load('Sounds/gameover.mp3')
                 mixer.music.set_volume(self.volume/100)
                 mixer.music.play()
 
-                running, quitG, playAgain = self.endScreen(window)
+                running, quitG, playAgain = self.endScreen(window, t.score)
 
                 if playAgain:
                     mixer.init()
@@ -805,7 +802,7 @@ class Game():
                     timeLeft = int(timer - (time.time() - sTime))
 
                 if len(t.selection) >= 1:
-                    if t.checkBomb(timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window):
+                    if t.checkBomb():
                         
                         self.stopAllFor(1)
                         for c in t.selection:
@@ -824,7 +821,7 @@ class Game():
                             sTime = sTime - 10
                             
                     if len(t.selection) >= 2:
-                        isMatch = t.checkMatch(timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window)
+                        isMatch = t.checkMatch()
                         if isMatch == 2:
                             self.stopAllFor(1)
                             if(running):
@@ -866,18 +863,28 @@ class Game():
         es.join(0)
         return quitG
         
-    def endScreen(self, window):
-        retryButton = pygame.Rect((self.screenWidth / 2) - 100, (self.screenHeight / 2) + 50, 200, 50)
-        retryButtonText = self.buttonFont.render("Press R to Restart", True, self.black)
-        pygame.draw.rect(window, (127, 127, 127), retryButton)
-        retryButtonTextRect = retryButtonText.get_rect()
-        retryButtonTextRect.center = retryButton.center
-        window.blit(retryButtonText, retryButtonTextRect)
-        pygame.display.update()
+    def endScreen(self, window, score):
+        retryButton = Button(pygame.image.load("Assets/ButtonBG.jpg"), (self.screenWidth/2, self.screenHeight/ 4 * 2), "Restart", self.buttonFont, "White", "#d7fcd4")
+        scoresButton = Button(pygame.image.load("Assets/ButtonBG.jpg"), (self.screenWidth/2, (self.screenHeight / 4 * 2) + 110), "High scores", self.buttonFont, "White", "#d7fcd4")
+        mmButton = Button(pygame.image.load("Assets/ButtonBG.jpg"), (self.screenWidth/2, (self.screenHeight / 4 * 2) + 220), "Return to main menu", self.buttonFont, "White", "#d7fcd4")
+        
+        Score.saveScore(str(score))
 
         while True:
             self.mainClock.tick(self.FPS)
             mouse = pygame.mouse.get_pos()
+            
+            retryButton.update(window)
+            retryButton.changeColor(mouse)
+            
+            scoresButton.update(window)
+            scoresButton.changeColor(mouse)
+            
+            mmButton.update(window)
+            mmButton.changeColor(mouse)
+            
+            pygame.display.update()
+            
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     return [False, True, False]  # [Running, quitgame, playagain]
@@ -892,9 +899,17 @@ class Game():
                         window.fill(self.black)  # so cards show during lose screen
                         return [False, False, True]
                 elif event.type == pygame.MOUSEBUTTONDOWN:
-                    if retryButton.collidepoint(mouse):
+                    if retryButton.checkForInput(mouse):
                         window.fill(self.black)
                         return [False, False, True]
+                    elif scoresButton.checkForInput(mouse):
+                        self.showScores(window, str(score))
+                    elif mmButton.checkForInput(mouse):
+                        mixer.init()
+                        mixer.music.load('Sounds/loading.mp3')
+                        mixer.music.set_volume(self.volume/100)
+                        mixer.music.play()
+                        return [False, False, False]
                     
     def createTable(self):
         if self.difficulty == 0:
@@ -904,3 +919,31 @@ class Game():
         else:
             return Table(5, 5, self.selectedTheme, 6, self.difficulty, self.FPS)
         
+    def showScores(self, window, pScore):
+        window.fill(self.black, (0, 40, self.screenWidth, self.screenHeight))
+        
+        self.draw_text_center("High scores", pygame.font.SysFont("Times New Roman", 40), self.white, self.screenWidth / 2, self.screenHeight / 10, window)
+        
+        scores = Score.readScores()
+        textArea = ((self.screenHeight / 10) * 9) / 10
+        pos = (self.screenHeight / 10) + 40
+        
+        for score in scores:
+            if score == pScore:
+                self.draw_text_center(score, self.buttonFont, self.green, self.screenWidth / 2, pos, window)
+            else:
+                self.draw_text_center(score, self.buttonFont, self.white, self.screenWidth / 2, pos, window)
+                
+            pos = pos + textArea
+        
+        while True:
+            self.mainClock.tick(self.FPS)
+            
+            pygame.display.update()
+            
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    return
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        return
