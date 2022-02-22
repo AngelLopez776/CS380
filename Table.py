@@ -56,7 +56,7 @@ class Table():
             for c in r:
                 c.update()
             
-    def checkMatch(self, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window):
+    def checkMatch(self):
         if self.selection[0].ID == self.selection[1].ID:
             return 0
         
@@ -66,19 +66,18 @@ class Table():
         else:       
             return 2
         
-    def checkBomb(self, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window):
+    def checkBomb(self):
         for c in self.selection:
             if c.ID == "BOMB":
                 return True
                 
                 
-    def checkWin(self, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window):
-        extra = []
+    def checkWin(self):
         for row in self.table:
             for c in row:
                 if c.shown == False:
                     if c.ID == "BOMB" or c.ID == "JOKER":
-                        extra.append(c)
+                        continue
                     else:
                         return False
         

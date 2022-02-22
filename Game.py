@@ -638,10 +638,6 @@ class Game():
         white = (255, 255, 255)
         black = (0, 0, 0)
 
-        buttonFont = pygame.font.SysFont('Times New Roman', 20)
-        lifeFont = pygame.font.SysFont('Times New Roman', 20)
-        endFont = pygame.font.SysFont('Times New Roman', 32)
-
         minBorder = 70
         inBTween = 10
         scale = self.setCardScale(minBorder, t.x, t.y, inBTween)
@@ -698,16 +694,16 @@ class Game():
 
             window.fill(black, (0, 0, 400, 40))  # so cards show during lose screen
             if self.gamemode == 1:
-                self.draw_text("Lives: " + str(t.lives), lifeFont, white, 5, 0, window)
+                self.draw_text("Lives: " + str(t.lives), self.lifeFont, white, 5, 0, window)
             elif self.gamemode == 2:
-                self.draw_text("Time: " + str(timeLeft) + "s", lifeFont, white, 5, 0, window)
+                self.draw_text("Time: " + str(timeLeft) + "s", self.lifeFont, white, 5, 0, window)
             elif self.gamemode == 3:
-                self.draw_text("Lives: " + str(t.lives), lifeFont, white, 5, 0, window)
-                self.draw_text("Time: " + str(timeLeft) + "s", lifeFont, white, 5, 20, window)
+                self.draw_text("Lives: " + str(t.lives), self.lifeFont, white, 5, 0, window)
+                self.draw_text("Time: " + str(timeLeft) + "s", self.lifeFont, white, 5, 20, window)
 
-            self.draw_text("Score: " + str(t.score), lifeFont, white, 105, 0, window)
+            self.draw_text("Score: " + str(t.score), self.lifeFont, white, 105, 0, window)
 
-            if (t.checkWin(timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window)):
+            if t.checkWin():
                 window.fill(black, (0, 0, 400, 40))
 
                 if len(t.selection) >= 2:
@@ -715,19 +711,19 @@ class Game():
                     
                 if self.gamemode == 1:
                     t.score = t.score + (t.lives * 100)
-                    self.draw_text("Lives: " + str(t.lives), lifeFont, white, 5, 0, window)
+                    self.draw_text("Lives: " + str(t.lives), self.lifeFont, white, 5, 0, window)
                 elif self.gamemode == 2:
                     t.score = t.score + (timeLeft * 10)
-                    self.draw_text("Time: " + str(timeLeft) + "s", lifeFont, white, 5, 0, window)    
+                    self.draw_text("Time: " + str(timeLeft) + "s", self.lifeFont, white, 5, 0, window)    
                 elif self.gamemode == 3:
                     t.score = t.score + (t.lives * 100) + (timeLeft * 10)
-                    self.draw_text("Lives: " + str(t.lives), lifeFont, white, 5, 0, window)
-                    self.draw_text("Time: " + str(timeLeft) + "s", lifeFont, white, 5, 20, window)
+                    self.draw_text("Lives: " + str(t.lives), self.lifeFont, white, 5, 0, window)
+                    self.draw_text("Time: " + str(timeLeft) + "s", self.lifeFont, white, 5, 20, window)
 
                 
-                self.draw_text("Score: " + str(t.score), lifeFont, white, 105, 0, window)
+                self.draw_text("Score: " + str(t.score), self.lifeFont, white, 105, 0, window)
 
-                self.draw_text_center("You win!", endFont, green, self.screenWidth / 2, self.screenHeight / 2, window)
+                self.draw_text_center("You win!", self.endFont, green, self.screenWidth / 2, self.screenHeight / 4, window)
 
                 mixer.init()
                 mixer.music.load('Sounds/winner.mp3')
@@ -751,7 +747,7 @@ class Game():
 
                 self.animate.flip(hiddenTable, 1000, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, True)
 
-                self.draw_text_center("You lose!", endFont, red, self.screenWidth / 2, self.screenHeight / 2, window)
+                self.draw_text_center("You lose!", self.endFont, red, self.screenWidth / 2, self.screenHeight / 4, window)
                 mixer.init()
                 mixer.music.load('Sounds/gameover.mp3')
                 mixer.music.set_volume(self.volume/100)
@@ -780,7 +776,7 @@ class Game():
                     timeLeft = int(timer - (time.time() - sTime))
 
                 if len(t.selection) >= 1:
-                    if t.checkBomb(timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window):
+                    if t.checkBomb():
                         
                         self.stopAllFor(1)
                         for c in t.selection:
@@ -799,7 +795,7 @@ class Game():
                             sTime = sTime - 10
                             
                     if len(t.selection) >= 2:
-                        isMatch = t.checkMatch(timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window)
+                        isMatch = t.checkMatch()
                         if isMatch == 2:
                             self.stopAllFor(1)
                             if(running):
@@ -842,8 +838,9 @@ class Game():
         return quitG
         
     def endScreen(self, window, score):
-        retryButton = Button(pygame.image.load("Assets/ButtonBG.jpg"), (self.screenWidth/2, self.screenHeight/2 + 100), "Restart", self.buttonFont, "White", "#d7fcd4")
-        scoresButton = Button(pygame.image.load("Assets/ButtonBG.jpg"), (self.screenWidth/2, self.screenHeight/2 + 200), "High scores", self.buttonFont, "White", "#d7fcd4")
+        retryButton = Button(pygame.image.load("Assets/ButtonBG.jpg"), (self.screenWidth/2, self.screenHeight/ 4 * 2), "Restart", self.buttonFont, "White", "#d7fcd4")
+        scoresButton = Button(pygame.image.load("Assets/ButtonBG.jpg"), (self.screenWidth/2, (self.screenHeight / 4 * 2) + 110), "High scores", self.buttonFont, "White", "#d7fcd4")
+        mmButton = Button(pygame.image.load("Assets/ButtonBG.jpg"), (self.screenWidth/2, (self.screenHeight / 4 * 2) + 220), "Return to main menu", self.buttonFont, "White", "#d7fcd4")
         
         Score.saveScore(str(score))
 
@@ -856,6 +853,9 @@ class Game():
             
             scoresButton.update(window)
             scoresButton.changeColor(mouse)
+            
+            mmButton.update(window)
+            mmButton.changeColor(mouse)
             
             pygame.display.update()
             
@@ -878,6 +878,12 @@ class Game():
                         return [False, False, True]
                     elif scoresButton.checkForInput(mouse):
                         self.showScores(window, str(score))
+                    elif mmButton.checkForInput(mouse):
+                        mixer.init()
+                        mixer.music.load('Sounds/loading.mp3')
+                        mixer.music.set_volume(self.volume/100)
+                        mixer.music.play()
+                        return [False, False, False]
                     
     def createTable(self):
         if self.difficulty == 0:
