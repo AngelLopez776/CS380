@@ -16,13 +16,16 @@ running = True
 
 class Game():
     def __init__(self):
-        #multiplayer-----------#eventually will batch be saved to File
+        #multiplayer-----------#eventually will be read from File
         self.flipTime = 2 
         self.teamCount = 0
         self.playerCount = 2
-        #multiplayer-----------
+        self.lives = 4
+        self.error = False
+        #singlePlayer-----------
         self.difficulty = int(self.readSettingFromFile("SavedVariables.txt", "difficulty"))
         self.gamemode = int(self.readSettingFromFile("SavedVariables.txt", "gamemode"))
+        #both----------
         self.volume = int(self.readSettingFromFile("SavedVariables.txt", "volume"))
         self.selectedTheme = self.readCardTheme()
         self.FPS = int(self.readSettingFromFile("SavedVariables.txt", "FPS"))
@@ -265,9 +268,10 @@ class Game():
             theme=menuTheme)
         
         def setTeamsOption(teamCountStr, teamCnt, **kwargs):
-            value_tuple, index = teamCountStr
             self.teamCount = teamCnt
+            print(self.teamCount)
             if(teamCnt <= 1):
+                errorPlayerCountLable.hide()
                 for team in range(maxTeamsEver):
                     teamCountSelectors[team].hide()
                 return
@@ -276,24 +280,24 @@ class Game():
             for team in range(maxTeamsEver - teamCnt):
                 teamCountSelectors[-1 * (team - maxTeamsEver) - 1].hide()
             if(teamCnt > 1):
-                setPlayerCountPerTeamOptions(None, None)
-
-                
+                checkPlayerCountPerTeamOptions(None, None)
+ 
         def setPlayerCountOptions(playerCountStr, playerCnt, **kwargs):
-            value_tuple, index = playerCountStr
-            print(teamCount)
-            teamCount.clear()
+            #print(teamCount)
+            teamCountList.clear()
             for player in range(playerCnt):
                 stringPC = str(player)
                 intPC = player
-                teamCount.append((stringPC, intPC))
-            teamSelector.update_items(teamCount)
+                teamCountList.append((stringPC, intPC))
+            #print(playerCnt <= self.teamCount)
+            if playerCnt <= self.teamCount:
+                #print(playerCnt)
+                teamSelector.set_value(str(playerCnt-1))
+                setTeamsOption(None, playerCnt-1)
+            teamSelector.update_items(teamCountList)
             self.playerCount = playerCnt
 
-
-        
-        
-        def setPlayerCountPerTeamOptions(playerCountStr, playerCnt, **kwargs):
+        def checkPlayerCountPerTeamOptions(playerCountStr, playerCnt, **kwargs):
             attemptedPlayerCnt = 0
             for team in teamCountSelectors:
                 if int(team.get_id()) > self.teamCount - 1:
@@ -302,27 +306,37 @@ class Game():
                 #print(team.get_value()[1] + 1)
                 attemptedPlayerCnt += team.get_value()[1] + 1
                 #print(attemptedPlayerCnt)
-                print(self.playerCount)
-            if not errorPlayerCountLable.is_visible() and attemptedPlayerCnt != self.playerCount:
+                #print(self.playerCount)
+            if not errorPlayerCountLable.is_visible() and attemptedPlayerCnt != self.playerCount and self.teamCount >= 2:
                 errorPlayerCountLable.show()
             elif errorPlayerCountLable.is_visible() and attemptedPlayerCnt == self.playerCount:
                 errorPlayerCountLable.hide()
+                
+        def setIntroSequence(isLives, **kwargs):
+            pass
         
         maxTeamsEver = 7
-            
-        playerCount = [("2", 2),("3", 3),("4", 4),("5", 5),("6", 6),("7", 7), ("8", 8)]
+        
+        #ability to select saved game modes
+        #There probably should be a way to delete modes too, but that would be hard
+        
+        introSequenceSwitch = menu.add.toggle_switch("Intro Sequence", onchange=setIntroSequence, default=False, align=pygame_menu.locals.ALIGN_LEFT)
+        
+        #deck count selector: columns and rows; cannot go above 8 rows or 12 columns
+        
+        playerCountList = [("2", 2),("3", 3),("4", 4),("5", 5),("6", 6),("7", 7), ("8", 8)]
         playerCountSelector = menu.add.selector("Total Player Count", 
-                                                items=playerCount, 
+                                                items=playerCountList, 
                                                 onchange=setPlayerCountOptions, 
                                                 style=pygame_menu.widgets.SELECTOR_STYLE_FANCY, 
                                                 align=pygame_menu.locals.ALIGN_LEFT
                                                 )
-        teamCount = []
+        teamCountList = []
         for player in range(self.playerCount):
             stringPC = str(player)
             intPC = player
-            teamCount.append((stringPC, intPC))
-        teamSelector = menu.add.selector("Teams", items=teamCount, onchange=setTeamsOption, style=pygame_menu.widgets.SELECTOR_STYLE_FANCY, align=pygame_menu.locals.ALIGN_LEFT)
+            teamCountList.append((stringPC, intPC))
+        teamSelector = menu.add.selector("Teams", items=teamCountList, onchange=setTeamsOption, style=pygame_menu.widgets.SELECTOR_STYLE_FANCY, align=pygame_menu.locals.ALIGN_LEFT)
         teamPlayerCount = [("1", 1),("2", 2),("3", 3),("4", 4),("5", 5),("6", 6),("7", 7)]
         teamCountSelectors = []
         for i in range(maxTeamsEver):
@@ -331,14 +345,14 @@ class Game():
                  teamName, 
                  selector_id=str(i),
                  items=teamPlayerCount, 
-                 onchange=setPlayerCountPerTeamOptions, 
+                 onchange=checkPlayerCountPerTeamOptions, 
                  style=pygame_menu.widgets.SELECTOR_STYLE_FANCY, 
                  align=pygame_menu.locals.ALIGN_RIGHT
              )
             teamCountSelectors.append(teamCountSelector)
-        errorPlayerCountLable = menu.add.label("Added Player Count of Individual Teams need to match Total Player Count", font_size=10, align=pygame_menu.locals.ALIGN_LEFT)
-
+        errorPlayerCountLable = menu.add.label("Added Player Count of Individual Teams needs to match Total Player Count", font_size=10, align=pygame_menu.locals.ALIGN_LEFT)
         
+        introSequenceSwitch.add_self_to_kwargs()
         playerCountSelector.add_self_to_kwargs()
         teamSelector.add_self_to_kwargs()
         for i in range(maxTeamsEver):
@@ -348,8 +362,23 @@ class Game():
             teamCountSelectors[-1 * (team - maxTeamsEver) - 1].hide()
         errorPlayerCountLable.add_self_to_kwargs()
         errorPlayerCountLable.hide()
+        
+        #lives switch
+            #lives per team text box
+        #timer switch
+            #time per team text box
+        #must have one of time or lives per team enabled
+        
+        #go until deck is depleted and then determine score to select winner or make new decks until lives/time is depleted and determine winner that way
+        
+        #time between turns text box
+        
+        #save upon finish switch
+            #ability to save settings to file as new game mode text
+            
+        #finished button
+        
         while True:
-                
             optionsMenu.fill((202, 228, 241))
             self.draw_text_center(
                 "Press escape to go back to main menu",
@@ -575,10 +604,7 @@ class Game():
                         mixer.music.play()
                         screen.fill(black)
                         self.sOrMOptions(screen)
-                        #if self.game(screen):
-                         #   pygame.quit()
-                          #  sys.exit()
-                    
+
                     if OPTIONS_BUTTON.checkForInput(MENU_MOUSE_POS):
                         mixer.init()
                         mixer.music.load('Sounds/settings.mp3')
