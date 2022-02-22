@@ -421,7 +421,7 @@ class Game():
             # selectedTheme = value_tuple[0]
             self.saveInitialCardTheme(value_tuple[0])
 
-        allCardThemes = [('Tarrot', 'Tarrot'),
+        allCardThemes = [('Tarot', 'Tarot'),
                          ('Pokemon', 'Pokemon'),
                          ('Mario', 'Mario'),
                          ('Poker', 'Poker')]
