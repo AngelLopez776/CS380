@@ -14,8 +14,7 @@ class Animations():
         frames = self.fps
 
     def flip(self, cards, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, showFront):
-        mixer.music.load('Sounds/cardflip.mp3')
-        mixer.music.play(0)
+        pygame.mixer.Channel(1).play(pygame.mixer.Sound('Sounds/cardflip.mp3'))
         def halfFlip(cards, timeToFlip, movedX, maxSize, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, firstHalf):
             global frames
             deltaTime = 1000/frames/1000
