@@ -22,10 +22,10 @@ class Game():
         self.playerCount = 2 #how many players
         self.playersInTeams = [0,0,0,0,0,0,0] #if there is a team with 0 players, then that team does not exist according to the user
         self.lives = 4 #how many lives per team; may add switch to select lives per player or lives per team
-        self.showIntroSequence=False
-        self.introSequenceTime=5
-        self.FFA = False #if there are no teams
-        self.co_op = True #if there is one team
+        self.showIntroSequence=False #whetehr cards are shown at the beginnging of the game
+        self.introSequenceTime=5 #how long the cards are displayed at the beginning of the game
+        self.FFA = False #if there are 0 teams
+        self.co_op = True #if there is 1 team
         self.error = False #set to true when there is any user error; this will not let the user exit the menu until they fix the error
         self.timeBetweenTurns = 3 #time between turns for players
         self.loopDeck = False #will tell whether there should be a new deck until a winner is made, or to tie game after one deck if the winner is not chosen
@@ -368,10 +368,10 @@ class Game():
             
             print(self.loopDeck)
         
-        maxTeamsEver = 7 #since there are only allowed 8 possible players (because I think it would be too many after that), then there are only 7 possible teams. Otherwise it is a free for all, or 0 teams
+        maxTeamsEver = 7 #since there are only allowed 8 possible players (because I think it would be too many after that), then there are only 7 possible teams. Otherwise it is a free for all, or complete co-op
         
-        #needed: ability to select saved game modes
-        #There probably should be a way to delete modes too, but that would be hard
+        #needed: ability to select saved game modes - drop selection
+        #There probably should be a way to delete modes too, but that would be hard I think
         
         introSequenceSwitch = menu.add.toggle_switch("Intro Sequence", onchange=setIntroSequence, state_text=("Skip", "Play"), default=self.showIntroSequence, align=pygame_menu.locals.ALIGN_LEFT)
         introSequenceTimeText = menu.add.text_input("In seconds, show Cards for: ", default=self.introSequenceTime, onchange=setIntroSequenceTime, input_type=INPUT_FLOAT, align=pygame_menu.locals.ALIGN_RIGHT)
@@ -411,7 +411,7 @@ class Game():
         #needed: lives switch
             #lives per team text box
             #or
-            #lives per player
+            #lives per player text boxes (one per player)
                 
         loopDeckSwitch = menu.add.toggle_switch("Finish game after a", onchange=setLoopDeck, state_text=("deck", "winner"), default=self.showIntroSequence, align=pygame_menu.locals.ALIGN_LEFT)
         
