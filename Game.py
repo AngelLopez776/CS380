@@ -317,7 +317,7 @@ class Game():
                 #print(team.get_id())
                 #print(team.get_value()[1] + 1)
                 attemptedPlayerCnt += team.get_value()[1] + 1
-                self.playersInTeams[i] = team.get_value[1]
+                self.playersInTeams[i] = team.get_value()[1]
                 i += 1
                 #print(attemptedPlayerCnt)
                 #print(self.playerCount)
@@ -336,7 +336,7 @@ class Game():
             else:
                 introSequenceTime.hide()
                 
-        def setIntroSequenceTime(time):
+        def setIntroSequenceTime(time, **kwargs):
             self.introSequenceTime = time
         
         maxTeamsEver = 7 #since there are only allowed 8 possible players (because I think it would be too many after that), then there are only 7 possible teams. Otherwise it is a free for all, or 0 teams
