@@ -286,9 +286,9 @@ class Game():
         def setPlayerCountOptions(playerCountStr, playerCnt, **kwargs):
             #print(teamCount)
             teamCountList.clear()
-            for player in range(playerCnt):
-                stringPC = str(player)
-                intPC = player
+            for players in range(playerCnt):
+                stringPC = str(players)
+                intPC = players
                 teamCountList.append((stringPC, intPC))
             #print(playerCnt <= self.teamCount)
             if playerCnt <= self.teamCount:
@@ -334,9 +334,10 @@ class Game():
                                                 align=pygame_menu.locals.ALIGN_LEFT
                                                 )
         teamCountList = []
-        for player in range(self.playerCount):
-            stringPC = str(player)
-            intPC = player
+        for players in range(self.playerCount):
+            stringPC = None
+            stringPC = str(players)
+            intPC = players
             teamCountList.append((stringPC, intPC))
         teamSelector = menu.add.selector("Teams", items=teamCountList, onchange=setTeamsOption, style=pygame_menu.widgets.SELECTOR_STYLE_FANCY, align=pygame_menu.locals.ALIGN_LEFT)
         teamPlayerCount = [("1", 1),("2", 2),("3", 3),("4", 4),("5", 5),("6", 6),("7", 7)]
@@ -352,7 +353,7 @@ class Game():
                  align=pygame_menu.locals.ALIGN_RIGHT
              )
             teamCountSelectors.append(teamCountSelector)
-        errorPlayerCountLable = menu.add.label("Added Player Count of Individual Teams needs to match Total Player Count", font_size=10, align=pygame_menu.locals.ALIGN_LEFT)
+        errorPlayerCountLable = menu.add.label("The Added Player Count of Individual Teams needs to match the Total Player Count", font_size=10, align=pygame_menu.locals.ALIGN_LEFT)
         
         introSequenceSwitch.add_self_to_kwargs()
         playerCountSelector.add_self_to_kwargs()
@@ -421,7 +422,7 @@ class Game():
             # selectedTheme = value_tuple[0]
             self.saveInitialCardTheme(value_tuple[0])
 
-        allCardThemes = [('Tarrot', 'Tarrot'),
+        allCardThemes = [('Tarot', 'Tarot'),
                          ('Pokemon', 'Pokemon'),
                          ('Mario', 'Mario'),
                          ('Poker', 'Poker')]
