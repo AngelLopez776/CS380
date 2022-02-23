@@ -2,11 +2,11 @@ selectedTheme=theme_Poker
 
 FPS=140
 
-screenWidth=1280
+screenWidth=1024
 
-screenHeight=720
-
+screenHeight=768
 volume=3
+
 difficulty=0
 
 gamemode=3
