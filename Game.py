@@ -20,11 +20,15 @@ class Game():
         #multiplayer-----------#eventually will be read from File; some variables still need to be saved by the functions in multiplayerOptions
         self.teamCount = 0 #how many teams
         self.playerCount = 2 #how many players
-        self.playersInTeams = [0,0,0,0,0,0,0,0] #if there is a team with 0 players, then that team does not exist according to the user
+        self.playersInTeams = [0,0,0,0,0,0,0] #if there is a team with 0 players, then that team does not exist according to the user
         self.lives = 4 #how many lives per team; may add switch to select lives per player or lives per team
         self.showIntroSequence=False
         self.introSequenceTime=5
+        self.FFA = False #if there are no teams
+        self.co_op = True #if there is one team
         self.error = False #set to true when there is any user error; this will not let the user exit the menu until they fix the error
+        self.timeBetweenTurns = 3 #time between turns for players
+        self.loopDeck = False #will tell whether there should be a new deck until a winner is made, or to tie game after one deck if the winner is not chosen
         #singlePlayer-----------
         self.difficulty = int(self.readSettingFromFile("SavedVariables.txt", "difficulty"))
         self.gamemode = int(self.readSettingFromFile("SavedVariables.txt", "gamemode"))
@@ -276,17 +280,34 @@ class Game():
         #reveals the number of teams based off the number of teams chosen
         def setTeamsOption(teamCountStr, teamCnt, **kwargs):
             self.teamCount = teamCnt
-            print(self.teamCount)
+            #print(self.teamCount)
             if(teamCnt <= 1):
                 errorPlayerCountLable.hide()
+                if(teamCnt):
+                    self.oneTeam = True
+                    self.FFA = False
+                else:
+                    self.FFA = True
+                    self.oneTeam = True
                 self.error = False
                 for team in range(maxTeamsEver):
                     teamPlayerCountSelectors[team].hide()
+                    self.playersInTeams[team] = 0
                 return
+            else:
+                self.FFA = False
+                self.oneTeam = False
+                
             for team in range(teamCnt):
                 teamPlayerCountSelectors[team].show()
+                self.playersInTeams[team] = teamPlayerCountSelectors[team].get_value()[1]
             for team in range(maxTeamsEver - teamCnt):
+                print(-1 * (team - maxTeamsEver) - 1)
                 teamPlayerCountSelectors[-1 * (team - maxTeamsEver) - 1].hide()
+                self.playersInTeams[-1 * (team - maxTeamsEver) - 1] = 0
+                
+            print("-------------------")
+
             if(teamCnt > 1):
                 checkPlayerCountPerTeamOptions(None, None)
         
@@ -310,15 +331,13 @@ class Game():
         #both sets the number of players per team and checks that they equal the number of total players
         def checkPlayerCountPerTeamOptions(playerCountStr, playerCnt, **kwargs):
             attemptedPlayerCnt = 0
-            i = 0
             for team in teamPlayerCountSelectors:
                 if int(team.get_id()) > self.teamCount - 1:
                     break
+                self.playersInTeams[int(team.get_id())] = team.get_value()[1] + 1
                 #print(team.get_id())
                 #print(team.get_value()[1] + 1)
                 attemptedPlayerCnt += team.get_value()[1] + 1
-                self.playersInTeams[i] = team.get_value()[1]
-                i += 1
                 #print(attemptedPlayerCnt)
                 #print(self.playerCount)
             if not errorPlayerCountLable.is_visible() and attemptedPlayerCnt != self.playerCount and self.teamCount >= 2:
@@ -332,12 +351,22 @@ class Game():
         def setIntroSequence(isPlay, **kwargs):
             self.showIntroSequence = isPlay
             if(isPlay):
-                introSequenceTime.show()
+                introSequenceTimeText.show()
             else:
-                introSequenceTime.hide()
-                
+                introSequenceTimeText.hide()
+        #sets the time for the intro sequence        
         def setIntroSequenceTime(time, **kwargs):
             self.introSequenceTime = time
+        
+        def setTimeBetweenTurns(time, **kwargs):
+            self.timeBetweenTurns = time
+            
+        def setLoopDeck(isLooped, **kwargs):
+            if isLooped:
+                self.loopDeck = True
+            else: self.loopDeck = False
+            
+            print(self.loopDeck)
         
         maxTeamsEver = 7 #since there are only allowed 8 possible players (because I think it would be too many after that), then there are only 7 possible teams. Otherwise it is a free for all, or 0 teams
         
@@ -345,7 +374,7 @@ class Game():
         #There probably should be a way to delete modes too, but that would be hard
         
         introSequenceSwitch = menu.add.toggle_switch("Intro Sequence", onchange=setIntroSequence, state_text=("Skip", "Play"), default=self.showIntroSequence, align=pygame_menu.locals.ALIGN_LEFT)
-        introSequenceTime = menu.add.text_input("In seconds, show Cards for: ", default=self.introSequenceTime, onchange=setIntroSequenceTime, input_type=INPUT_FLOAT, align=pygame_menu.locals.ALIGN_RIGHT)
+        introSequenceTimeText = menu.add.text_input("In seconds, show Cards for: ", default=self.introSequenceTime, onchange=setIntroSequenceTime, input_type=INPUT_FLOAT, align=pygame_menu.locals.ALIGN_RIGHT)
         #needed: deck count selector: columns and rows; cannot go above 8 rows or 12 columns
         
         playerCountList = [("2", 2),("3", 3),("4", 4),("5", 5),("6", 6),("7", 7), ("8", 8)]
@@ -377,9 +406,25 @@ class Game():
             teamPlayerCountSelectors.append(teamCountSelector)
         errorPlayerCountLable = menu.add.label("The Added Player Count of Individual Teams needs to match the Total Player Count", font_size=10, align=pygame_menu.locals.ALIGN_LEFT)
         
-        introSequenceTime.add_self_to_kwargs()
+        timeBetweenTurnsText = menu.add.text_input("In seconds, time between turns: ", default=self.timeBetweenTurns, onchange=setTimeBetweenTurns, input_type=INPUT_FLOAT, align=pygame_menu.locals.ALIGN_LEFT)
+        
+        #needed: lives switch
+            #lives per team text box
+            #or
+            #lives per player
+                
+        loopDeckSwitch = menu.add.toggle_switch("Finish game after a", onchange=setLoopDeck, state_text=("deck", "winner"), default=self.showIntroSequence, align=pygame_menu.locals.ALIGN_LEFT)
+        
+        
+        #needed: save upon finish switch
+            #ability to save settings to file as new game mode text
+            
+        #needed: finished button
+        
+        introSequenceTimeText.add_self_to_kwargs()
         introSequenceSwitch.add_self_to_kwargs()
-        introSequenceTime.hide()
+        introSequenceTimeText.hide()
+        timeBetweenTurnsText.add_self_to_kwargs()
         playerCountSelector.add_self_to_kwargs()
         teamSelector.add_self_to_kwargs()
         for team in range(maxTeamsEver):
@@ -388,24 +433,12 @@ class Game():
             #print(-1 * (teams - maxTeams) - 1) 
             teamPlayerCountSelectors[-1 * (team - maxTeamsEver) - 1].hide()
         errorPlayerCountLable.add_self_to_kwargs()
+        loopDeckSwitch.add_self_to_kwargs()
         errorPlayerCountLable.hide()
         
-        #needed: time between turns text box
-        
-        #needed: lives switch
-            #lives per team text box
-            #or
-            #lives per player
-                
-        #needed: go until deck is depleted and then determine score to select winner (potential for tie) or make new decks until lives are depleted and determine winner that way (no ties)
-        
-        
-        #needed: save upon finish switch
-            #ability to save settings to file as new game mode text
-            
-        #needed: finished button
-        
         while True:
+            #print(self.playersInTeams)
+
             optionsMenu.fill((202, 228, 241))
             self.draw_text_center(
                 "Press escape to go back to main menu",
