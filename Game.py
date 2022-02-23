@@ -20,8 +20,10 @@ class Game():
         #multiplayer-----------#eventually will be read from File; some variables still need to be saved by the functions in multiplayerOptions
         self.teamCount = 0 #how many teams
         self.playerCount = 2 #how many players
-        self.playersInTeams = [] #if there is a team with 0 players, then that team does not exist according to the user
+        self.playersInTeams = [0,0,0,0,0,0,0,0] #if there is a team with 0 players, then that team does not exist according to the user
         self.lives = 4 #how many lives per team; may add switch to select lives per player or lives per team
+        self.showIntroSequence=False
+        self.introSequenceTime=5
         self.error = False #set to true when there is any user error; this will not let the user exit the menu until they fix the error
         #singlePlayer-----------
         self.difficulty = int(self.readSettingFromFile("SavedVariables.txt", "difficulty"))
@@ -257,6 +259,8 @@ class Game():
            self.mainClock.tick(self.FPS)
     
     def multiplayerOptions(self, screen):
+        from pygame_menu.locals import INPUT_FLOAT, INPUT_INT, INPUT_TEXT #allows float, ints, texts to be used as an input type for text boxes
+        
         optionsMenu = screen
         menuTheme = pygame_menu.themes.Theme(
             background_color=(202, 228, 241),
@@ -275,6 +279,7 @@ class Game():
             print(self.teamCount)
             if(teamCnt <= 1):
                 errorPlayerCountLable.hide()
+                self.error = False
                 for team in range(maxTeamsEver):
                     teamPlayerCountSelectors[team].hide()
                 return
@@ -305,30 +310,42 @@ class Game():
         #both sets the number of players per team and checks that they equal the number of total players
         def checkPlayerCountPerTeamOptions(playerCountStr, playerCnt, **kwargs):
             attemptedPlayerCnt = 0
+            i = 0
             for team in teamPlayerCountSelectors:
                 if int(team.get_id()) > self.teamCount - 1:
                     break
                 #print(team.get_id())
                 #print(team.get_value()[1] + 1)
                 attemptedPlayerCnt += team.get_value()[1] + 1
+                self.playersInTeams[i] = team.get_value[1]
+                i += 1
                 #print(attemptedPlayerCnt)
                 #print(self.playerCount)
             if not errorPlayerCountLable.is_visible() and attemptedPlayerCnt != self.playerCount and self.teamCount >= 2:
+                self.error = True
                 errorPlayerCountLable.show()
             elif errorPlayerCountLable.is_visible() and attemptedPlayerCnt == self.playerCount:
+                self.error = False
                 errorPlayerCountLable.hide()
                 
         #reveals the text box for the time for the intro sequence if the introSequenceSwitch is set to showing
-        def setIntroSequence(isLives, **kwargs):
-            pass
+        def setIntroSequence(isPlay, **kwargs):
+            self.showIntroSequence = isPlay
+            if(isPlay):
+                introSequenceTime.show()
+            else:
+                introSequenceTime.hide()
+                
+        def setIntroSequenceTime(time):
+            self.introSequenceTime = time
         
         maxTeamsEver = 7 #since there are only allowed 8 possible players (because I think it would be too many after that), then there are only 7 possible teams. Otherwise it is a free for all, or 0 teams
         
         #needed: ability to select saved game modes
         #There probably should be a way to delete modes too, but that would be hard
         
-        introSequenceSwitch = menu.add.toggle_switch("Intro Sequence", onchange=setIntroSequence, default=False, align=pygame_menu.locals.ALIGN_LEFT)
-        
+        introSequenceSwitch = menu.add.toggle_switch("Intro Sequence", onchange=setIntroSequence, state_text=("Skip", "Play"), default=self.showIntroSequence, align=pygame_menu.locals.ALIGN_LEFT)
+        introSequenceTime = menu.add.text_input("In seconds, show Cards for: ", default=self.introSequenceTime, onchange=setIntroSequenceTime, input_type=INPUT_FLOAT, align=pygame_menu.locals.ALIGN_RIGHT)
         #needed: deck count selector: columns and rows; cannot go above 8 rows or 12 columns
         
         playerCountList = [("2", 2),("3", 3),("4", 4),("5", 5),("6", 6),("7", 7), ("8", 8)]
@@ -360,7 +377,9 @@ class Game():
             teamPlayerCountSelectors.append(teamCountSelector)
         errorPlayerCountLable = menu.add.label("The Added Player Count of Individual Teams needs to match the Total Player Count", font_size=10, align=pygame_menu.locals.ALIGN_LEFT)
         
+        introSequenceTime.add_self_to_kwargs()
         introSequenceSwitch.add_self_to_kwargs()
+        introSequenceTime.hide()
         playerCountSelector.add_self_to_kwargs()
         teamSelector.add_self_to_kwargs()
         for team in range(maxTeamsEver):
