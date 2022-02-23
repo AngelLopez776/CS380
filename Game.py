@@ -25,7 +25,7 @@ class Game():
         self.showIntroSequence=False #whetehr cards are shown at the beginnging of the game
         self.introSequenceTime=5 #how long the cards are displayed at the beginning of the game
         self.FFA = False #if there are 0 teams
-        self.co_op = True #if there is 1 team
+        self.co_op = False #if there is 1 team
         self.error = False #set to true when there is any user error; this will not let the user exit the menu until they fix the error
         self.timeBetweenTurns = 3 #time between turns for players
         self.loopDeck = False #will tell whether there should be a new deck until a winner is made, or to tie game after one deck if the winner is not chosen
@@ -288,7 +288,7 @@ class Game():
                     self.FFA = False
                 else:
                     self.FFA = True
-                    self.oneTeam = True
+                    self.oneTeam = False
                 self.error = False
                 for team in range(maxTeamsEver):
                     teamPlayerCountSelectors[team].hide()
@@ -302,11 +302,11 @@ class Game():
                 teamPlayerCountSelectors[team].show()
                 self.playersInTeams[team] = teamPlayerCountSelectors[team].get_value()[1]
             for team in range(maxTeamsEver - teamCnt):
-                print(-1 * (team - maxTeamsEver) - 1)
+                #print(-1 * (team - maxTeamsEver) - 1)
                 teamPlayerCountSelectors[-1 * (team - maxTeamsEver) - 1].hide()
                 self.playersInTeams[-1 * (team - maxTeamsEver) - 1] = 0
                 
-            print("-------------------")
+            #print("-------------------")
 
             if(teamCnt > 1):
                 checkPlayerCountPerTeamOptions(None, None)
@@ -358,15 +358,16 @@ class Game():
         def setIntroSequenceTime(time, **kwargs):
             self.introSequenceTime = time
         
+        #sets the time between turns
         def setTimeBetweenTurns(time, **kwargs):
             self.timeBetweenTurns = time
-            
+        
+        #sets whether the game finishes after one deck, or if a new deck is given until there is a winner
         def setLoopDeck(isLooped, **kwargs):
             if isLooped:
                 self.loopDeck = True
             else: self.loopDeck = False
-            
-            print(self.loopDeck)
+            #print(self.loopDeck)
         
         maxTeamsEver = 7 #since there are only allowed 8 possible players (because I think it would be too many after that), then there are only 7 possible teams. Otherwise it is a free for all, or complete co-op
         
@@ -404,6 +405,7 @@ class Game():
                  align=pygame_menu.locals.ALIGN_RIGHT
              )
             teamPlayerCountSelectors.append(teamCountSelector)
+            
         errorPlayerCountLable = menu.add.label("The Added Player Count of Individual Teams needs to match the Total Player Count", font_size=10, align=pygame_menu.locals.ALIGN_LEFT)
         
         timeBetweenTurnsText = menu.add.text_input("In seconds, time between turns: ", default=self.timeBetweenTurns, onchange=setTimeBetweenTurns, input_type=INPUT_FLOAT, align=pygame_menu.locals.ALIGN_LEFT)
@@ -423,7 +425,9 @@ class Game():
         
         introSequenceTimeText.add_self_to_kwargs()
         introSequenceSwitch.add_self_to_kwargs()
-        introSequenceTimeText.hide()
+        if(not self.showIntroSequence):
+            introSequenceTimeText.hide()
+        #else:introSequenceTimeText.show()
         timeBetweenTurnsText.add_self_to_kwargs()
         playerCountSelector.add_self_to_kwargs()
         teamSelector.add_self_to_kwargs()

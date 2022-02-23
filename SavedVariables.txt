@@ -1,13 +1,13 @@
-selectedTheme=theme_Poker
+selectedTheme=theme_Tarot
 
-FPS=140
+FPS=360
 
 screenWidth=1024
 
 screenHeight=768
-volume=3
+volume=0
 
 difficulty=0
 
-gamemode=3
+gamemode=1
 
