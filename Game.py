@@ -114,59 +114,37 @@ class Game():
         self.saveSettingToFile("SavedVariables.txt", "selectedTheme", newTheme)
         
     def sOrMOptions(self, screen):
-        optionsMenu = screen
-        menuTheme = pygame_menu.themes.Theme(
-            background_color=(202, 228, 241),
-            title_background_color=(202, 228, 241),
-        )
-        
-        menu = pygame_menu.Menu(
-            title="",
-            height=self.screenHeight,
-            width=self.screenWidth,
-            columns=2,
-            rows=2,
-            theme=menuTheme)
-        
-        def singlePlayer(**kwargs):
-            self.game(screen)
-            #self.main_menu()#returns to main menu instead of options menu
-        
-        playSBut = menu.add.button('Single-Player', singlePlayer)
-        playSBut.add_self_to_kwargs()
-        
-        def singlePlayerOptionsButton(**kwargs):
-            self.singlePlayerOptions(screen)
-        
-        optionsSBut = menu.add.button('Single-Player Options', singlePlayerOptionsButton)
-        optionsSBut.add_self_to_kwargs()
-        
-        def multiPlayer(**kwargs):
-            self.game(screen)
-            #self.main_menu()#returns to main menu instead of options menu
-        
-        playMBut = menu.add.button('Multi-Player', multiPlayer)
-        playMBut.add_self_to_kwargs()
-        
-        def multiPlayerOptionsButton(**kwargs):
-            self.multiplayerOptions(screen)
-        
-        optionsMBut = menu.add.button('Multi-Player Options', multiPlayerOptionsButton)
-        optionsMBut.add_self_to_kwargs()
+        self.screen = screen
         
         while True:
-            optionsMenu.fill((202, 228, 241))
-            self.draw_text_center(
-                "Press escape to go back to main menu",
-                self.lifeFont, self.white,
-                self.screenWidth / 2, self.screenHeight / 6,
-                optionsMenu
-            )
+            screen.fill((202, 228, 241))
+            
+            MENU_MOUSE_POS = pygame.mouse.get_pos()
+
+            # Single Player Game Button
+            sp_button = Button(image=pygame.image.load("Assets/ButtonBG.jpg"), pos=(self.screenWidth*1/4, self.screenHeight*4/8), 
+                            text_input="Single Player", font=pygame.font.Font("assets/font.ttf", 25), base_color="#d7fcd4", hovering_color="White")
+
+            # Single Player Options Button
+            sp_options_button = Button(image=pygame.image.load("Assets/ButtonBG.jpg"), pos=(self.screenWidth*1/4, self.screenHeight*6/8), 
+                            text_input="Single Player Options", font=pygame.font.Font("assets/font.ttf", 25), base_color="#d7fcd4", hovering_color="White")
+            
+            # Multi Player Game Button
+            mp_button = Button(image=pygame.image.load("Assets/ButtonBG.jpg"), pos=(self.screenWidth*3/4, self.screenHeight*4/8), 
+                           text_input="Multi Player", font=pygame.font.Font("assets/font.ttf", 25), base_color="#d7fcd4", hovering_color="White")
+
+            # Multi Player Options Button
+            mp_options_button = Button(image=pygame.image.load("Assets/ButtonBG.jpg"), pos=(self.screenWidth*3/4, self.screenHeight*6/8), 
+                           text_input="Multi Player Options", font=pygame.font.Font("assets/font.ttf", 25), base_color="#d7fcd4", hovering_color="White")
+            
+            for button in [sp_button, sp_options_button, mp_button, mp_options_button]:
+                button.changeColor(MENU_MOUSE_POS)
+                button.update(screen)
+            
             events = pygame.event.get()
-            # events2 = pygame.event.get()
-            menu.draw(optionsMenu)
-            menu.update(events)
             for event in events:
+                if event.type == pygame.QUIT:
+                    return
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         mixer.init()
@@ -174,6 +152,20 @@ class Game():
                         mixer.music.set_volume(self.volume/100)
                         mixer.music.play(-1)
                         return
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    # Button events when specific buttons are clicked
+                    if sp_button.checkForInput(MENU_MOUSE_POS):
+                        self.game(screen)
+
+                    if sp_options_button.checkForInput(MENU_MOUSE_POS):
+                        self.singlePlayerOptions(screen)
+                
+                    if mp_button.checkForInput(MENU_MOUSE_POS):
+                        self.game(screen)
+
+                    if mp_options_button.checkForInput(MENU_MOUSE_POS):
+                        self.multiplayerOptions(screen)
+            
             pygame.display.update()
             self.mainClock.tick(self.FPS)
     
