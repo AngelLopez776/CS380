@@ -6,8 +6,8 @@ screenWidth=1024
 
 screenHeight=768
 
-volume=8
-difficulty=0
+volume=0
 
+difficulty=0
 gamemode=1
 

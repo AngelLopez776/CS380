@@ -12,6 +12,7 @@ from pygame import mixer
 import threading
 import keyboard #must be installed: pip install keyboard in anaconda cmd
 from Score import Score
+from Player import Player
 
 running = True
 
@@ -20,8 +21,9 @@ class Game():
         #multiplayer-----------#eventually will be read from File; some variables still need to be saved by the functions in multiplayerOptions
         self.teamCount = 0 #how many teams
         self.playerCount = 2 #how many players
+        self.tempPlayerCnt = self.playerCount #in order to properly reset the game if wanted
         self.playersInTeams = [0,0,0,0,0,0,0] #if there is a team with 0 players, then that team does not exist according to the user
-        self.lives = 4 #how many lives per team; may add switch to select lives per player or lives per team
+        self.lives = 2 #how many lives per team; may add switch to select lives per player or lives per team
         self.showIntroSequence=False #whetehr cards are shown at the beginnging of the game
         self.introSequenceTime=5 #how long the cards are displayed at the beginning of the game
         self.FFA = False #if there are 0 teams
@@ -695,7 +697,13 @@ class Game():
     
         
     #while this will be very similar to the game method, it's different enough I feel to where a new method is warrented. 
-    def multiPlayerGame(self, window):   
+    def multiPlayerGame(self, window):
+        players = []
+        self.tempPlayerCnt = self.playerCount
+        for i in range(self.playerCount):
+            player = Player(i + 1, self.lives)
+            players.append(player)
+        print("there are " + str(self.playerCount) + " players")
         def parallelEscape():
             global running
             while True:
@@ -758,21 +766,38 @@ class Game():
                     return False
                 self.animate.flip(tempTable, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, False)
 
-
         setUpMPTable()
-        streak = [0,0,0,0,0,0,0]
 
         quitG = False
         
+        def playerIsOutOrRemoveLife(players, activePlayer):
+            players[activePlayer].lives -= 1
+            if (players[activePlayer].lives == 0):
+                players[activePlayer].alive == False
+                print("player " + str(players[activePlayer].playerNum) + " is out")
+                self.tempPlayerCnt -= 1
+                if(activePlayer == self.playerCount - 1):
+                    activePlayer = -1
+                activePlayer +=1
+            else:
+                players[activePlayer].streak = 0
+                print("player " + str(players[activePlayer].playerNum) + " has lost a life; they are now at " + str(players[activePlayer].lives) + " lives left")
+                if(activePlayer == self.playerCount - 1):
+                    activePlayer = -1
+                activePlayer +=1
+            print("player " + str(players[activePlayer].playerNum) + "'s turn")
+            return activePlayer
+            
+        activePlayer = 0
+        print("player " + str(players[activePlayer].playerNum) + "'s turn")
         while running:
             self.mainClock.tick(self.FPS)
             mouse = pygame.mouse.get_pos()
 
-            window.fill(black, (0, 0, 400, 40))  # so cards show during lose screen
-            self.draw_text("Lives: " + str(t.lives), self.lifeFont, white, 5, 0, window)
+            #window.fill(black, (0, 0, 400, 40))  # so cards show during lose screen
+            #self.draw_text("Lives: " + str(t.lives), self.lifeFont, white, 5, 0, window)
 
-
-            #self.draw_text("Score: " + str(t.score), self.lifeFont, white, 105, 0, window)
+            #here, rather than checking for a win, this checks for a completed deck
             if t.checkWin():
                 for card in tempTable:
                     if not card.shown:
@@ -786,56 +811,33 @@ class Game():
                         pass
                         
                     #t.score = t.score + (t.lives * 100)
-                    self.draw_text("Lives: " + str(t.lives), self.lifeFont, white, 5, 0, window)
+                    #self.draw_text("Lives: " + str(t.lives), self.lifeFont, white, 5, 0, window)
         
                     
                     #self.draw_text("Score: " + str(t.score), self.lifeFont, white, 105, 0, window)
                     
-                    self.draw_text_center("You win!", self.endFont, green, self.screenWidth / 2, self.screenHeight / 4, window)
+                    #self.draw_text_center("You win!", self.endFont, green, self.screenWidth / 2, self.screenHeight / 4, window)
 
                     mixer.init()
                     mixer.music.load('Sounds/winner.mp3')
                     mixer.music.set_volume(self.volume/100)
                     mixer.music.play()
-                                   
+                    for i in players:
+                        if(i.alive == True):
+                            print(str(i.playerNum) + "wins!")
                     running, quitG, playAgain = self.endScreen(window, t.score)
-
+                   
                     if playAgain:
                         mixer.init()
                         mixer.music.load('Sounds/'+str(self.selectedTheme)+'.mp3')
                         mixer.music.set_volume(self.volume/100)
                         mixer.music.play(-1)
-                        return Game.game(self, window)
+                        return Game.multiPlayerGame(self, window)
                 else:
                     self.stopAllFor(1)
                     self.animate.flip(tempTable, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, False)
                     t = Table(self.col, self.row, self.selectedTheme, 5, 0, self.FPS)
                     setUpMPTable()
-            
-            elif (t.lives == 0):
-                """
-                hiddenTable = []
-                for card in tempTable:
-                    if (not card.shown):
-                        hiddenTable.append(card)
-
-                self.animate.flip(hiddenTable, 1000, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, True)
-
-                self.draw_text_center("You lose!", self.endFont, red, self.screenWidth / 2, self.screenHeight / 4, window)
-                mixer.init()
-                mixer.music.load('Sounds/gameover.mp3')
-                mixer.music.set_volume(self.volume/100)
-                mixer.music.play()
-
-                running, quitG, playAgain = self.endScreen(window, t.score)
-
-                if playAgain:
-                    mixer.init()
-                    mixer.music.load('Sounds/'+str(self.selectedTheme)+'.mp3')
-                    mixer.music.set_volume(self.volume/100)
-                    mixer.music.play(-1)
-                    return Game.game(self, window)"""
-                pass
             
             else:
                 t.update()
@@ -858,10 +860,11 @@ class Game():
                                 self.animate.flip(cards, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, False)
                         
                         t.selection.clear()
-                       
-                        #t.lives = t.lives - 1
-                        
-                            
+                        activePlayer = playerIsOutOrRemoveLife(players, activePlayer)
+                        if(self.tempPlayerCnt == 1):
+                            print("player " + str(players[activePlayer].playerNum) + " wins!")
+                            running, quitG, playAgain = self.endScreen(window, t.score)
+
                     if len(t.selection) >= 2:
                         isMatch = t.checkMatch()
                         if isMatch == 2:
@@ -869,9 +872,11 @@ class Game():
                             if(running):
                                 self.animate.flip(t.selection, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, False)
                                 t.selection.clear()
-                                #if self.gamemode == 1 or self.gamemode == 3:
-                                 #   t.lives = t.lives - 1
-                                #streak = 0
+                                activePlayer = playerIsOutOrRemoveLife(players, activePlayer)
+                                if(self.tempPlayerCnt == 1):
+                                    print("player " + str(players[activePlayer].playerNum) + " wins!")
+                                    running, quitG, playAgain = self.endScreen(window, t.score)
+
                         else:
                             if isMatch == 1:
                                 match = t.selection[1].ID if t.selection[1].ID != "JOKER" else t.selection[0].ID
@@ -883,7 +888,13 @@ class Game():
                                             cards.append(c)
                                             self.animate.flip(cards, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, True)
                             t.selection.clear()
-                            #streak = streak + 1
+                            players[activePlayer].streak += 1
+                            print("player " + str(players[activePlayer].playerNum) + " is now at a winning streak of " + str(players[activePlayer].lives))
+                            if(activePlayer == self.playerCount - 1):
+                                activePlayer = -1
+                            activePlayer +=1
+                            print(activePlayer)
+                            print("player " + str(players[activePlayer].playerNum) + "'s turn")
 
                 for row in t.table:
                     for c in row:

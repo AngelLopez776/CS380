@@ -1,0 +1,8 @@
+# -*- coding: utf-8 -*-
+
+class Player:
+    def __init__(self, playerNum, lives):
+        self.lives = lives
+        self.streak = 0
+        self.alive = False
+        self.playerNum = playerNum
