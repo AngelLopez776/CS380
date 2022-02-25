@@ -271,7 +271,8 @@ class Game():
             width=self.screenWidth/2,
             theme=menuTheme)
         
-        #reveals the number of teams based off the number of teams chosen
+        #reveals the number of teams based off the number of teams chosen; 
+        """need to change so that the values are only saved once there is no user error"""
         def setTeamsOption(teamCountStr, teamCnt, **kwargs):
             self.teamCount = teamCnt
             #print(self.teamCount)
