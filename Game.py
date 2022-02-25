@@ -29,6 +29,8 @@ class Game():
         self.error = False #set to true when there is any user error; this will not let the user exit the menu until they fix the error
         self.timeBetweenTurns = 3 #time between turns for players
         self.loopDeck = False #will tell whether there should be a new deck until a winner is made, or to tie game after one deck if the winner is not chosen
+        self.col = 3 #how many columns in the multiplayer table
+        self.row = 3 #how many rows in the multiplayer table
         #singlePlayer-----------
         self.difficulty = int(self.readSettingFromFile("SavedVariables.txt", "difficulty"))
         self.gamemode = int(self.readSettingFromFile("SavedVariables.txt", "gamemode"))
@@ -161,7 +163,7 @@ class Game():
                         self.singlePlayerOptions(screen)
                 
                     if mp_button.checkForInput(MENU_MOUSE_POS):
-                        self.game(screen)
+                        self.multiPlayerGame(screen)
 
                     if mp_options_button.checkForInput(MENU_MOUSE_POS):
                         self.multiplayerOptions(screen)
@@ -689,7 +691,219 @@ class Game():
             timeSinceStart = time.perf_counter()
             timeSinceStart -= startTime
             time.sleep(0.05)
-           
+    
+        
+    #while this will be very similar to the game method, it's different enough I feel to where a new method is warrented. 
+    def multiPlayerGame(self, window):   
+              
+            def parallelEscape():
+                global running
+                while True:
+                    if keyboard.is_pressed("Esc"):
+                        #when exiting game this will play main menu sound in the select screen, not finished
+                        mixer.init()
+                        mixer.music.load('Sounds/mainmenu.mp3')
+                        mixer.music.set_volume(self.volume/100)
+                        mixer.music.play(-1)
+                        running = False
+                    time.sleep(0.05)
+            
+                    
+            global running
+            running = True
+            
+            es = threading.Thread(target=parallelEscape)
+            es.start()
+            window.fill(self.black)
+            t = Table(self.col, self.row, self.selectedTheme, 5, 0, self.FPS)
+
+            green = (0, 255, 0)
+            red = (255, 0, 0)
+            white = (255, 255, 255)
+            black = (0, 0, 0)
+
+            minBorder = 70
+            inBTween = 10
+            scale = self.setCardScale(minBorder, t.x, t.y, inBTween)
+            xDim = int(250 * scale)
+            yDim = int(350 * scale)
+            xSize = xDim + inBTween
+            ySize = yDim + inBTween
+            toXCenter = self.centerDeckX(xSize, t.x, self.screenWidth, minBorder)
+            timeToFlip = int(3000 * scale)  # can't be too fast or frames don't register
+            
+            mixer.init()
+            mixer.music.load('Sounds/'+str(self.selectedTheme)+'.mp3')
+            mixer.music.set_volume(self.volume/100)
+            mixer.music.play(-1)
+            #set up lives based off team or individual 
+            tempTable = []
+            def setUpMPTable():
+                for i in range(t.x):
+                    for j in range(t.y):
+                        t.table[j][i].col = i
+                        t.table[j][i].row = j
+                        tempTable.append(t.table[j][i])
+                        surface = t.table[j][i].image.convert()
+                        surface = pygame.transform.scale(surface, (xDim, yDim))
+                        window.blit(surface, ((minBorder + toXCenter) + xSize * t.table[j][i].col, minBorder + ySize * t.table[j][i].row))
+                pygame.display.update()
+                
+                if(self.showIntroSequence):
+                    self.stopAllFor(1)
+                    self.animate.flip(tempTable, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, True)
+                    self.stopAllFor(self.introSequenceTime)
+                    if(not running):
+                        pygame.event.clear()
+                        return False
+                    self.animate.flip(tempTable, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, False)
+
+
+            setUpMPTable()
+            streak = [0,0,0,0,0,0,0]
+
+            quitG = False
+            
+            while running:
+                self.mainClock.tick(self.FPS)
+                mouse = pygame.mouse.get_pos()
+
+                window.fill(black, (0, 0, 400, 40))  # so cards show during lose screen
+                self.draw_text("Lives: " + str(t.lives), self.lifeFont, white, 5, 0, window)
+
+
+                #self.draw_text("Score: " + str(t.score), self.lifeFont, white, 105, 0, window)
+                if t.checkWin():
+                    for card in tempTable:
+                        if not card.shown:
+                            c = [card]
+                            self.animate.flip(c, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, True)
+                    if not self.loopDeck:
+                        window.fill(black, (0, 0, 400, 40))
+    
+                        if len(t.selection) >= 2:
+                            #t.score = t.score + 100 + (50 * streak)
+                            pass
+                            
+                        #t.score = t.score + (t.lives * 100)
+                        self.draw_text("Lives: " + str(t.lives), self.lifeFont, white, 5, 0, window)
+            
+                        
+                        #self.draw_text("Score: " + str(t.score), self.lifeFont, white, 105, 0, window)
+                        
+                        self.draw_text_center("You win!", self.endFont, green, self.screenWidth / 2, self.screenHeight / 4, window)
+    
+                        mixer.init()
+                        mixer.music.load('Sounds/winner.mp3')
+                        mixer.music.set_volume(self.volume/100)
+                        mixer.music.play()
+                                       
+                        running, quitG, playAgain = self.endScreen(window, t.score)
+    
+                        if playAgain:
+                            mixer.init()
+                            mixer.music.load('Sounds/'+str(self.selectedTheme)+'.mp3')
+                            mixer.music.set_volume(self.volume/100)
+                            mixer.music.play(-1)
+                            return Game.game(self, window)
+                    else:
+                        self.stopAllFor(1)
+                        self.animate.flip(tempTable, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, False)
+                        t = Table(self.col, self.row, self.selectedTheme, 5, 0, self.FPS)
+                        setUpMPTable()
+                
+                elif (t.lives == 0):
+                    """
+                    hiddenTable = []
+                    for card in tempTable:
+                        if (not card.shown):
+                            hiddenTable.append(card)
+
+                    self.animate.flip(hiddenTable, 1000, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, True)
+
+                    self.draw_text_center("You lose!", self.endFont, red, self.screenWidth / 2, self.screenHeight / 4, window)
+                    mixer.init()
+                    mixer.music.load('Sounds/gameover.mp3')
+                    mixer.music.set_volume(self.volume/100)
+                    mixer.music.play()
+
+                    running, quitG, playAgain = self.endScreen(window, t.score)
+
+                    if playAgain:
+                        mixer.init()
+                        mixer.music.load('Sounds/'+str(self.selectedTheme)+'.mp3')
+                        mixer.music.set_volume(self.volume/100)
+                        mixer.music.play(-1)
+                        return Game.game(self, window)"""
+                    pass
+                
+                else:
+                    t.update()
+                    for i in range(t.x):
+                        for j in range(t.y):
+                            surface = t.table[j][i].image.convert()
+                            surface = pygame.transform.smoothscale(surface, (xDim, yDim))
+                            t.table[j][i].rect = surface.get_rect()
+                            t.table[j][i].makeRect((minBorder + toXCenter) + xSize * i, minBorder + ySize * j)
+                    pygame.display.update()
+                    
+                  
+                    if len(t.selection) >= 1:
+                        if t.checkBomb():
+                            self.stopAllFor(1)
+                            for c in t.selection:
+                                if not (c.ID == "BOMB"):
+                                    cards = []
+                                    cards.append(c)
+                                    self.animate.flip(cards, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, False)
+                            
+                            t.selection.clear()
+                           
+                            #t.lives = t.lives - 1
+                            
+                                
+                        if len(t.selection) >= 2:
+                            isMatch = t.checkMatch()
+                            if isMatch == 2:
+                                self.stopAllFor(1)
+                                if(running):
+                                    self.animate.flip(t.selection, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, False)
+                                    t.selection.clear()
+                                    #if self.gamemode == 1 or self.gamemode == 3:
+                                     #   t.lives = t.lives - 1
+                                    #streak = 0
+                            else:
+                                if isMatch == 1:
+                                    match = t.selection[1].ID if t.selection[1].ID != "JOKER" else t.selection[0].ID
+                                    t.selection.clear()
+                                    for r in t.table:
+                                        for c in r:
+                                            if c.ID == match and not c.shown:
+                                                cards = []
+                                                cards.append(c)
+                                                self.animate.flip(cards, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, True)
+                                t.selection.clear()
+                                #streak = streak + 1
+
+                    for row in t.table:
+                        for c in row:
+                            if (c.rect.collidepoint(mouse) and not c.shown):
+                                for event in pygame.event.get():
+                                    if event.type == pygame.MOUSEBUTTONDOWN:
+                                        cards = [c]
+                                        self.animate.flip(cards, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window,
+                                                          True)
+
+                                        t.selection.append(c)
+                                        
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        pygame.quit()
+                        sys.exit()  
+                
+            es.join(0)
+            return quitG
+        
     def game(self, window):
         
         def parallelEscape():
@@ -784,6 +998,10 @@ class Game():
             self.draw_text("Score: " + str(t.score), self.lifeFont, white, 105, 0, window)
 
             if t.checkWin():
+                for card in tempTable:
+                    if not card.shown:
+                        c = [card]
+                        self.animate.flip(c, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, True)
                 window.fill(black, (0, 0, 400, 40))
 
                 if len(t.selection) >= 2:
