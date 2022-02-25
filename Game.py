@@ -19,11 +19,14 @@ running = True
 class Game():
     def __init__(self):
         #multiplayer-----------#eventually will be read from File; some variables still need to be saved by the functions in multiplayerOptions
+        self.streakToOneUp = 3
+        self.completedRounds = 0
+        self.roundsToComplete = 3
         self.teamCount = 0 #how many teams
         self.playerCount = 2 #how many players
         self.tempPlayerCnt = self.playerCount #in order to properly reset the game if wanted
         self.playersInTeams = [0,0,0,0,0,0,0] #if there is a team with 0 players, then that team does not exist according to the user
-        self.lives = 2 #how many lives per team; may add switch to select lives per player or lives per team
+        self.lives = 1 #how many lives per team; may add switch to select lives per player or lives per team
         self.showIntroSequence=False #whetehr cards are shown at the beginnging of the game
         self.introSequenceTime=5 #how long the cards are displayed at the beginning of the game
         self.FFA = False #if there are 0 teams
@@ -31,7 +34,7 @@ class Game():
         self.error = False #set to true when there is any user error; this will not let the user exit the menu until they fix the error
         self.timeBetweenTurns = 3 #time between turns for players
         self.loopDeck = False #will tell whether there should be a new deck until a winner is made, or to tie game after one deck if the winner is not chosen
-        self.col = 3 #how many columns in the multiplayer table
+        self.col = 5 #how many columns in the multiplayer table
         self.row = 3 #how many rows in the multiplayer table
         #singlePlayer-----------
         self.difficulty = int(self.readSettingFromFile("SavedVariables.txt", "difficulty"))
@@ -758,7 +761,7 @@ class Game():
             pygame.display.update()
             
             if(self.showIntroSequence):
-                self.stopAllFor(1)
+                self.stopAllFor(0.5)
                 self.animate.flip(tempTable, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, True)
                 self.stopAllFor(self.introSequenceTime)
                 if(not running):
@@ -788,6 +791,19 @@ class Game():
             print("player " + str(players[activePlayer].playerNum) + "'s turn")
             return activePlayer
             
+        def playerGetsOneUpOrNextTurn(players, activePlayer):
+            players[activePlayer].streak += 1
+            print("player " + str(players[activePlayer].playerNum) + " is now at a winning streak of " + str(players[activePlayer].streak))
+            if(players[activePlayer].streak == self.streakToOneUp):
+                players[activePlayer].lives += 1
+                players[activePlayer].streak = 0
+                print(str("player " + str(players[activePlayer].playerNum)) + " has been given an extra life; they are now at " + str(players[activePlayer].lives) + " lives")
+            if(activePlayer == self.playerCount - 1):
+                activePlayer = -1
+            activePlayer +=1
+            print("player " + str(players[activePlayer].playerNum) + "'s turn")
+            return activePlayer
+        
         activePlayer = 0
         print("player " + str(players[activePlayer].playerNum) + "'s turn")
         while running:
@@ -799,11 +815,11 @@ class Game():
 
             #here, rather than checking for a win, this checks for a completed deck
             if t.checkWin():
-                for card in tempTable:
-                    if not card.shown:
-                        c = [card]
-                        self.animate.flip(c, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, True)
+                activePlayer = playerGetsOneUpOrNextTurn(players, activePlayer)
                 if not self.loopDeck:
+                    if(self.showIntroSequence):
+                        self.animate.flip(tempTable, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, True)
+
                     window.fill(black, (0, 0, 400, 40))
 
                     if len(t.selection) >= 2:
@@ -834,7 +850,9 @@ class Game():
                         mixer.music.play(-1)
                         return Game.multiPlayerGame(self, window)
                 else:
-                    self.stopAllFor(1)
+                    self.completedRounds += 1
+                    print("round " + str(self.completedRounds) + " complete")
+                    #self.stopAllFor(1)
                     self.animate.flip(tempTable, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, False)
                     t = Table(self.col, self.row, self.selectedTheme, 5, 0, self.FPS)
                     setUpMPTable()
@@ -888,13 +906,7 @@ class Game():
                                             cards.append(c)
                                             self.animate.flip(cards, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, True)
                             t.selection.clear()
-                            players[activePlayer].streak += 1
-                            print("player " + str(players[activePlayer].playerNum) + " is now at a winning streak of " + str(players[activePlayer].lives))
-                            if(activePlayer == self.playerCount - 1):
-                                activePlayer = -1
-                            activePlayer +=1
-                            print(activePlayer)
-                            print("player " + str(players[activePlayer].playerNum) + "'s turn")
+                            activePlayer = playerGetsOneUpOrNextTurn(players, activePlayer)
 
                 for row in t.table:
                     for c in row:
