@@ -26,7 +26,7 @@ class Game():
         self.playerCount = 2 #how many players
         self.tempPlayerCnt = self.playerCount #in order to properly reset the game if wanted
         self.playersInTeams = [0,0,0,0,0,0,0] #if there is a team with 0 players, then that team does not exist according to the user
-        self.lives = 1 #how many lives per team; may add switch to select lives per player or lives per team
+        self.lives = 2 #how many lives per team; may add switch to select lives per player or lives per team
         self.showIntroSequence=False #whetehr cards are shown at the beginnging of the game
         self.introSequenceTime=5 #how long the cards are displayed at the beginning of the game
         self.FFA = False #if there are 0 teams
@@ -34,7 +34,7 @@ class Game():
         self.error = False #set to true when there is any user error; this will not let the user exit the menu until they fix the error
         self.timeBetweenTurns = 3 #time between turns for players
         self.loopDeck = False #will tell whether there should be a new deck until a winner is made, or to tie game after one deck if the winner is not chosen
-        self.col = 5 #how many columns in the multiplayer table
+        self.col = 3 #how many columns in the multiplayer table
         self.row = 3 #how many rows in the multiplayer table
         #singlePlayer-----------
         self.difficulty = int(self.readSettingFromFile("SavedVariables.txt", "difficulty"))
@@ -772,22 +772,27 @@ class Game():
         setUpMPTable()
 
         quitG = False
-        
+        def findNextAlivePlayer(players, activePlayer):
+            while True:
+                if(activePlayer == self.playerCount - 1):
+                    activePlayer = -1
+                activePlayer +=1
+                #print(activePlayer)
+                if(players[activePlayer].alive == True):
+                    break
+            return activePlayer
+                
         def playerIsOutOrRemoveLife(players, activePlayer):
             players[activePlayer].lives -= 1
             if (players[activePlayer].lives == 0):
-                players[activePlayer].alive == False
+                players[activePlayer].alive = False
                 print("player " + str(players[activePlayer].playerNum) + " is out")
                 self.tempPlayerCnt -= 1
-                if(activePlayer == self.playerCount - 1):
-                    activePlayer = -1
-                activePlayer +=1
+                activePlayer = findNextAlivePlayer(players, activePlayer)
             else:
                 players[activePlayer].streak = 0
                 print("player " + str(players[activePlayer].playerNum) + " has lost a life; they are now at " + str(players[activePlayer].lives) + " lives left")
-                if(activePlayer == self.playerCount - 1):
-                    activePlayer = -1
-                activePlayer +=1
+                activePlayer = findNextAlivePlayer(players, activePlayer)
             print("player " + str(players[activePlayer].playerNum) + "'s turn")
             return activePlayer
             
@@ -798,9 +803,7 @@ class Game():
                 players[activePlayer].lives += 1
                 players[activePlayer].streak = 0
                 print(str("player " + str(players[activePlayer].playerNum)) + " has been given an extra life; they are now at " + str(players[activePlayer].lives) + " lives")
-            if(activePlayer == self.playerCount - 1):
-                activePlayer = -1
-            activePlayer +=1
+            activePlayer = findNextAlivePlayer(players, activePlayer)
             print("player " + str(players[activePlayer].playerNum) + "'s turn")
             return activePlayer
         
