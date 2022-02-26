@@ -394,8 +394,10 @@ class Game():
         teamSelector = menu.add.selector("Teams", items=teamCountList, onchange=setTeamsOption, style=pygame_menu.widgets.SELECTOR_STYLE_FANCY, align=pygame_menu.locals.ALIGN_LEFT)
         teamPlayerCountList = [("1", 1),("2", 2),("3", 3),("4", 4),("5", 5),("6", 6),("7", 7)]
         teamPlayerCountSelectors = [] #the number of players per team
-        playerCountSelector.set_default_value(self.playerCount - 2)
+        playerCountSelector.set_default_value(self.playerCount - 2) #this ensures that the default value is correct; if the default in the parameters, it crashes.
         playerCountSelector.reset_value()
+        teamSelector.set_default_value(self.teamCount) #this ensures that the default value is correct; if the default in the parameters, it crashes.
+        teamSelector.reset_value()
         for i in range(maxTeamsEver):
             teamName = "Team " + str(i + 1) + " size"
             teamCountSelector = menu.add.selector(

@@ -7,7 +7,7 @@ screenWidth=1440
 screenHeight=900
 
 volume=0
+
 difficulty=0
 
-gamemode=3
-
+gamemode=1
