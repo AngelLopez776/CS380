@@ -310,7 +310,6 @@ class Game():
 
             if(teamCnt > 1):
                 checkPlayerCountPerTeamOptions(None, None)
-        
         #sets the number of total players
         def setPlayerCountOptions(playerCountStr, playerCnt, **kwargs):
             #print(teamCount)
@@ -386,6 +385,7 @@ class Game():
                                                 align=pygame_menu.locals.ALIGN_LEFT
                                                 )
         teamCountList = []
+
         for players in range(self.playerCount):
             stringPC = None
             stringPC = str(players)
@@ -394,6 +394,8 @@ class Game():
         teamSelector = menu.add.selector("Teams", items=teamCountList, onchange=setTeamsOption, style=pygame_menu.widgets.SELECTOR_STYLE_FANCY, align=pygame_menu.locals.ALIGN_LEFT)
         teamPlayerCountList = [("1", 1),("2", 2),("3", 3),("4", 4),("5", 5),("6", 6),("7", 7)]
         teamPlayerCountSelectors = [] #the number of players per team
+        playerCountSelector.set_default_value(self.playerCount - 2)
+        playerCountSelector.reset_value()
         for i in range(maxTeamsEver):
             teamName = "Team " + str(i + 1) + " size"
             teamCountSelector = menu.add.selector(
@@ -697,6 +699,7 @@ class Game():
             timeSinceStart = time.perf_counter()
             timeSinceStart -= startTime
             time.sleep(0.05)
+        pygame.event.clear()
     
         
     #while this will be very similar to the game method, it's different enough I feel to where a new method is warrented. 
@@ -773,6 +776,7 @@ class Game():
 
         quitG = False
         def findNextAlivePlayer(players, activePlayer):
+            self.stopAllFor(self.timeBetweenTurns)
             while True:
                 if(activePlayer == self.playerCount - 1):
                     activePlayer = -1
