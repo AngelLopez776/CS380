@@ -122,27 +122,27 @@ class Game():
         
     def sOrMOptions(self, screen):
         self.screen = screen
-        
+        textSize = 20
         while True:
             screen.fill((202, 228, 241))
             
             MENU_MOUSE_POS = pygame.mouse.get_pos()
-
+            
             # Single Player Game Button
             sp_button = Button(image=pygame.image.load("Assets/ButtonBG.jpg"), pos=(self.screenWidth*1/4, self.screenHeight*4/8), 
-                            text_input="Single Player", font=pygame.font.Font("assets/font.ttf", 25), base_color="#d7fcd4", hovering_color="White")
+                            text_input="Single Player", font=pygame.font.Font("assets/font.ttf", textSize), base_color="#d7fcd4", hovering_color="White")
 
             # Single Player Options Button
             sp_options_button = Button(image=pygame.image.load("Assets/ButtonBG.jpg"), pos=(self.screenWidth*1/4, self.screenHeight*6/8), 
-                            text_input="Single Player Options", font=pygame.font.Font("assets/font.ttf", 25), base_color="#d7fcd4", hovering_color="White")
+                            text_input="Options", font=pygame.font.Font("assets/font.ttf", textSize), base_color="#d7fcd4", hovering_color="White")
             
             # Multi Player Game Button
             mp_button = Button(image=pygame.image.load("Assets/ButtonBG.jpg"), pos=(self.screenWidth*3/4, self.screenHeight*4/8), 
-                           text_input="Multi Player", font=pygame.font.Font("assets/font.ttf", 25), base_color="#d7fcd4", hovering_color="White")
+                           text_input="Multi Player", font=pygame.font.Font("assets/font.ttf", textSize), base_color="#d7fcd4", hovering_color="White")
 
             # Multi Player Options Button
             mp_options_button = Button(image=pygame.image.load("Assets/ButtonBG.jpg"), pos=(self.screenWidth*3/4, self.screenHeight*6/8), 
-                           text_input="Multi Player Options", font=pygame.font.Font("assets/font.ttf", 25), base_color="#d7fcd4", hovering_color="White")
+                           text_input="Options", font=pygame.font.Font("assets/font.ttf", textSize), base_color="#d7fcd4", hovering_color="White")
             
             for button in [sp_button, sp_options_button, mp_button, mp_options_button]:
                 button.changeColor(MENU_MOUSE_POS)
