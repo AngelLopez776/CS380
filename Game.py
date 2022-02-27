@@ -761,7 +761,7 @@ class Game():
                 squareY = (i * 80) + minBorder
                 lives = players[i].lives
                 if(lives == 0):
-                    lives = "dead"
+                    lives = "depleted"
                 textYLoc = (squareY + squareH/2) + 40
                 window.fill(self.black, (squareX, textYLoc, 150, 15))  
                 self.draw_text("lives:" + str(lives),  pygame.font.Font("assets/font.ttf", 15), self.white, squareX, textYLoc, window)
@@ -964,6 +964,7 @@ class Game():
 
                     if len(t.selection) >= 2:
                         isMatch = t.checkMatch()
+                        #bomb
                         if isMatch == 2:
                             self.stopAllFor(1)
                             if(running):
