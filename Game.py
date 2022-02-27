@@ -765,7 +765,7 @@ class Game():
                 textYLoc = (squareY + squareH/2) + 40
                 window.fill(self.black, (squareX, textYLoc, 150, 15))  
                 self.draw_text("lives:" + str(lives),  pygame.font.Font("assets/font.ttf", 15), self.white, squareX, textYLoc, window)
-            pygame.display.update()
+            #pygame.display.update()
 
 
         def streakVisualUpdate(players):
@@ -777,7 +777,7 @@ class Game():
                 textYLoc = (squareY + squareH/2) + 25
                 window.fill(self.black, (squareX, textYLoc, 150, 15))  
                 self.draw_text("streak:" + str(streak),  pygame.font.Font("assets/font.ttf", 15), self.white, squareX, textYLoc, window)
-            pygame.display.update()
+            #pygame.display.update()
             
         def activePlayerVisualUpdate(activePlayer, prevActivePlayer):
             squareH = 10
@@ -787,7 +787,7 @@ class Game():
             window.fill(self.black, (squareX, prevSquareY , squareH, squareH))
             activeSquare = pygame.Rect(squareX, squareY, squareH, squareH)
             pygame.draw.rect(window, (100,100,255), activeSquare)
-            pygame.display.update()
+            #pygame.display.update()
 
         def setUpMPTable(players):
             #sets up card display
