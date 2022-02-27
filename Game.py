@@ -26,7 +26,7 @@ class Game():
         self.playerCount = 2 #how many players
         self.tempPlayerCnt = self.playerCount #in order to properly reset the game if wanted
         self.playersInTeams = [0,0,0,0,0,0,0] #if there is a team with 0 players, then that team does not exist according to the user
-        self.lives = 2 #how many lives per team; may add switch to select lives per player or lives per team
+        self.lives = 100 #how many lives per team; may add switch to select lives per player or lives per team
         self.showIntroSequence=False #whetehr cards are shown at the beginnging of the game
         self.introSequenceTime=5 #how long the cards are displayed at the beginning of the game
         self.FFA = False #if there are 0 teams
@@ -215,7 +215,6 @@ class Game():
            value_tuple, index = difficulty
            self.difficulty = value_tuple[1]
            self.saveSettingToFile("SavedVariables.txt", "difficulty", str(value_tuple[1]))
-
        allDifficulties = [('Easy', 0),
                          ('Medium', 1),
                          ('Hard', 2)]
@@ -792,6 +791,7 @@ class Game():
 
         def setUpMPTable(players):
             #sets up card display
+            tempTable.clear()
             for i in range(t.x):
                 for j in range(t.y):
                     t.table[j][i].col = i
@@ -886,9 +886,12 @@ class Game():
             if t.checkWin():
                 activePlayer = playerGetsOneUpOrNextTurn(players, activePlayer)
                 if not self.loopDeck:
-                    if(self.showIntroSequence):
-                        self.animate.flip(tempTable, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, True)
-
+                    for i in tempTable:
+                        if not i.shown:
+                            card = [i]
+                            self.animate.flip(card, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, True)
+                            self.stopAllFor(0.2)
+                            break
                     window.fill(black, (0, 0, 400, 40))
 
                     if len(t.selection) >= 2:
@@ -920,8 +923,14 @@ class Game():
                         return Game.multiPlayerGame(self, window)
                 else:
                     self.completedRounds += 1
+                    for i in tempTable:
+                        print(i.shown)
+                        if not i.shown:
+                            card = [i]
+                            self.animate.flip(card, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, True)
+                            self.stopAllFor(0.2)
+                            break
                     print("round " + str(self.completedRounds) + " complete")
-                    #self.stopAllFor(1)
                     self.animate.flip(tempTable, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, False)
                     t = Table(self.col, self.row, self.selectedTheme, 5, 0, self.FPS)
                     setUpMPTable(players)
