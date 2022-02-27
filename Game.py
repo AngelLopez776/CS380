@@ -19,21 +19,21 @@ running = True
 class Game():
     def __init__(self):
         #multiplayer-----------#eventually will be read from File; some variables still need to be saved by the functions in multiplayerOptions
-        self.streakToOneUp = 3
-        self.completedRounds = 0
-        self.roundsToComplete = 3
+        self.streakToOneUp = 3 #streak until a oneUp is given
+        self.completedRounds = 0 #number of full decks completed
+        self.roundsToComplete = 3 #number of decks completed until game complete
         self.teamCount = 0 #how many teams
         self.playerCount = 2 #how many players
         self.tempPlayerCnt = self.playerCount #in order to properly reset the game if wanted
         self.playersInTeams = [0,0,0,0,0,0,0] #if there is a team with 0 players, then that team does not exist according to the user
-        self.lives = 100 #how many lives per team; may add switch to select lives per player or lives per team
-        self.showIntroSequence=False #whetehr cards are shown at the beginnging of the game
-        self.introSequenceTime=5 #how long the cards are displayed at the beginning of the game
+        self.lives = 2 #how many lives per team; may add switch to select lives per player or lives per team
+        self.showIntroSequence=True #whetehr cards are shown at the beginnging of the game
+        self.introSequenceTime=3 #how long the cards are displayed at the beginning of the game
         self.FFA = False #if there are 0 teams
         self.co_op = False #if there is 1 team
         self.error = False #set to true when there is any user error; this will not let the user exit the menu until they fix the error
-        self.timeBetweenTurns = 3 #time between turns for players
-        self.loopDeck = False #will tell whether there should be a new deck until a winner is made, or to tie game after one deck if the winner is not chosen
+        self.timeBetweenTurns = 1 #time between turns for players
+        self.loopDeck = True #will tell whether there should be a new deck until a winner is made, or to tie game after one deck if the winner is not chosen
         self.col = 3 #how many columns in the multiplayer table
         self.row = 3 #how many rows in the multiplayer table
         #singlePlayer-----------
@@ -816,7 +816,6 @@ class Game():
                 self.draw_text_center(player, pygame.font.Font("assets/font.ttf", 15), self.white, textXLoc, textYLoc, window)
                 streakVisualUpdate(players)
                 livesVisualUpdate(players)
-                activePlayerVisualUpdate(0, 0)
             pygame.display.update()
             
             if(self.showIntroSequence):
@@ -827,8 +826,10 @@ class Game():
                     pygame.event.clear()
                     return False
                 self.animate.flip(tempTable, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, False)
-
+        
         setUpMPTable(players)
+        activePlayerVisualUpdate(0, 0)
+
 
         quitG = False
         def findNextAlivePlayer(players, activePlayer):
