@@ -754,7 +754,44 @@ class Game():
         mixer.music.play(-1)
         #set up lives based off team or individual 
         tempTable = []
-        def setUpMPTable():
+        
+        def livesVisualUpdate(players):
+            squareH = 40
+            squareX = 40
+            for i in range(self.playerCount):
+                squareY = (i * 80) + minBorder
+                lives = players[i].lives
+                if(lives == 0):
+                    lives = "dead"
+                textYLoc = (squareY + squareH/2) + 40
+                window.fill(self.black, (squareX, textYLoc, 150, 15))  
+                self.draw_text("lives:" + str(lives),  pygame.font.Font("assets/font.ttf", 15), self.white, squareX, textYLoc, window)
+            pygame.display.update()
+
+
+        def streakVisualUpdate(players):
+            squareH = 40
+            squareX = 40
+            for i in range(self.playerCount):
+                squareY = (i * 80) + minBorder
+                streak = players[i].streak
+                textYLoc = (squareY + squareH/2) + 25
+                window.fill(self.black, (squareX, textYLoc, 150, 15))  
+                self.draw_text("streak:" + str(streak),  pygame.font.Font("assets/font.ttf", 15), self.white, squareX, textYLoc, window)
+            pygame.display.update()
+            
+        def activePlayerVisualUpdate(activePlayer, prevActivePlayer):
+            squareH = 10
+            squareX = 100
+            squareY = (activePlayer * 80) + minBorder + 15
+            prevSquareY = (prevActivePlayer * 80) + minBorder + 15
+            window.fill(self.black, (squareX, prevSquareY , squareH, squareH))
+            activeSquare = pygame.Rect(squareX, squareY, squareH, squareH)
+            pygame.draw.rect(window, (100,100,255), activeSquare)
+            pygame.display.update()
+
+        def setUpMPTable(players):
+            #sets up card display
             for i in range(t.x):
                 for j in range(t.y):
                     t.table[j][i].col = i
@@ -763,6 +800,23 @@ class Game():
                     surface = t.table[j][i].image.convert()
                     surface = pygame.transform.scale(surface, (xDim, yDim))
                     window.blit(surface, ((minBorder + toXCenter) + xSize * t.table[j][i].col, minBorder + ySize * t.table[j][i].row))
+            #sets up players display
+            playerDisplays = []
+            squareX = 40
+            squareW = 40
+            squareH = 40
+            for i in range(self.playerCount):
+                squareY = (i * 80) + minBorder
+                playerDisplay = pygame.Rect(squareX, squareY, squareW, squareH)
+                playerDisplays.append(playerDisplay)
+                pygame.draw.rect(window, (255,0,0), playerDisplays[i])
+                player = "P" + str(i + 1)
+                textXLoc = (squareX + squareW/2)
+                textYLoc = (squareY + squareH/2)
+                self.draw_text_center(player, pygame.font.Font("assets/font.ttf", 15), self.white, textXLoc, textYLoc, window)
+                streakVisualUpdate(players)
+                livesVisualUpdate(players)
+                activePlayerVisualUpdate(0, 0)
             pygame.display.update()
             
             if(self.showIntroSequence):
@@ -774,10 +828,13 @@ class Game():
                     return False
                 self.animate.flip(tempTable, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, False)
 
-        setUpMPTable()
+        setUpMPTable(players)
 
         quitG = False
         def findNextAlivePlayer(players, activePlayer):
+            livesVisualUpdate(players)
+            streakVisualUpdate(players)
+            prevActivePlayer = activePlayer
             self.stopAllFor(self.timeBetweenTurns)
             while True:
                 if(activePlayer == self.playerCount - 1):
@@ -786,6 +843,7 @@ class Game():
                 #print(activePlayer)
                 if(players[activePlayer].alive == True):
                     break
+            activePlayerVisualUpdate(activePlayer, prevActivePlayer)
             return activePlayer
                 
         def playerIsOutOrRemoveLife(players, activePlayer):
@@ -817,6 +875,8 @@ class Game():
         print("player " + str(players[activePlayer].playerNum) + "'s turn")
         while running:
             self.mainClock.tick(self.FPS)
+            
+            
             mouse = pygame.mouse.get_pos()
 
             #window.fill(black, (0, 0, 400, 40))  # so cards show during lose screen
@@ -849,7 +909,7 @@ class Game():
                     mixer.music.play()
                     for i in players:
                         if(i.alive == True):
-                            print(str(i.playerNum) + "wins!")
+                            print("Plauer " + str(i.playerNum) + "wins!")
                     running, quitG, playAgain = self.endScreen(window, t.score)
                    
                     if playAgain:
@@ -864,7 +924,7 @@ class Game():
                     #self.stopAllFor(1)
                     self.animate.flip(tempTable, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, False)
                     t = Table(self.col, self.row, self.selectedTheme, 5, 0, self.FPS)
-                    setUpMPTable()
+                    setUpMPTable(players)
             
             else:
                 t.update()
