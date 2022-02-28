@@ -129,7 +129,7 @@ class Game():
             MENU_MOUSE_POS = pygame.mouse.get_pos()
             
             # Single Player Game Button
-            sp_button = Button(image=pygame.image.load("Assets/ButtonBG.jpg"), pos=(self.screenWidth*1/4, self.screenHeight*4/8), 
+            sp_button = Button(image=pygame.image.load("Assets/LargerButtonBG.jpg"), pos=(self.screenWidth*1/4, self.screenHeight*4/8), 
                             text_input="Single Player", font=pygame.font.Font("assets/font.ttf", textSize), base_color="#d7fcd4", hovering_color="White")
 
             # Single Player Options Button
@@ -137,7 +137,7 @@ class Game():
                             text_input="Options", font=pygame.font.Font("assets/font.ttf", textSize), base_color="#d7fcd4", hovering_color="White")
             
             # Multi Player Game Button
-            mp_button = Button(image=pygame.image.load("Assets/ButtonBG.jpg"), pos=(self.screenWidth*3/4, self.screenHeight*4/8), 
+            mp_button = Button(image=pygame.image.load("Assets/LargerButtonBG.jpg"), pos=(self.screenWidth*3/4, self.screenHeight*4/8), 
                            text_input="Multi Player", font=pygame.font.Font("assets/font.ttf", textSize), base_color="#d7fcd4", hovering_color="White")
 
             # Multi Player Options Button
