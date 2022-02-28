@@ -581,11 +581,21 @@ class Game():
             value_format=lambda x: str(int(x)),
            # command = set_vol()
         )
-
+        
+        def fullscreen(isFullscreen, **kwargs):
+            global screen
+            if isFullscreen:
+                screen = pygame.display.set_mode((self.screenWidth, self.screenHeight), pygame.FULLSCREEN)
+            else:
+                screen = pygame.display.set_mode((self.screenWidth, self.screenHeight), 0, 32)
+        
+        fullscreenToggle = menu.add.toggle_switch("Fullscreen", onchange = fullscreen)
+        
         themeSelector.add_self_to_kwargs()  
         resolutionSelector.add_self_to_kwargs()  
         fpsSelector.add_self_to_kwargs()  
-        volumeSlider.add_self_to_kwargs() 
+        volumeSlider.add_self_to_kwargs()
+        
 
         # running = True
         while True:
