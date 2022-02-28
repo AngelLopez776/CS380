@@ -34,7 +34,7 @@ class Game():
         self.error = False #set to true when there is any user error; this will not let the user exit the menu until they fix the error
         self.timeBetweenTurns = 1 #time between turns for players
         self.loopDeck = True #will tell whether there should be a new deck until a winner is made, or to tie game after one deck if the winner is not chosen
-        self.col = 3 #how many columns in the multiplayer table
+        self.col = 5 #how many columns in the multiplayer table
         self.row = 3 #how many rows in the multiplayer table
         #singlePlayer-----------
         self.difficulty = int(self.readSettingFromFile("SavedVariables.txt", "difficulty"))
@@ -736,8 +736,9 @@ class Game():
         red = (255, 0, 0)
         white = (255, 255, 255)
         black = (0, 0, 0)
-
-        minBorder = 70
+        
+        playerMinBorder = 40
+        minBorder = 120
         inBTween = 10
         scale = self.setCardScale(minBorder, t.x, t.y, inBTween)
         xDim = int(250 * scale)
@@ -758,10 +759,10 @@ class Game():
             squareH = 40
             squareX = 40
             for i in range(self.playerCount):
-                squareY = (i * 80) + minBorder
+                squareY = (i * 80) + playerMinBorder
                 lives = players[i].lives
                 if(lives == 0):
-                    lives = "depleted"
+                    lives = "--"
                 textYLoc = (squareY + squareH/2) + 40
                 window.fill(self.black, (squareX, textYLoc, 150, 15))  
                 self.draw_text("lives:" + str(lives),  pygame.font.Font("assets/font.ttf", 15), self.white, squareX, textYLoc, window)
@@ -772,7 +773,7 @@ class Game():
             squareH = 40
             squareX = 40
             for i in range(self.playerCount):
-                squareY = (i * 80) + minBorder
+                squareY = (i * 80) + playerMinBorder
                 streak = players[i].streak
                 textYLoc = (squareY + squareH/2) + 25
                 window.fill(self.black, (squareX, textYLoc, 150, 15))  
@@ -782,8 +783,8 @@ class Game():
         def activePlayerVisualUpdate(activePlayer, prevActivePlayer):
             squareH = 10
             squareX = 100
-            squareY = (activePlayer * 80) + minBorder + 15
-            prevSquareY = (prevActivePlayer * 80) + minBorder + 15
+            squareY = (activePlayer * 80) + playerMinBorder + 15
+            prevSquareY = (prevActivePlayer * 80) + playerMinBorder + 15
             window.fill(self.black, (squareX, prevSquareY , squareH, squareH))
             activeSquare = pygame.Rect(squareX, squareY, squareH, squareH)
             pygame.draw.rect(window, (100,100,255), activeSquare)
@@ -806,7 +807,7 @@ class Game():
             squareW = 40
             squareH = 40
             for i in range(self.playerCount):
-                squareY = (i * 80) + minBorder
+                squareY = (i * 80) + playerMinBorder
                 playerDisplay = pygame.Rect(squareX, squareY, squareW, squareH)
                 playerDisplays.append(playerDisplay)
                 pygame.draw.rect(window, (255,0,0), playerDisplays[i])
