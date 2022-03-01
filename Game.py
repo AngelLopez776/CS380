@@ -145,7 +145,11 @@ class Game():
             mp_options_button = Button(image=pygame.image.load("Assets/ButtonBG.jpg"), pos=(self.screenWidth*3/4, self.screenHeight*6/8), 
                            text_input="Options", font=pygame.font.Font("assets/font.ttf", textSize), base_color="#d7fcd4", hovering_color="White")
             
-            for button in [sp_button, sp_options_button, mp_button, mp_options_button]:
+            # Back Button to return to Main Menu
+            back_button = Button(image=pygame.image.load("Assets/LargerButtonBG.jpg"), pos=(self.screenWidth*2/4, self.screenHeight*2/8), 
+                           text_input="Back to Main Menu", font=pygame.font.Font("assets/font.ttf", textSize), base_color="#d7fcd4", hovering_color="White")
+            
+            for button in [sp_button, sp_options_button, mp_button, mp_options_button, back_button]:
                 button.changeColor(MENU_MOUSE_POS)
                 button.update(screen)
             
@@ -173,6 +177,13 @@ class Game():
 
                     if mp_options_button.checkForInput(MENU_MOUSE_POS):
                         self.multiplayerOptions(screen)
+            
+                    if back_button.checkForInput(MENU_MOUSE_POS): 
+                        mixer.init()
+                        mixer.music.load('Sounds/mainmenu.mp3')
+                        mixer.music.set_volume(self.volume/100)
+                        mixer.music.play(-1)
+                        return
             
             pygame.display.update()
             self.mainClock.tick(self.FPS)
