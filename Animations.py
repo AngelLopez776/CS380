@@ -21,7 +21,6 @@ class Animations():
             running = True
             rect = []
             blackSurfaceArea = None
-            #xDimStore = xDim
             for card in cards:
                 blackSurfaceArea = card.image.convert()
                 blackSurfaceArea = pygame.transform.smoothscale(blackSurfaceArea, (int(xDim), int(yDim)))  
@@ -29,7 +28,6 @@ class Animations():
             while running:
                 i = 0
                 mainClock.tick(frames)
-                #print(deltaTime)
                 xDim -= timeToFlip * deltaTime
                 movedX += timeToFlip/2 * deltaTime
                 for card in cards:
