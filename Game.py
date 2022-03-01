@@ -46,6 +46,7 @@ class Game():
         self.FPS = int(self.readSettingFromFile("SavedVariables.txt", "FPS"))
         self.screenWidth = int(self.readSettingFromFile("SavedVariables.txt", "screenWidth"))
         self.screenHeight = int(self.readSettingFromFile("SavedVariables.txt", "screenHeight"))
+        self.fullscreen = bool(self.readSettingFromFile("SavedVariables.txt", "fullscreen"))
         self.mainClock = pygame.time.Clock()
         self.animate = Animations(self.FPS)
         self.green = (0, 255, 0)
@@ -584,12 +585,16 @@ class Game():
         
         def fullscreen(isFullscreen, **kwargs):
             global screen
-            if isFullscreen:
+            self.fullscreen = isFullscreen
+            if self.fullscreen:
                 screen = pygame.display.set_mode((self.screenWidth, self.screenHeight), pygame.FULLSCREEN)
+                self.saveSettingToFile("SavedVariables.txt", "fullscreen", str(True))
             else:
                 screen = pygame.display.set_mode((self.screenWidth, self.screenHeight), 0, 32)
+                self.saveSettingToFile("SavedVariables.txt", "fullscreen", str(False))
+
         
-        fullscreenToggle = menu.add.toggle_switch("Fullscreen", onchange = fullscreen)
+        fullscreenToggle = menu.add.toggle_switch("Fullscreen", onchange = fullscreen, default=self.fullscreen)
         
         themeSelector.add_self_to_kwargs()  
         resolutionSelector.add_self_to_kwargs()  
@@ -1323,7 +1328,7 @@ class Game():
         self.draw_text_center("High scores", pygame.font.SysFont("Times New Roman", 40), self.white, self.screenWidth / 2, self.screenHeight / 10, window)
         
         scores = Score.readScores()
-        textArea = ((self.screenHeight / 10) * 9) / 10
+        textArea = ((self.screenHeight / 10) * 8) / 10
         pos = (self.screenHeight / 10) + 40
         
         for score in scores:
