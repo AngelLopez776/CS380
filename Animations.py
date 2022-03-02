@@ -13,7 +13,19 @@ class Animations():
         global frames
         self.fps = fps
         frames = self.fps
-
+    
+    def readSettingFromFile(self, fName, sName):
+        file = open(fName, 'r')
+        string = None
+        for line in file:
+            if (line.startswith(sName)):
+                string = line
+                break
+        string = string.replace(sName + "=", "")
+        string = string.replace("\n", "")
+        file.close()
+        return string
+    
     def flip(self, cards, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, showFront):
         def halfFlip(cards, timeToFlip, movedX, maxSize, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, firstHalf):
             global frames
@@ -45,7 +57,13 @@ class Animations():
         
         movedX = 0
         xDimStore = xDim
-        pygame.mixer.Channel(1).play(pygame.mixer.Sound('Sounds/cardflip.mp3'))
+        
+        self.volume = int(self.readSettingFromFile("SavedVariables.txt", "volume"))
+        pygame.mixer.init()
+        flipsound = pygame.mixer.Sound('Sounds/cardflip.mp3')
+        flipsound.set_volume(self.volume/100)
+        flipsound.play()
+        
         xDim, movedX = halfFlip(cards, timeToFlip, movedX, xDim, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, True)        
         for card in cards:     
             if(showFront):    

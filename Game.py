@@ -47,6 +47,7 @@ class Game():
         self.FPS = int(self.readSettingFromFile("SavedVariables.txt", "FPS"))
         self.screenWidth = int(self.readSettingFromFile("SavedVariables.txt", "screenWidth"))
         self.screenHeight = int(self.readSettingFromFile("SavedVariables.txt", "screenHeight"))
+        self.fullscreen = bool(self.readSettingFromFile("SavedVariables.txt", "fullscreen"))
         self.mainClock = pygame.time.Clock()
         self.animate = Animations(self.FPS)
         self.green = (0, 255, 0)
@@ -145,7 +146,12 @@ class Game():
             mp_options_button = Button(image=pygame.image.load("Assets/ButtonBG.jpg"), pos=(self.screenWidth*3/4, self.screenHeight*6/8), 
                            text_input="Options", font=pygame.font.Font("assets/font.ttf", textSize), base_color="#d7fcd4", hovering_color="White")
             
-            for button in [sp_button, sp_options_button, mp_button, mp_options_button]:
+            # Back Button to return to Main Menu
+            back_button = Button(image=pygame.image.load("Assets/LargerButtonBG.jpg"), pos=(self.screenWidth*2/4, self.screenHeight*2/8), 
+                           text_input="Back to Main Menu", font=pygame.font.Font("assets/font.ttf", textSize), base_color="#d7fcd4", hovering_color="White")
+            
+            #Initialize buttons on to the screen and allow mouse interaction
+            for button in [sp_button, sp_options_button, mp_button, mp_options_button, back_button]:
                 button.changeColor(MENU_MOUSE_POS)
                 button.update(screen)
             
@@ -173,6 +179,13 @@ class Game():
 
                     if mp_options_button.checkForInput(MENU_MOUSE_POS):
                         self.multiplayerOptions(screen)
+            
+                    if back_button.checkForInput(MENU_MOUSE_POS): 
+                        mixer.init()
+                        mixer.music.load('Sounds/mainmenu.mp3')
+                        mixer.music.set_volume(self.volume/100)
+                        mixer.music.play(-1)
+                        return
             
             pygame.display.update()
             self.mainClock.tick(self.FPS)
@@ -585,12 +598,16 @@ class Game():
         
         def fullscreen(isFullscreen, **kwargs):
             global screen
-            if isFullscreen:
+            self.fullscreen = isFullscreen
+            if self.fullscreen:
                 screen = pygame.display.set_mode((self.screenWidth, self.screenHeight), pygame.FULLSCREEN)
+                self.saveSettingToFile("SavedVariables.txt", "fullscreen", str(True))
             else:
                 screen = pygame.display.set_mode((self.screenWidth, self.screenHeight), 0, 32)
+                self.saveSettingToFile("SavedVariables.txt", "fullscreen", str(False))
+
         
-        fullscreenToggle = menu.add.toggle_switch("Fullscreen", onchange = fullscreen)
+        fullscreenToggle = menu.add.toggle_switch("Fullscreen", onchange = fullscreen, default=self.fullscreen)
         
         themeSelector.add_self_to_kwargs()  
         resolutionSelector.add_self_to_kwargs()  
@@ -632,7 +649,28 @@ class Game():
         mixer.music.load('Sounds/mainmenu.mp3')
         mixer.music.set_volume(self.volume/100)
         mixer.music.play(-1)
-
+        
+        cursorStrings = (
+            "                ",
+            "XXXXXX          ",
+            "XXXXXX          ",
+            "XX....XX        ",
+            "XX....XX        ",
+            "XX......XX      ",
+            "XX......XX      ",
+            "  XX......XX    ",
+            "  XX......XX    ",
+            "    XX......XX  ",
+            "    XX......XX  ",
+            "      XX..XXXX  ",
+            "      XX..XXXX  ",
+            "        XXXX    ",
+            "        XXXX    ",
+            "                ")
+        
+        cursor = pygame.cursors.compile(cursorStrings, black='X', white='.', xor='o')
+        pygame.mouse.set_cursor((16, 16), (0, 0), *cursor)
+        
         white = (255, 255, 255)
         black = (0, 0, 0)
 
@@ -656,6 +694,7 @@ class Game():
             QUIT_BUTTON = Button(image=pygame.image.load("Assets/ButtonBG.jpg"), pos=(self.screenWidth/2, self.screenHeight*7/8), 
                             text_input="Quit", font=pygame.font.Font("assets/font.ttf", 25), base_color="#d7fcd4", hovering_color="White")
 
+            #Initialize buttons on to the screen and allow mouse interaction
             for button in [START_BUTTON, OPTIONS_BUTTON, QUIT_BUTTON]:
                 button.changeColor(MENU_MOUSE_POS)
                 button.update(screen)
@@ -1334,9 +1373,9 @@ class Game():
         return quitG
         
     def endScreen(self, window, score):
-        retryButton = Button(pygame.image.load("Assets/ButtonBG.jpg"), (self.screenWidth/2, self.screenHeight/ 4 * 2), "Restart", self.buttonFont, "White", "#d7fcd4")
-        scoresButton = Button(pygame.image.load("Assets/ButtonBG.jpg"), (self.screenWidth/2, (self.screenHeight / 4 * 2) + 110), "High scores", self.buttonFont, "White", "#d7fcd4")
-        mmButton = Button(pygame.image.load("Assets/ButtonBG.jpg"), (self.screenWidth/2, (self.screenHeight / 4 * 2) + 220), "Return to main menu", self.buttonFont, "White", "#d7fcd4")
+        retryButton = Button(pygame.image.load("Assets/ButtonBG.jpg"), (self.screenWidth/2, self.screenHeight * 3/7), "Restart", self.buttonFont, "White", "#d7fcd4")
+        scoresButton = Button(pygame.image.load("Assets/ButtonBG.jpg"), (self.screenWidth/2, (self.screenHeight * 3/7) + 110), "High scores", self.buttonFont, "White", "#d7fcd4")
+        mmButton = Button(pygame.image.load("Assets/ButtonBG.jpg"), (self.screenWidth/2, (self.screenHeight * 3/7) + 220), "Return to mode select", self.buttonFont, "White", "#d7fcd4")
         
         Score.saveScore(str(score))
 
@@ -1344,14 +1383,9 @@ class Game():
             self.mainClock.tick(self.FPS)
             mouse = pygame.mouse.get_pos()
             
-            retryButton.update(window)
-            retryButton.changeColor(mouse)
-            
-            scoresButton.update(window)
-            scoresButton.changeColor(mouse)
-            
-            mmButton.update(window)
-            mmButton.changeColor(mouse)
+            for button in [retryButton, scoresButton, mmButton]:
+                button.changeColor(mouse)
+                button.update(window)
             
             pygame.display.update()
             
@@ -1395,7 +1429,7 @@ class Game():
         self.draw_text_center("High scores", pygame.font.SysFont("Times New Roman", 40), self.white, self.screenWidth / 2, self.screenHeight / 10, window)
         
         scores = Score.readScores()
-        textArea = ((self.screenHeight / 10) * 9) / 10
+        textArea = ((self.screenHeight / 10) * 8) / 10
         pos = (self.screenHeight / 10) + 40
         
         for score in scores:
