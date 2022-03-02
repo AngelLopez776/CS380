@@ -16,8 +16,25 @@ from Player import Player
 from Teams import Team
 
 running = True
+cursorStrings = (
+    "                ",
+    "XXXXXX          ",
+    "XXXXXX          ",
+    "XX....XX        ",
+    "XX....XX        ",
+    "XX......XX      ",
+    "XX......XX      ",
+    "  XX......XX    ",
+    "  XX......XX    ",
+    "    XX......XX  ",
+    "    XX......XX  ",
+    "      XX..XXXX  ",
+    "      XX..XXXX  ",
+    "        XXXX    ",
+    "        XXXX    ",
+    "                ")
 
-
+cursor = pygame.cursors.compile(cursorStrings, black='X', white='.', xor='o')
 class Game():
     def __init__(self):
         #multiplayer-----------#eventually will be read from File; some variables still need to be saved by the functions in multiplayerOptions
@@ -37,7 +54,7 @@ class Game():
         self.error = False #set to true when there is any user error; this will not let the user exit the menu until they fix the error
         self.timeBetweenTurns = 1 #time between turns for players
         self.loopDeck = True #will tell whether there should be a new deck until a winner is made, or to tie game after one deck if the winner is not chosen
-        self.col = 5 #how many columns in the multiplayer table
+        self.col = 3 #how many columns in the multiplayer table
         self.row = 3 #how many rows in the multiplayer table
         #singlePlayer-----------
         self.difficulty = int(self.readSettingFromFile("SavedVariables.txt", "difficulty"))
@@ -255,6 +272,7 @@ class Game():
        # running = True
        while True:
            optionsMenu.fill(self.black)
+           pygame_menu.widgets.core.widget.pygame.mouse.set_cursor((16, 16), (0, 0), *cursor)
            self.draw_text_center(
                "Press escape to go back to main menu",
                self.lifeFont, self.white,
@@ -461,8 +479,8 @@ class Game():
         
         while True:
             #print(self.playersInTeams)
-
             optionsMenu.fill((202, 228, 241))
+            pygame_menu.widgets.core.widget.pygame.mouse.set_cursor((16, 16), (0, 0), *cursor)
             self.draw_text_center(
                 "Press escape to go back to main menu",
                 self.lifeFont, self.white,
@@ -518,6 +536,7 @@ class Game():
             placeholder=self.selectedTheme,
             placeholder_add_to_selection_box=False
         )
+        
 
 
         def setResolution(newRes, resX, resY, **kwargs):
@@ -620,6 +639,7 @@ class Game():
         # running = True
         while True:
             optionsMenu.fill(self.black)
+            pygame_menu.widgets.core.widget.pygame.mouse.set_cursor((16, 16), (0, 0), *cursor)
             self.draw_text_center(
                 "Press escape to go back to main menu",
                 self.lifeFont, self.white,
@@ -652,25 +672,7 @@ class Game():
         mixer.music.set_volume(self.volume/100)
         mixer.music.play(-1)
         
-        cursorStrings = (
-            "                ",
-            "XXXXXX          ",
-            "XXXXXX          ",
-            "XX....XX        ",
-            "XX....XX        ",
-            "XX......XX      ",
-            "XX......XX      ",
-            "  XX......XX    ",
-            "  XX......XX    ",
-            "    XX......XX  ",
-            "    XX......XX  ",
-            "      XX..XXXX  ",
-            "      XX..XXXX  ",
-            "        XXXX    ",
-            "        XXXX    ",
-            "                ")
-        
-        cursor = pygame.cursors.compile(cursorStrings, black='X', white='.', xor='o')
+ 
         pygame.mouse.set_cursor((16, 16), (0, 0), *cursor)
         
         
