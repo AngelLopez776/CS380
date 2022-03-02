@@ -647,7 +647,28 @@ class Game():
         mixer.music.load('Sounds/mainmenu.mp3')
         mixer.music.set_volume(self.volume/100)
         mixer.music.play(-1)
-
+        
+        cursorStrings = (
+            "                ",
+            "XXXXXX          ",
+            "XXXXXX          ",
+            "XX....XX        ",
+            "XX....XX        ",
+            "XX......XX      ",
+            "XX......XX      ",
+            "  XX......XX    ",
+            "  XX......XX    ",
+            "    XX......XX  ",
+            "    XX......XX  ",
+            "      XX..XXXX  ",
+            "      XX..XXXX  ",
+            "        XXXX    ",
+            "        XXXX    ",
+            "                ")
+        
+        cursor = pygame.cursors.compile(cursorStrings, black='X', white='.', xor='o')
+        pygame.mouse.set_cursor((16, 16), (0, 0), *cursor)
+        
         white = (255, 255, 255)
         black = (0, 0, 0)
 
