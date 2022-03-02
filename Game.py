@@ -39,7 +39,6 @@ class Game():
     def __init__(self):
         #multiplayer-----------#eventually will be read from File; some variables still need to be saved by the functions in multiplayerOptions
         self.streakToOneUp = 3 #streak until a oneUp is given
-        self.completedRounds = 0 #number of full decks completed
         self.roundsToComplete = 3 #number of decks completed until game complete
         self.teamCount = 0 #how many teams
         self.playerCount = 2  #how many players
@@ -53,7 +52,6 @@ class Game():
         self.co_op = False #if there is 1 team
         self.error = False #set to true when there is any user error; this will not let the user exit the menu until they fix the error
         self.timeBetweenTurns = 1 #time between turns for players
-        self.loopDeck = True #will tell whether there should be a new deck until a winner is made, or to tie game after one deck if the winner is not chosen
         self.col = 3 #how many columns in the multiplayer table
         self.row = 3 #how many rows in the multiplayer table
         #singlePlayer-----------
@@ -394,12 +392,6 @@ class Game():
         def setTimeBetweenTurns(time, **kwargs):
             self.timeBetweenTurns = time
         
-        #sets whether the game finishes after one deck, or if a new deck is given until there is a winner
-        def setLoopDeck(isLooped, **kwargs):
-            if isLooped:
-                self.loopDeck = True
-            else: self.loopDeck = False
-            #print(self.loopDeck)
         
         maxTeamsEver = 7 #since there are only allowed 8 possible players (because I think it would be too many after that), then there are only 7 possible teams. Otherwise it is a free for all, or complete co-op
         
@@ -451,9 +443,7 @@ class Game():
             #lives per team text box
             #or
             #lives per player text boxes (one per player)
-                
-        loopDeckSwitch = menu.add.toggle_switch("Finish game after a", onchange=setLoopDeck, state_text=("deck", "winner"), default=self.showIntroSequence, align=pygame_menu.locals.ALIGN_LEFT)
-        
+                        
         
         #needed: save upon finish switch
             #ability to save settings to file as new game mode text
@@ -474,7 +464,6 @@ class Game():
             #print(-1 * (teams - maxTeams) - 1) 
             teamPlayerCountSelectors[-1 * (team - maxTeamsEver) - 1].hide()
         errorPlayerCountLable.add_self_to_kwargs()
-        loopDeckSwitch.add_self_to_kwargs()
         errorPlayerCountLable.hide()
         
         while True:
@@ -760,6 +749,7 @@ class Game():
         
     #while this will be very similar to the game method, it's different enough I feel to where a new method is warrented. 
     def multiPlayerGame(self, window):
+            
         players = []
         if(self.FFA or self.co_op):
             self.tempPlayerCnt = self.playerCount
@@ -835,7 +825,7 @@ class Game():
         #set up lives based off team or individual 
         tempTable = []
         
-        print(self.playersInTeams)
+        #print(self.playersInTeams)
         
         def livesVisualUpdate(players):
             squareH = 40
@@ -867,10 +857,7 @@ class Game():
                     textYLoc = (squareY + squareH/2) + 40
                     window.fill(self.black, (squareX, textYLoc, 150, 15))  
                     self.draw_text("lives:" + str(lives),  pygame.font.Font("assets/font.ttf", 15), self.white, squareX, textYLoc, window)
-                
-                #pygame.display.update()
-
-
+            
         def streakVisualUpdate(players):
             squareH = 40
             squareX = 40
@@ -950,7 +937,8 @@ class Game():
                     pygame.event.clear()
                     return False
                 self.animate.flip(tempTable, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, False)
-        
+        roundsComplete = 0
+        self.draw_text_center("round: " + str(roundsComplete + 1), pygame.font.Font("assets/font.ttf", 15), self.white, self.screenWidth/2, self.screenHeight/12, window)
         setUpMPTable(players)
         activePlayerVisualUpdate(0, 0)
 
@@ -1021,56 +1009,19 @@ class Game():
             #here, rather than checking for a win, this checks for a completed deck
             if t.checkWin():
                 activePlayer = playerGetsOneUpOrNextTurn(players, activePlayer)
-                if not self.loopDeck:
-                    for i in tempTable:
-                        if not i.shown:
-                            card = [i]
-                            self.animate.flip(card, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, True)
-                            self.stopAllFor(0.2)
-                            break
-                    window.fill(black, (0, 0, 400, 40))
-
-                    if len(t.selection) >= 2:
-                        #t.score = t.score + 100 + (50 * streak)
-                        pass
-                        
-                    #t.score = t.score + (t.lives * 100)
-                    #self.draw_text("Lives: " + str(t.lives), self.lifeFont, white, 5, 0, window)
-        
-                    
-                    #self.draw_text("Score: " + str(t.score), self.lifeFont, white, 105, 0, window)
-                    
-                    #self.draw_text_center("You win!", self.endFont, green, self.screenWidth / 2, self.screenHeight / 4, window)
-
-                    mixer.init()
-                    mixer.music.load('Sounds/winner.mp3')
-                    mixer.music.set_volume(self.volume/100)
-                    mixer.music.play()
-                    for i in players:
-                        if(i.alive == True):
-                            print("Plauer " + str(i.playerNum) + "wins!")
-                    running, quitG, playAgain = self.endScreen(window, t.score)
-                   
-                    if playAgain:
-                        mixer.init()
-                        mixer.music.load('Sounds/'+str(self.selectedTheme)+'.mp3')
-                        mixer.music.set_volume(self.volume/100)
-                        mixer.music.play(-1)
-                        return Game.multiPlayerGame(self, window)
-                else:
-                    self.completedRounds += 1 #this should be printed
-                    for i in tempTable:
-                        print(i.shown)
-                        if not i.shown:
-                            card = [i]
-                            self.animate.flip(card, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, True)
-                            self.stopAllFor(0.2)
-                            break
-                    print("round " + str(self.completedRounds) + " complete")
-                    self.animate.flip(tempTable, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, False)
-                    t = Table(self.col, self.row, self.selectedTheme, 5, 0, self.FPS)
-                    setUpMPTable(players)
-            
+                for i in tempTable:
+                    print(i.shown)
+                    if not i.shown:
+                        card = [i]
+                        self.animate.flip(card, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, True)
+                        self.stopAllFor(0.2)
+                        break
+                self.animate.flip(tempTable, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, False)
+                t = Table(self.col, self.row, self.selectedTheme, 5, 0, self.FPS)
+                window.fill(self.black, (self.screenWidth/2 - 70, self.screenHeight/12 - 10, 140, 18))
+                roundsComplete += 1 #this should be printed
+                self.draw_text_center("round: " + str(roundsComplete + 1), pygame.font.Font("assets/font.ttf", 15), self.white, self.screenWidth/2, self.screenHeight/12, window)
+                setUpMPTable(players)
             else:
                 t.update()
                 for i in range(t.x):
