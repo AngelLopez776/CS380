@@ -964,6 +964,8 @@ class Game():
                     activePlayer = -1
                 activePlayer +=1
                 if(players[activePlayer].alive == True):
+                    if(not self.FFA and teamsData[players[activePlayer].teamNum].alive == False):
+                        continue
                     break
             activePlayerVisualUpdate(activePlayer, prevActivePlayer)
             return activePlayer
