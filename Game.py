@@ -149,6 +149,7 @@ class Game():
             back_button = Button(image=pygame.image.load("Assets/LargerButtonBG.jpg"), pos=(self.screenWidth*2/4, self.screenHeight*2/8), 
                            text_input="Back to Main Menu", font=pygame.font.Font("assets/font.ttf", textSize), base_color="#d7fcd4", hovering_color="White")
             
+            #Initialize buttons on to the screen and allow mouse interaction
             for button in [sp_button, sp_options_button, mp_button, mp_options_button, back_button]:
                 button.changeColor(MENU_MOUSE_POS)
                 button.update(screen)
@@ -692,6 +693,7 @@ class Game():
             QUIT_BUTTON = Button(image=pygame.image.load("Assets/ButtonBG.jpg"), pos=(self.screenWidth/2, self.screenHeight*7/8), 
                             text_input="Quit", font=pygame.font.Font("assets/font.ttf", 25), base_color="#d7fcd4", hovering_color="White")
 
+            #Initialize buttons on to the screen and allow mouse interaction
             for button in [START_BUTTON, OPTIONS_BUTTON, QUIT_BUTTON]:
                 button.changeColor(MENU_MOUSE_POS)
                 button.update(screen)
@@ -1299,9 +1301,9 @@ class Game():
         return quitG
         
     def endScreen(self, window, score):
-        retryButton = Button(pygame.image.load("Assets/ButtonBG.jpg"), (self.screenWidth/2, self.screenHeight/ 4 * 2), "Restart", self.buttonFont, "White", "#d7fcd4")
-        scoresButton = Button(pygame.image.load("Assets/ButtonBG.jpg"), (self.screenWidth/2, (self.screenHeight / 4 * 2) + 110), "High scores", self.buttonFont, "White", "#d7fcd4")
-        mmButton = Button(pygame.image.load("Assets/ButtonBG.jpg"), (self.screenWidth/2, (self.screenHeight / 4 * 2) + 220), "Return to main menu", self.buttonFont, "White", "#d7fcd4")
+        retryButton = Button(pygame.image.load("Assets/ButtonBG.jpg"), (self.screenWidth/2, self.screenHeight * 3/7), "Restart", self.buttonFont, "White", "#d7fcd4")
+        scoresButton = Button(pygame.image.load("Assets/ButtonBG.jpg"), (self.screenWidth/2, (self.screenHeight * 3/7) + 110), "High scores", self.buttonFont, "White", "#d7fcd4")
+        mmButton = Button(pygame.image.load("Assets/ButtonBG.jpg"), (self.screenWidth/2, (self.screenHeight * 3/7) + 220), "Return to mode select", self.buttonFont, "White", "#d7fcd4")
         
         Score.saveScore(str(score))
 
@@ -1309,14 +1311,9 @@ class Game():
             self.mainClock.tick(self.FPS)
             mouse = pygame.mouse.get_pos()
             
-            retryButton.update(window)
-            retryButton.changeColor(mouse)
-            
-            scoresButton.update(window)
-            scoresButton.changeColor(mouse)
-            
-            mmButton.update(window)
-            mmButton.changeColor(mouse)
+            for button in [retryButton, scoresButton, mmButton]:
+                button.changeColor(mouse)
+                button.update(window)
             
             pygame.display.update()
             
