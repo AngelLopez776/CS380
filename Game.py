@@ -23,10 +23,10 @@ class Game():
         self.streakToOneUp = 3 #streak until a oneUp is given
         self.completedRounds = 0 #number of full decks completed
         self.roundsToComplete = 3 #number of decks completed until game complete
-        self.teamCount = 2 #how many teams
-        self.playerCount = 4  #how many players
+        self.teamCount = 0 #how many teams
+        self.playerCount = 2  #how many players
         self.tempPlayerCnt = 0 #in order to properly reset the game if wanted
-        self.playersInTeams = [2,2,0,0,0,0,0] #if there is a team with 0 players, then that team does not exist according to the user
+        self.playersInTeams = [0,0,0,0,0,0,0] #if there is a team with 0 players, then that team does not exist according to the user
         self.lives = 2 #how many lives per team; may add switch to select lives per player or lives per team
         self.showIntroSequence=True #whetehr cards are shown at the beginnging of the game
         self.introSequenceTime=3 #how long the cards are displayed at the beginning of the game
