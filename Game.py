@@ -396,10 +396,12 @@ class Game():
         maxTeamsEver = 7 #since there are only allowed 8 possible players (because I think it would be too many after that), then there are only 7 possible teams. Otherwise it is a free for all, or complete co-op
         
         #needed: ability to select saved game modes - drop selection
+        
         #There probably should be a way to delete modes too, but that would be hard I think
         
         introSequenceSwitch = menu.add.toggle_switch("Intro Sequence", onchange=setIntroSequence, state_text=("Skip", "Play"), default=self.showIntroSequence, align=pygame_menu.locals.ALIGN_LEFT)
         introSequenceTimeText = menu.add.text_input("In seconds, show Cards for: ", default=self.introSequenceTime, onchange=setIntroSequenceTime, input_type=INPUT_FLOAT, align=pygame_menu.locals.ALIGN_RIGHT)
+        
         #needed: deck count selector: columns and rows; cannot go above 8 rows or 12 columns
         
         playerCountList = [("2", 2),("3", 3),("4", 4),("5", 5),("6", 6),("7", 7), ("8", 8)]
@@ -438,12 +440,6 @@ class Game():
         errorPlayerCountLable = menu.add.label("The Added Player Count of Individual Teams needs to match the Total Player Count", font_size=10, align=pygame_menu.locals.ALIGN_LEFT)
         
         timeBetweenTurnsText = menu.add.text_input("In seconds, time between turns: ", default=self.timeBetweenTurns, onchange=setTimeBetweenTurns, input_type=INPUT_FLOAT, align=pygame_menu.locals.ALIGN_LEFT)
-        
-        #needed: lives switch
-            #lives per team text box
-            #or
-            #lives per player text boxes (one per player)
-                        
         
         #needed: save upon finish switch
             #ability to save settings to file as new game mode text
@@ -525,8 +521,6 @@ class Game():
             placeholder=self.selectedTheme,
             placeholder_add_to_selection_box=False
         )
-        
-
 
         def setResolution(newRes, resX, resY, **kwargs):
             global screen
@@ -779,8 +773,6 @@ class Game():
             teamNum+=1
             teamsData.append(team)    
             
-            
-           
         def parallelEscape():
             global running
             while True:
@@ -941,9 +933,8 @@ class Game():
         self.draw_text_center("round: " + str(roundsComplete + 1), pygame.font.Font("assets/font.ttf", 15), self.white, self.screenWidth/2, self.screenHeight/12, window)
         setUpMPTable(players)
         activePlayerVisualUpdate(0, 0)
-
-
         quitG = False
+        
         def findNextAlivePlayer(players, activePlayer):
             livesVisualUpdate(players)
             streakVisualUpdate(players)
@@ -996,15 +987,11 @@ class Game():
             return activePlayer
         
         activePlayer = 0
-        print("player " + str(players[activePlayer].playerNum) + "'s turn")
+        
         while running:
             self.mainClock.tick(self.FPS)
             
-            
             mouse = pygame.mouse.get_pos()
-
-            #window.fill(black, (0, 0, 400, 40))  # so cards show during lose screen
-            #self.draw_text("Lives: " + str(t.lives), self.lifeFont, white, 5, 0, window)
 
             #here, rather than checking for a win, this checks for a completed deck
             if t.checkWin():
@@ -1094,7 +1081,6 @@ class Game():
         return quitG
         
     def game(self, window):
-        
         def parallelEscape():
             global running
             while True:
@@ -1106,7 +1092,6 @@ class Game():
                     mixer.music.play(-1)
                     running = False
                 time.sleep(0.05)
-        
                 
         global running
         running = True
@@ -1173,7 +1158,6 @@ class Game():
         else:
             matchTime = 45
 
-
         timer = matchTime
         sTime = time.time()
 
@@ -1219,7 +1203,6 @@ class Game():
                     self.draw_text("Lives: " + str(t.lives), self.lifeFont, white, 5, 0, window)
                     self.draw_text("Time: " + str(timeLeft) + "s", self.lifeFont, white, 5, 20, window)
 
-                
                 self.draw_text("Score: " + str(t.score), self.lifeFont, white, 105, 0, window)
 
                 self.draw_text_center("You win!", self.endFont, green, self.screenWidth / 2, self.screenHeight / 4, window)

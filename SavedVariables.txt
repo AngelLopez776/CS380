@@ -6,10 +6,10 @@ screenWidth=1024
 
 screenHeight=768
 
-volume=0
+volume=18
+
 difficulty=1
 
 gamemode=3
 
-fullscreen=True
-
+fullscreen=False
