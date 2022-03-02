@@ -13,6 +13,7 @@ import threading
 import keyboard #must be installed: pip install keyboard in anaconda cmd
 from Score import Score
 from Player import Player
+from Teams import Team
 
 running = True
 
@@ -22,10 +23,10 @@ class Game():
         self.streakToOneUp = 3 #streak until a oneUp is given
         self.completedRounds = 0 #number of full decks completed
         self.roundsToComplete = 3 #number of decks completed until game complete
-        self.teamCount = 0 #how many teams
-        self.playerCount = 2 #how many players
-        self.tempPlayerCnt = self.playerCount #in order to properly reset the game if wanted
-        self.playersInTeams = [0,0,0,0,0,0,0] #if there is a team with 0 players, then that team does not exist according to the user
+        self.teamCount = 2 #how many teams
+        self.playerCount = 4  #how many players
+        self.tempPlayerCnt = 0 #in order to properly reset the game if wanted
+        self.playersInTeams = [2,2,0,0,0,0,0] #if there is a team with 0 players, then that team does not exist according to the user
         self.lives = 2 #how many lives per team; may add switch to select lives per player or lives per team
         self.showIntroSequence=True #whetehr cards are shown at the beginnging of the game
         self.introSequenceTime=3 #how long the cards are displayed at the beginning of the game
@@ -716,11 +717,30 @@ class Game():
     #while this will be very similar to the game method, it's different enough I feel to where a new method is warrented. 
     def multiPlayerGame(self, window):
         players = []
-        self.tempPlayerCnt = self.playerCount
+        if(self.FFA or self.co_op):
+            self.tempPlayerCnt = self.playerCount
+        elif(not (self.FFA or self.co_op)):
+            self.tempPlayerCnt = self.teamCount
         for i in range(self.playerCount):
-            player = Player(i + 1, self.lives)
+            player = Player(i + 1, self.lives, -1)
             players.append(player)
-        print("there are " + str(self.playerCount) + " players")
+         
+        teamsData = []
+        teamNum = 0
+        cnt = 0
+        for i in self.playersInTeams:
+            #print(i)
+            if i == 0:
+                break
+            for j in range(i):
+                print("cnt: " + str(cnt+j))
+                players[cnt + j].teamNum = teamNum
+                print("team: " + str(teamNum))
+            cnt += i
+            team = Team(teamNum, self.lives)
+            teamNum+=1
+            teamsData.append(team)    
+           
         def parallelEscape():
             global running
             while True:
@@ -765,30 +785,67 @@ class Game():
         #set up lives based off team or individual 
         tempTable = []
         
+        print(self.playersInTeams)
+        
         def livesVisualUpdate(players):
             squareH = 40
             squareX = 40
-            for i in range(self.playerCount):
-                squareY = (i * 80) + playerMinBorder
-                lives = players[i].lives
-                if(lives == 0):
-                    lives = "--"
-                textYLoc = (squareY + squareH/2) + 40
-                window.fill(self.black, (squareX, textYLoc, 150, 15))  
-                self.draw_text("lives:" + str(lives),  pygame.font.Font("assets/font.ttf", 15), self.white, squareX, textYLoc, window)
-            #pygame.display.update()
+            if(self.FFA or self.co_op):
+                for i in range(self.playerCount):
+                    squareY = (i * 80) + playerMinBorder
+                    lives = players[i].lives
+                    if(lives == 0):
+                        lives = "--"
+                    textYLoc = (squareY + squareH/2) + 40
+                    window.fill(self.black, (squareX, textYLoc, 150, 15))  
+                    self.draw_text("lives:" + str(lives),  pygame.font.Font("assets/font.ttf", 15), self.white, squareX, textYLoc, window)
+                #pygame.display.update()
+            elif(not (self.FFA or self.co_op)):
+                cnt = 0
+                teamNum = 0
+                for i in self.playersInTeams:
+                    if i == 0:
+                        break
+                    print("members in Team " + str(teamNum) +": " + str(i))
+                    cnt += i
+                    squareY = ((cnt - 1) * 80) + playerMinBorder
+                    lives = teamsData[teamNum].lives
+                    print(str(teamNum) + " has " + str(lives) + " lives")
+                    teamNum += 1
+                    if(lives == 0):
+                        lives = "--"
+                    textYLoc = (squareY + squareH/2) + 40
+                    window.fill(self.black, (squareX, textYLoc, 150, 15))  
+                    self.draw_text("lives:" + str(lives),  pygame.font.Font("assets/font.ttf", 15), self.white, squareX, textYLoc, window)
+                
+                #pygame.display.update()
 
 
         def streakVisualUpdate(players):
             squareH = 40
             squareX = 40
-            for i in range(self.playerCount):
-                squareY = (i * 80) + playerMinBorder
-                streak = players[i].streak
-                textYLoc = (squareY + squareH/2) + 25
-                window.fill(self.black, (squareX, textYLoc, 150, 15))  
-                self.draw_text("streak:" + str(streak),  pygame.font.Font("assets/font.ttf", 15), self.white, squareX, textYLoc, window)
-            #pygame.display.update()
+            if(self.FFA or self.co_op):
+                for i in range(self.playerCount):
+                    squareY = (i * 80) + playerMinBorder
+                    streak = players[i].streak
+                    textYLoc = (squareY + squareH/2) + 25
+                    window.fill(self.black, (squareX, textYLoc, 150, 15))  
+                    self.draw_text("streak:" + str(streak),  pygame.font.Font("assets/font.ttf", 15), self.white, squareX, textYLoc, window)
+                #pygame.display.update()
+            elif(not (self.FFA or self.co_op)):
+                cnt = 0
+                teamNum = 0
+                for i in self.playersInTeams:
+                    #print(i)
+                    if i == 0:
+                        break
+                    cnt += i
+                    squareY = ((cnt-1) * 80) + playerMinBorder
+                    streak = teamsData[teamNum].streak
+                    teamNum += 1
+                    textYLoc = (squareY + squareH/2) + 25
+                    window.fill(self.black, (squareX, textYLoc, 150, 15))  
+                    self.draw_text("streak:" + str(streak),  pygame.font.Font("assets/font.ttf", 15), self.white, squareX, textYLoc, window)
             
         def activePlayerVisualUpdate(activePlayer, prevActivePlayer):
             squareH = 10
@@ -817,6 +874,7 @@ class Game():
             squareW = 40
             squareH = 40
             for i in range(self.playerCount):
+                #image=pygame.image.load("Assets/ButtonBG.jpg")
                 squareY = (i * 80) + playerMinBorder
                 playerDisplay = pygame.Rect(squareX, squareY, squareW, squareH)
                 playerDisplays.append(playerDisplay)
@@ -825,6 +883,11 @@ class Game():
                 textXLoc = (squareX + squareW/2)
                 textYLoc = (squareY + squareH/2)
                 self.draw_text_center(player, pygame.font.Font("assets/font.ttf", 15), self.white, textXLoc, textYLoc, window)
+            if(self.FFA or self.co_op):
+                for i in range(self.playerCount):
+                    streakVisualUpdate(players)
+                    livesVisualUpdate(players)
+            elif(not(self.FFA or self.co_op)):
                 streakVisualUpdate(players)
                 livesVisualUpdate(players)
             pygame.display.update()
@@ -852,35 +915,44 @@ class Game():
                 if(activePlayer == self.playerCount - 1):
                     activePlayer = -1
                 activePlayer +=1
-                #print(activePlayer)
                 if(players[activePlayer].alive == True):
                     break
             activePlayerVisualUpdate(activePlayer, prevActivePlayer)
             return activePlayer
                 
         def playerIsOutOrRemoveLife(players, activePlayer):
-            players[activePlayer].lives -= 1
-            if (players[activePlayer].lives == 0):
-                players[activePlayer].alive = False
-                print("player " + str(players[activePlayer].playerNum) + " is out")
-                self.tempPlayerCnt -= 1
-                activePlayer = findNextAlivePlayer(players, activePlayer)
-            else:
-                players[activePlayer].streak = 0
-                print("player " + str(players[activePlayer].playerNum) + " has lost a life; they are now at " + str(players[activePlayer].lives) + " lives left")
-                activePlayer = findNextAlivePlayer(players, activePlayer)
-            print("player " + str(players[activePlayer].playerNum) + "'s turn")
+            if(self.FFA or self.co_op):
+                players[activePlayer].lives -= 1
+                if (players[activePlayer].lives == 0):
+                    players[activePlayer].alive = False
+                    self.tempPlayerCnt -= 1
+                else:
+                    players[activePlayer].streak = 0
+            elif(not (self.FFA or self.co_op)):
+                teamEffected = players[activePlayer].teamNum
+                print("teamEffected " + str(teamEffected))
+                teamsData[teamEffected].lives -= 1
+                if (teamsData[teamEffected].lives == 0):
+                    teamsData[teamEffected].alive = False
+                    self.tempPlayerCnt -= 1
+                else:
+                    teamsData[teamEffected].streak = 0
+            activePlayer = findNextAlivePlayer(players, activePlayer)
             return activePlayer
             
         def playerGetsOneUpOrNextTurn(players, activePlayer):
-            players[activePlayer].streak += 1
-            print("player " + str(players[activePlayer].playerNum) + " is now at a winning streak of " + str(players[activePlayer].streak))
-            if(players[activePlayer].streak == self.streakToOneUp):
-                players[activePlayer].lives += 1
-                players[activePlayer].streak = 0
-                print(str("player " + str(players[activePlayer].playerNum)) + " has been given an extra life; they are now at " + str(players[activePlayer].lives) + " lives")
+            if(self.FFA or self.co_op):
+                players[activePlayer].streak += 1
+                if(players[activePlayer].streak == self.streakToOneUp):
+                    players[activePlayer].lives += 1
+                    players[activePlayer].streak = 0
+            elif(not (self.FFA or self.co_op)):
+                teamEffected = players[activePlayer].teamNum
+                teamsData[teamEffected].streak += 1
+                if(teamsData[teamEffected].streak == self.streakToOneUp):
+                    teamsData[teamEffected].lives += 1
+                    teamsData[teamEffected].streak = 0
             activePlayer = findNextAlivePlayer(players, activePlayer)
-            print("player " + str(players[activePlayer].playerNum) + "'s turn")
             return activePlayer
         
         activePlayer = 0
@@ -934,7 +1006,7 @@ class Game():
                         mixer.music.play(-1)
                         return Game.multiPlayerGame(self, window)
                 else:
-                    self.completedRounds += 1
+                    self.completedRounds += 1 #this should be printed
                     for i in tempTable:
                         print(i.shown)
                         if not i.shown:
