@@ -17,6 +17,7 @@ from Teams import Team
 
 running = True
 
+
 class Game():
     def __init__(self):
         #multiplayer-----------#eventually will be read from File; some variables still need to be saved by the functions in multiplayerOptions
@@ -30,7 +31,7 @@ class Game():
         self.lives = 2 #how many lives per team; may add switch to select lives per player or lives per team
         self.showIntroSequence=True #whetehr cards are shown at the beginnging of the game
         self.introSequenceTime=3 #how long the cards are displayed at the beginning of the game
-        self.FFA = False #if there are 0 teams
+        self.FFA = True #if there are 0 teams
         self.co_op = False #if there is 1 team
         self.error = False #set to true when there is any user error; this will not let the user exit the menu until they fix the error
         self.timeBetweenTurns = 1 #time between turns for players
@@ -296,20 +297,20 @@ class Game():
             #print(self.teamCount)
             if(teamCnt <= 1):
                 errorPlayerCountLable.hide()
+                self.error = False
                 if(teamCnt):
-                    self.oneTeam = True
+                    self.co_op = True
                     self.FFA = False
                 else:
                     self.FFA = True
-                    self.oneTeam = False
-                self.error = False
+                    self.co_op = False
                 for team in range(maxTeamsEver):
                     teamPlayerCountSelectors[team].hide()
                     self.playersInTeams[team] = 0
                 return
             else:
                 self.FFA = False
-                self.oneTeam = False
+                self.co_op = False
                 
             for team in range(teamCnt):
                 teamPlayerCountSelectors[team].show()
@@ -671,6 +672,7 @@ class Game():
         cursor = pygame.cursors.compile(cursorStrings, black='X', white='.', xor='o')
         pygame.mouse.set_cursor((16, 16), (0, 0), *cursor)
         
+        
         white = (255, 255, 255)
         black = (0, 0, 0)
 
@@ -917,11 +919,11 @@ class Game():
                 squareY = (i * 80) + playerMinBorder
                 playerDisplay = pygame.Rect(squareX, squareY, squareW, squareH)
                 playerDisplays.append(playerDisplay)
-                pygame.draw.rect(window, (255,0,0), playerDisplays[i])
+                pygame.draw.rect(window, (255,255,255), playerDisplays[i])
                 player = "P" + str(i + 1)
                 textXLoc = (squareX + squareW/2)
                 textYLoc = (squareY + squareH/2)
-                self.draw_text_center(player, pygame.font.Font("assets/font.ttf", 15), self.white, textXLoc, textYLoc, window)
+                self.draw_text_center(player, pygame.font.Font("assets/font.ttf", 15), self.black, textXLoc, textYLoc, window)
             if(self.FFA or self.co_op):
                 for i in range(self.playerCount):
                     streakVisualUpdate(players)
