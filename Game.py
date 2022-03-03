@@ -886,6 +886,24 @@ class Game():
             #pygame.display.update()
 
         def setUpMPTable(players):
+            def getTeamColor(team):
+                if team == 0:
+                    return (255, 0, 0)
+                elif team == 1:
+                    return (0, 255, 0)
+                elif team == 2:
+                    return (0, 0, 255)
+                elif team == 3:
+                    return (255, 255, 0)
+                elif team == 4:
+                    return (0, 255, 255)
+                elif team == 5:
+                    return (255, 0, 255)
+                elif team == 6:
+                    return (127, 127, 127)
+                else:
+                    return (255, 255, 255)
+                
             #sets up card display
             tempTable.clear()
             for i in range(t.x):
@@ -897,16 +915,17 @@ class Game():
                     surface = pygame.transform.scale(surface, (xDim, yDim))
                     window.blit(surface, ((minBorder + toXCenter) + xSize * t.table[j][i].col, minBorder + ySize * t.table[j][i].row))
             #sets up players display
-            playerDisplays = []
             squareX = 40
             squareW = 40
             squareH = 40
             for i in range(self.playerCount):
                 #image=pygame.image.load("Assets/ButtonBG.jpg")
                 squareY = (i * 80) + playerMinBorder
-                playerDisplay = pygame.Rect(squareX, squareY, squareW, squareH)
-                playerDisplays.append(playerDisplay)
-                pygame.draw.rect(window, (255,255,255), playerDisplays[i])
+                
+                playerDisplay = pygame.Surface((squareW, squareH))
+                playerDisplay.fill(getTeamColor(players[i].teamNum))
+                window.blit(playerDisplay, (squareX, squareY))
+                
                 player = "P" + str(i + 1)
                 textXLoc = (squareX + squareW/2)
                 textYLoc = (squareY + squareH/2)

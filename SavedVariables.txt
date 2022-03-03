@@ -1,5 +1,4 @@
-selectedTheme=theme_Tarot
-
+selectedTheme=theme_Mario
 FPS=360
 
 screenWidth=1024
@@ -9,6 +8,7 @@ screenHeight=768
 volume=0
 
 difficulty=0
+
 gamemode=3
 
 fullscreen=False
