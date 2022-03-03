@@ -953,7 +953,6 @@ class Game():
             return activePlayer
                 
         def playerIsOutOrRemoveLife(players, activePlayer):
-            print("tempPlayerCount" + str(self.tempPlayerCnt))
             if(self.FFA):
                 players[activePlayer].lives -= 1
                 if (players[activePlayer].lives == 0):
@@ -1034,6 +1033,12 @@ class Game():
                         t.selection.clear()
                         activePlayer = playerIsOutOrRemoveLife(players, activePlayer)
                         if(self.tempPlayerCnt <= 1):
+                            hidenCards = []
+                            for i in tempTable:
+                                if not i.shown:
+                                    hidenCards.append(i)
+                            self.animate.flip(hidenCards, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, True)
+                            self.stopAllFor(0.5)
                             running, quitG, playAgain = self.endScreen(window, t.score)
 
                     if len(t.selection) >= 2:
@@ -1046,6 +1051,12 @@ class Game():
                                 t.selection.clear()
                                 activePlayer = playerIsOutOrRemoveLife(players, activePlayer)
                                 if(self.tempPlayerCnt <= 1):
+                                    hidenCards = []
+                                    for i in tempTable:
+                                        if not i.shown:
+                                            hidenCards.append(i)
+                                    self.animate.flip(hidenCards, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, True)
+                                    self.stopAllFor(0.5)
                                     running, quitG, playAgain = self.endScreen(window, t.score)
 
                         else:
