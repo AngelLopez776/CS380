@@ -745,16 +745,16 @@ class Game():
     def multiPlayerGame(self, window):
             
         players = []
-        if(self.FFA or self.co_op):
+        if(self.FFA):
             self.tempPlayerCnt = self.playerCount
-        elif(not (self.FFA or self.co_op)):
+        elif(not (self.co_op)):
             self.tempPlayerCnt = self.teamCount
         for i in range(self.playerCount):
             player = Player(i + 1, self.lives, -1)
             players.append(player)
          
         if(self.co_op):
-            self.teamCount = 1
+            self.tempPlayerCnt = 2 #this really should be one, but the game crashes if it's 1 so...
             self.playersInTeams[0] = self.playerCount
 
         teamsData = []
@@ -838,7 +838,6 @@ class Game():
                 for i in self.playersInTeams:
                     if i == 0:
                         break
-                    print("members in Team " + str(teamNum) +": " + str(i))
                     cnt += i
                     squareY = ((cnt - 1) * 80) + playerMinBorder
                     lives = teamsData[teamNum].lives
@@ -940,6 +939,8 @@ class Game():
             streakVisualUpdate(players)
             prevActivePlayer = activePlayer
             self.stopAllFor(self.timeBetweenTurns)
+            if(self.tempPlayerCnt <= 1):
+                return activePlayer
             while True:
                 if(activePlayer == self.playerCount - 1):
                     activePlayer = -1
@@ -952,6 +953,7 @@ class Game():
             return activePlayer
                 
         def playerIsOutOrRemoveLife(players, activePlayer):
+            print("tempPlayerCount" + str(self.tempPlayerCnt))
             if(self.FFA):
                 players[activePlayer].lives -= 1
                 if (players[activePlayer].lives == 0):
@@ -997,7 +999,7 @@ class Game():
             if t.checkWin():
                 activePlayer = playerGetsOneUpOrNextTurn(players, activePlayer)
                 for i in tempTable:
-                    print(i.shown)
+                    #print(i.shown)
                     if not i.shown:
                         card = [i]
                         self.animate.flip(card, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, True)
@@ -1031,8 +1033,7 @@ class Game():
                         
                         t.selection.clear()
                         activePlayer = playerIsOutOrRemoveLife(players, activePlayer)
-                        if(self.tempPlayerCnt == 1):
-                            print("player " + str(players[activePlayer].playerNum) + " wins!")
+                        if(self.tempPlayerCnt <= 1):
                             running, quitG, playAgain = self.endScreen(window, t.score)
 
                     if len(t.selection) >= 2:
@@ -1044,8 +1045,7 @@ class Game():
                                 self.animate.flip(t.selection, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, False)
                                 t.selection.clear()
                                 activePlayer = playerIsOutOrRemoveLife(players, activePlayer)
-                                if(self.tempPlayerCnt == 1):
-                                    print("player " + str(players[activePlayer].playerNum) + " wins!")
+                                if(self.tempPlayerCnt <= 1):
                                     running, quitG, playAgain = self.endScreen(window, t.score)
 
                         else:
