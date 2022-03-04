@@ -313,11 +313,14 @@ class Game():
             background_color=(202, 228, 241),
             title_background_color=(0, 0, 0, 0),
         )
+        
+        goBackButton = Button(pygame.image.load("Assets/ButtonBG.jpg"), (self.screenWidth/2-170, self.screenHeight /8), "Go Back:", self.buttonFont, "White", "#d7fcd4")
+        finishedButton = Button(pygame.image.load("Assets/ButtonBG.jpg"), (self.screenWidth/2+170, self.screenHeight /8), "Finished:", self.buttonFont, "White", "#d7fcd4")
 
         menu = pygame_menu.Menu(
             title="",
             height=(self.screenHeight - 200),
-            position = (self.screenWidth/2 - 350, 150, False),
+            position = (self.screenWidth/2 - 350, self.screenHeight /8 + 100, False),
             width=700,
             center_content = False,
             theme=menuTheme)
@@ -481,11 +484,27 @@ class Game():
                 teamPlayerCountSelectors[-1 * (team - maxTeamsEver) - 1].hide()
         errorPlayerCountLable.add_self_to_kwargs()
         errorPlayerCountLable.hide()
-        
-        goBackButton = Button(pygame.image.load("Assets/ButtonBG.jpg"), (self.screenWidth/2-170, self.screenHeight /8), "Go Back:", self.buttonFont, "White", "#d7fcd4")
-        finishedButton = Button(pygame.image.load("Assets/ButtonBG.jpg"), (self.screenWidth/2+170, self.screenHeight /8), "Finished:", self.buttonFont, "White", "#d7fcd4")
-
-        
+        def revertTmpVars():
+            self.tmpTimeBT = self.timeBetweenTurns
+            self.tmpIntSeq = self.introSequenceTime
+            self.tmpShIntSeq = self.showIntroSequence
+            self.tmpPlyCnt = self.playerCount
+            self.tmpTeamCnt = self.teamCount
+            self.tmpCoop = self.co_op
+            self.tmpFFA = self.FFA
+            self.tmpPlayersInTeam = self.playersInTeams
+            self.error = False
+            
+        def applyTmpVars():
+            self.timeBetweenTurns = self.tmpTimeBT 
+            self.introSequenceTime = self.tmpIntSeq
+            self.showIntroSequence = self.tmpShIntSeq
+            self.playerCount = self.tmpPlyCnt
+            self.teamCount = self.tmpTeamCnt
+            self.co_op = self.tmpCoop
+            self.FFA = self.tmpFFA
+            self.playersInTeams = self.tmpPlayersInTeam
+            
         while True:
             #print(self.playersInTeams)
             
@@ -508,34 +527,20 @@ class Game():
                     print(self.error)
                     if goBackButton.checkForInput(mouse):
                         pygame.mixer.music.stop()
-                        self.tmpTimeBT = self.timeBetweenTurns
-                        self.tmpIntSeq = self.introSequenceTime
-                        self.tmpShIntSeq = self.showIntroSequence
-                        self.tmpPlyCnt = self.playerCount
-                        self.tmpTeamCnt = self.teamCount
-                        self.tmpCoop = self.co_op
-                        self.tmpFFA = self.FFA
-                        self.tmpPlayersInTeam = self.playersInTeams
-                        self.error = False
+                        revertTmpVars()
                         return
                         #window.fill(self.black)
                         #return [False, False, True]
                     elif finishedButton.checkForInput(mouse) and self.error == False:
                         pygame.mixer.music.stop()
-                        self.timeBetweenTurns = self.tmpTimeBT 
-                        self.introSequenceTime = self.tmpIntSeq
-                        self.showIntroSequence = self.tmpShIntSeq
-                        self.playerCount = self.tmpPlyCnt
-                        self.teamCount = self.tmpTeamCnt
-                        self.co_op = self.tmpCoop
-                        self.FFA = self.tmpFFA
-                        self.playersInTeams = self.tmpPlayersInTeam
+                        applyTmpVars()
                         return
                         #self.showScores(window, str(score))
-            #    if event.type == pygame.KEYDOWN:
-            #        if event.key == pygame.K_ESCAPE:
-            #            pygame.mixer.music.stop()
-            #            return
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        pygame.mixer.music.stop()
+                        revertTmpVars()
+                        return
             pygame.display.update()
             self.mainClock.tick(self.FPS)
     

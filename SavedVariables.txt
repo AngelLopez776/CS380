@@ -1,15 +1,15 @@
 selectedTheme=theme_Mario
+
 FPS=360
 
-screenWidth=1024
+screenWidth=2560
 
-screenHeight=768
-
+screenHeight=1440
 volume=0
 
 difficulty=0
 
 gamemode=3
 
-fullscreen=False
+fullscreen=True
 
