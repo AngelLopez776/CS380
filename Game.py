@@ -35,6 +35,7 @@ cursorStrings = (
     "                ")
 
 cursor = pygame.cursors.compile(cursorStrings, black='X', white='.', xor='o')
+
 class Game():
     def __init__(self):
         #multiplayer-----------#eventually will be read from File; some variables still need to be saved by the functions in multiplayerOptions
@@ -54,6 +55,17 @@ class Game():
         self.timeBetweenTurns = 1 #time between turns for players
         self.col = 3 #how many columns in the multiplayer table
         self.row = 3 #how many rows in the multiplayer table
+        
+        #for variables which should not be saved after exiting the menu; a little messy, I know
+        self.tmpTeamCnt = self.teamCount
+        self.tmpCoop = self.co_op
+        self.tmpFFA = self.FFA
+        self.tmpPlayersInTeam = self.playersInTeams
+        self.tmpPlyCnt = self.playerCount
+        self.tmpShIntSeq = self.showIntroSequence
+        self.tmpIntSeq = self.introSequenceTime
+        self.tmpTimeBT = self.timeBetweenTurns
+
         #singlePlayer-----------
         self.difficulty = int(self.readSettingFromFile("SavedVariables.txt", "difficulty"))
         self.gamemode = int(self.readSettingFromFile("SavedVariables.txt", "gamemode"))
@@ -74,6 +86,7 @@ class Game():
         self.buttonFont = pygame.font.SysFont('Times New Roman', 20)
         self.lifeFont = pygame.font.SysFont('Times New Roman', 20)
         self.endFont = pygame.font.SysFont('Times New Roman', 32)
+        
 
     def draw_text(self, text, font, color, x, y, window):
         img = font.render(text, True, color)
@@ -303,41 +316,44 @@ class Game():
 
         menu = pygame_menu.Menu(
             title="",
-            height=self.screenHeight,
-            width=self.screenWidth/2,
+            height=(self.screenHeight - 200),
+            position = (self.screenWidth/2 - 350, 150, False),
+            width=700,
+            center_content = False,
             theme=menuTheme)
         
         #reveals the number of teams based off the number of teams chosen; 
         """need to change so that the values are only saved once there is no user error"""
+        
         def setTeamsOption(teamCountStr, teamCnt, **kwargs):
-            self.teamCount = teamCnt
+            self.tmpTeamCnt = teamCnt
             #print(self.teamCount)
             if(teamCnt <= 1):
                 errorPlayerCountLable.hide()
                 self.error = False
                 if(teamCnt):
-                    self.co_op = True
-                    self.FFA = False
+                    self.tmpCoop = True
+                    self.tempFFA = False
                 else:
-                    self.FFA = True
-                    self.co_op = False
+                    self.tempFFA = True
+                    self.tmpCoop = False
                 for team in range(maxTeamsEver):
                     teamPlayerCountSelectors[team].hide()
-                    self.playersInTeams[team] = 0
+                    self.tmpPlayersInTeam[team] = 0
                 return
             else:
-                self.FFA = False
-                self.co_op = False
+                self.tempFFA = False
+                self.tmpCoop = False
                 
             for team in range(teamCnt):
                 teamPlayerCountSelectors[team].show()
-                self.playersInTeams[team] = teamPlayerCountSelectors[team].get_value()[1]
+                self.tmpPlayersInTeam[team] = teamPlayerCountSelectors[team].get_value()[1]
             for team in range(maxTeamsEver - teamCnt):
                 #print(-1 * (team - maxTeamsEver) - 1)
                 teamPlayerCountSelectors[-1 * (team - maxTeamsEver) - 1].hide()
-                self.playersInTeams[-1 * (team - maxTeamsEver) - 1] = 0
+                self.tmpPlayersInTeam[-1 * (team - maxTeamsEver) - 1] = 0
                 
-            #print("-------------------")
+            #print("-------------------")W
 
             if(teamCnt > 1):
                 checkPlayerCountPerTeamOptions(None, None)
@@ -350,47 +366,50 @@ class Game():
                 intPC = players
                 teamCountList.append((stringPC, intPC))
             #print(playerCnt <= self.teamCount)
-            if playerCnt <= self.teamCount:
+            if playerCnt <= self.tmpTeamCnt:
                 #print(playerCnt)
                 teamSelector.set_value(str(playerCnt-1))
                 setTeamsOption(None, playerCnt-1)
             teamSelector.update_items(teamCountList)
-            self.playerCount = playerCnt
+            self.tmpPlyCnt = playerCnt
             checkPlayerCountPerTeamOptions(None, None)
             
         #both sets the number of players per team and checks that they equal the number of total players
         def checkPlayerCountPerTeamOptions(playerCountStr, playerCnt, **kwargs):
             attemptedPlayerCnt = 0
             for team in teamPlayerCountSelectors:
-                if int(team.get_id()) > self.teamCount - 1:
+                if int(team.get_id()) > self.tmpTeamCnt - 1:
                     break
-                self.playersInTeams[int(team.get_id())] = team.get_value()[1] + 1
+                self.tmpPlayersInTeam[int(team.get_id())] = team.get_value()[1] + 1
                 #print(team.get_id())
                 #print(team.get_value()[1] + 1)
                 attemptedPlayerCnt += team.get_value()[1] + 1
                 #print(attemptedPlayerCnt)
                 #print(self.playerCount)
-            if not errorPlayerCountLable.is_visible() and attemptedPlayerCnt != self.playerCount and self.teamCount >= 2:
+            if not errorPlayerCountLable.is_visible() and attemptedPlayerCnt != self.tmpPlyCnt and self.tmpTeamCnt >= 2:
                 self.error = True
                 errorPlayerCountLable.show()
-            elif errorPlayerCountLable.is_visible() and attemptedPlayerCnt == self.playerCount:
+            elif errorPlayerCountLable.is_visible() and attemptedPlayerCnt == self.tmpPlyCnt:
                 self.error = False
                 errorPlayerCountLable.hide()
                 
         #reveals the text box for the time for the intro sequence if the introSequenceSwitch is set to showing
         def setIntroSequence(isPlay, **kwargs):
-            self.showIntroSequence = isPlay
+            self.tmpShIntSeq = isPlay
             if(isPlay):
                 introSequenceTimeText.show()
             else:
                 introSequenceTimeText.hide()
+                
         #sets the time for the intro sequence        
         def setIntroSequenceTime(time, **kwargs):
-            self.introSequenceTime = time
+            self.tmpIntSeq = time
+            #self.introSequenceTime = time
         
         #sets the time between turns
         def setTimeBetweenTurns(time, **kwargs):
-            self.timeBetweenTurns = time
+            self.tmpTimeBT = time
+            #self.timeBetweenTurns = time
         
         
         maxTeamsEver = 7 #since there are only allowed 8 possible players (because I think it would be too many after that), then there are only 7 possible teams. Otherwise it is a free for all, or complete co-op
@@ -436,19 +455,15 @@ class Game():
                  align=pygame_menu.locals.ALIGN_RIGHT
              )
             teamPlayerCountSelectors.append(teamCountSelector)
-            
+        
         errorPlayerCountLable = menu.add.label("The Added Player Count of Individual Teams needs to match the Total Player Count", font_size=10, align=pygame_menu.locals.ALIGN_LEFT)
         
         timeBetweenTurnsText = menu.add.text_input("In seconds, time between turns: ", default=self.timeBetweenTurns, onchange=setTimeBetweenTurns, input_type=INPUT_FLOAT, align=pygame_menu.locals.ALIGN_LEFT)
-        
-        #needed: save upon finish switch
-            #ability to save settings to file as new game mode text
             
-        #needed: finished button
         
         introSequenceTimeText.add_self_to_kwargs()
         introSequenceSwitch.add_self_to_kwargs()
-        if(not self.showIntroSequence):
+        if(not self.tmpShIntSeq):
             introSequenceTimeText.hide()
         #else:introSequenceTimeText.show()
         timeBetweenTurnsText.add_self_to_kwargs()
@@ -456,31 +471,71 @@ class Game():
         teamSelector.add_self_to_kwargs()
         for team in range(maxTeamsEver):
             teamPlayerCountSelectors[team].add_self_to_kwargs()
-        for team in range(maxTeamsEver - self.teamCount):
-            #print(-1 * (teams - maxTeams) - 1) 
-            teamPlayerCountSelectors[-1 * (team - maxTeamsEver) - 1].hide()
+        if(self.tmpTeamCnt > 1):
+            for team in range(maxTeamsEver - self.tmpTeamCnt):
+                #print(-1 * (teams - maxTeams) - 1) 
+                teamPlayerCountSelectors[-1 * (team - maxTeamsEver) - 1].hide()
+        else:
+            for team in range(maxTeamsEver):
+                #print(-1 * (teams - maxTeams) - 1) 
+                teamPlayerCountSelectors[-1 * (team - maxTeamsEver) - 1].hide()
         errorPlayerCountLable.add_self_to_kwargs()
         errorPlayerCountLable.hide()
         
+        goBackButton = Button(pygame.image.load("Assets/ButtonBG.jpg"), (self.screenWidth/2-170, self.screenHeight /8), "Go Back:", self.buttonFont, "White", "#d7fcd4")
+        finishedButton = Button(pygame.image.load("Assets/ButtonBG.jpg"), (self.screenWidth/2+170, self.screenHeight /8), "Finished:", self.buttonFont, "White", "#d7fcd4")
+
+        
         while True:
             #print(self.playersInTeams)
+            
+
             optionsMenu.fill((202, 228, 241))
+            mouse = pygame.mouse.get_pos()
             pygame_menu.widgets.core.widget.pygame.mouse.set_cursor((16, 16), (0, 0), *cursor)
-            self.draw_text_center(
-                "Press escape to go back to main menu",
-                self.lifeFont, self.white,
-                self.screenWidth / 2, self.screenHeight / 6,
-                optionsMenu
-            )
+            
+            for button in [goBackButton, finishedButton]:
+                button.changeColor(mouse)
+                button.update(optionsMenu)
+            self.draw_text_center("values not saved", self.buttonFont, self.white, self.screenWidth/2-170, self.screenHeight /8 + 20, optionsMenu)
+            self.draw_text_center("Values Saved if no errors", self.buttonFont, self.white, self.screenWidth/2+170, self.screenHeight /8 + 20, optionsMenu)
             events = pygame.event.get()
             # events2 = pygame.event.get()
             menu.draw(optionsMenu)
             menu.update(events)
             for event in events:
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_ESCAPE:
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    print(self.error)
+                    if goBackButton.checkForInput(mouse):
                         pygame.mixer.music.stop()
+                        self.tmpTimeBT = self.timeBetweenTurns
+                        self.tmpIntSeq = self.introSequenceTime
+                        self.tmpShIntSeq = self.showIntroSequence
+                        self.tmpPlyCnt = self.playerCount
+                        self.tmpTeamCnt = self.teamCount
+                        self.tmpCoop = self.co_op
+                        self.tmpFFA = self.FFA
+                        self.tmpPlayersInTeam = self.playersInTeams
+                        self.error = False
                         return
+                        #window.fill(self.black)
+                        #return [False, False, True]
+                    elif finishedButton.checkForInput(mouse) and self.error == False:
+                        pygame.mixer.music.stop()
+                        self.timeBetweenTurns = self.tmpTimeBT 
+                        self.introSequenceTime = self.tmpIntSeq
+                        self.showIntroSequence = self.tmpShIntSeq
+                        self.playerCount = self.tmpPlyCnt
+                        self.teamCount = self.tmpTeamCnt
+                        self.co_op = self.tmpCoop
+                        self.FFA = self.tmpFFA
+                        self.playersInTeams = self.tmpPlayersInTeam
+                        return
+                        #self.showScores(window, str(score))
+            #    if event.type == pygame.KEYDOWN:
+            #        if event.key == pygame.K_ESCAPE:
+            #            pygame.mixer.music.stop()
+            #            return
             pygame.display.update()
             self.mainClock.tick(self.FPS)
     
@@ -814,11 +869,8 @@ class Game():
         mixer.music.load('Sounds/'+str(self.selectedTheme)+'.mp3')
         mixer.music.set_volume(self.volume/100)
         mixer.music.play(-1)
-        #set up lives based off team or individual 
         tempTable = []
-        
-        #print(self.playersInTeams)
-        
+                
         def livesVisualUpdate(players):
             squareH = 40
             squareX = 40
@@ -831,7 +883,6 @@ class Game():
                     textYLoc = (squareY + squareH/2) + 40
                     window.fill(self.black, (squareX, textYLoc, 150, 15))  
                     self.draw_text("lives:" + str(lives),  pygame.font.Font("assets/font.ttf", 15), self.white, squareX, textYLoc, window)
-                #pygame.display.update()
             elif(not (self.FFA)):
                 cnt = 0
                 teamNum = 0
@@ -930,13 +981,8 @@ class Game():
                 textXLoc = (squareX + squareW/2)
                 textYLoc = (squareY + squareH/2)
                 self.draw_text_center(player, pygame.font.Font("assets/font.ttf", 15), self.black, textXLoc, textYLoc, window)
-            if(self.FFA):
-                for i in range(self.playerCount):
-                    streakVisualUpdate(players)
-                    livesVisualUpdate(players)
-            elif(not(self.FFA)):
-                streakVisualUpdate(players)
-                livesVisualUpdate(players)
+            streakVisualUpdate(players)
+            livesVisualUpdate(players)
             pygame.display.update()
             
             if(self.showIntroSequence):
@@ -1017,7 +1063,6 @@ class Game():
             if t.checkWin():
                 activePlayer = playerGetsOneUpOrNextTurn(players, activePlayer)
                 for i in tempTable:
-                    #print(i.shown)
                     if not i.shown:
                         card = [i]
                         self.animate.flip(card, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, True)
@@ -1026,7 +1071,7 @@ class Game():
                 self.animate.flip(tempTable, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, False)
                 t = Table(self.col, self.row, self.selectedTheme, 5, 0, self.FPS)
                 window.fill(self.black, (self.screenWidth/2 - 70, self.screenHeight/12 - 10, 140, 18))
-                roundsComplete += 1 #this should be printed
+                roundsComplete += 1 
                 self.draw_text_center("round: " + str(roundsComplete + 1), pygame.font.Font("assets/font.ttf", 15), self.white, self.screenWidth/2, self.screenHeight/12, window)
                 setUpMPTable(players)
             else:
