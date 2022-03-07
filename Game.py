@@ -14,6 +14,7 @@ import keyboard #must be installed: pip install keyboard in anaconda cmd
 from Score import Score
 from Player import Player
 from Teams import Team
+import random
 
 running = True
 cursorStrings = (
@@ -813,6 +814,7 @@ class Game():
         for i in range(self.playerCount):
             player = Player(i + 1, self.lives, -1)
             players.append(player)
+            players[i].ID = i + 1
          
         if(self.co_op):
             self.tempPlayerCnt = 2 #this really should be one, but the game crashes if it's 1 so...
@@ -876,6 +878,9 @@ class Game():
         mixer.music.set_volume(self.volume/100)
         mixer.music.play(-1)
         tempTable = []
+        
+        if not self.co_op:
+            random.shuffle(players)
                 
         def livesVisualUpdate(players):
             squareH = 40
@@ -983,7 +988,7 @@ class Game():
                 playerDisplay.fill(getTeamColor(players[i].teamNum))
                 window.blit(playerDisplay, (squareX, squareY))
                 
-                player = "P" + str(i + 1)
+                player = "P" + str(players[i].ID)
                 textXLoc = (squareX + squareW/2)
                 textYLoc = (squareY + squareH/2)
                 self.draw_text_center(player, pygame.font.Font("assets/font.ttf", 15), self.black, textXLoc, textYLoc, window)
