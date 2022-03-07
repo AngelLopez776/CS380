@@ -1206,7 +1206,12 @@ class Game():
         if (pokertheme in savedVariablesFile4.read()):
             dh = pygame.image.load("images/theme_Poker/pokerwallpaper.jpg")
             window.blit(dh, (0, 0))
-            
+        savedVariablesFile4 = open("SavedVariables.txt", "r")
+        ffxivtheme = "selectedTheme=theme_Final Fantasy 14"
+        if (ffxivtheme in savedVariablesFile4.read()):
+            dh = pygame.image.load("images/theme_Final Fantasy 14/ffxivwallpaper.jpg")
+            window.blit(dh, (0, 0))    
+        
         t = self.createTable()
 
         green = (0, 255, 0)
