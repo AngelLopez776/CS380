@@ -336,16 +336,16 @@ class Game():
                 self.error = False
                 if(teamCnt):
                     self.tmpCoop = True
-                    self.tempFFA = False
+                    self.tmpFFA = False
                 else:
-                    self.tempFFA = True
+                    self.tmpFFA = True
                     self.tmpCoop = False
                 for team in range(maxTeamsEver):
                     teamPlayerCountSelectors[team].hide()
                     self.tmpPlayersInTeam[team] = 0
                 return
             else:
-                self.tempFFA = False
+                self.tmpFFA = False
                 self.tmpCoop = False
                 
             for team in range(teamCnt):
@@ -804,7 +804,7 @@ class Game():
         
     #while this will be very similar to the game method, it's different enough I feel to where a new method is warrented. 
     def multiPlayerGame(self, window):
-            
+        #print(self.FFA)   
         players = []
         if(self.FFA):
             self.tempPlayerCnt = self.playerCount
@@ -880,6 +880,7 @@ class Game():
         def livesVisualUpdate(players):
             squareH = 40
             squareX = 40
+            print("FFA: " + str(self.FFA))
             if(self.FFA):
                 for i in range(self.playerCount):
                     squareY = (i * 80) + playerMinBorder
