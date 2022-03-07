@@ -1181,15 +1181,25 @@ class Game():
         es.start()
         window.fill(self.black)
         
-        savedVariablesFile = open("SavedVariables.txt","r")
+        savedVariablesFile = open("SavedVariables.txt", "r")
         mariotheme = "selectedTheme=theme_Mario"
-        if(mariotheme in savedVariablesFile.read()):
+        if (mariotheme in savedVariablesFile.read()):
             bg = pygame.image.load("images/theme_Mario/mariowallpaper.jpg")
             window.blit(bg, (0, 0))
         savedVariablesFile2 = open("SavedVariables.txt", "r")
         tarottheme = "selectedTheme=theme_Tarot"
-        if(tarottheme in savedVariablesFile2.read()):
+        if (tarottheme in savedVariablesFile2.read()):
             dh = pygame.image.load("images/theme_Tarot/tarotwallpaper.jpg")
+            window.blit(dh, (0, 0))
+        savedVariablesFile3 = open("SavedVariables.txt", "r")
+        pokemontheme = "selectedTheme=theme_Pokemon"
+        if (pokemontheme in savedVariablesFile3.read()):
+            dh = pygame.image.load("images/theme_Pokemon/pokemonwallpaper.jpg")
+            window.blit(dh, (0, 0))
+        savedVariablesFile4 = open("SavedVariables.txt", "r")
+        pokertheme = "selectedTheme=theme_Poker"
+        if (pokertheme in savedVariablesFile4.read()):
+            dh = pygame.image.load("images/theme_Poker/pokerwallpaper.jpg")
             window.blit(dh, (0, 0))
             
         t = self.createTable()
