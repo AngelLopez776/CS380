@@ -1,11 +1,11 @@
-selectedTheme=theme_Mario
+selectedTheme=theme_Poker
 
 FPS=360
 
-screenWidth=1920
+screenWidth=1600
 
-screenHeight=1080
-volume=0
+screenHeight=900
+volume=18
 
 difficulty=0
 
