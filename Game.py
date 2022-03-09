@@ -611,14 +611,11 @@ class Game():
             self.saveSettingToFile("SavedVariables.txt", "screenHeight", str(resY))
 
         allResolutions = [('2560 x 1440', 2560, 1440),
-                          ('1920 x 1200', 1920, 1200),
                           ('1920 x 1080', 1920, 1080),
-                          ('1680 x 1050', 1680, 1050),
-                          ('1440 x 900', 1440, 900),
-                          ('1366 x 768', 1366, 768),
-                          ('1280 x 800', 1280, 800),
+                          ('1600 x 900', 1600, 900),
                           ('1280 x 720', 1280, 720),
-                          ('1024 x 768', 1024, 768)]
+                          ('854 x 480', 852, 480),
+                          ('640 x 360', 640, 360)]
         resolutionSelector = menu.add.dropselect(
             title="Resolution",
             items=allResolutions,
@@ -1211,31 +1208,31 @@ class Game():
         es.start()
         window.fill(self.black)
         
+        bg = pygame.image.load("images/theme_Developer/defaultbg.jpg")
+        
         savedVariablesFile = open("SavedVariables.txt", "r")
         mariotheme = "selectedTheme=theme_Mario"
         if (mariotheme in savedVariablesFile.read()):
             bg = pygame.image.load("images/theme_Mario/mariowallpaper.jpg")
-            window.blit(bg, (0, 0))
         savedVariablesFile2 = open("SavedVariables.txt", "r")
         tarottheme = "selectedTheme=theme_Tarot"
         if (tarottheme in savedVariablesFile2.read()):
-            dh = pygame.image.load("images/theme_Tarot/tarotwallpaper.jpg")
-            window.blit(dh, (0, 0))
+            bg = pygame.image.load("images/theme_Tarot/tarotwallpaper.jpg")
         savedVariablesFile3 = open("SavedVariables.txt", "r")
         pokemontheme = "selectedTheme=theme_Pokemon"
         if (pokemontheme in savedVariablesFile3.read()):
-            dh = pygame.image.load("images/theme_Pokemon/pokemonwallpaper.jpg")
-            window.blit(dh, (0, 0))
+            bg = pygame.image.load("images/theme_Pokemon/pokemonwallpaper.jpg")
         savedVariablesFile4 = open("SavedVariables.txt", "r")
         pokertheme = "selectedTheme=theme_Poker"
         if (pokertheme in savedVariablesFile4.read()):
-            dh = pygame.image.load("images/theme_Poker/pokerwallpaper.jpg")
-            window.blit(dh, (0, 0))
+            bg = pygame.image.load("images/theme_Poker/pokerwallpaper.jpg")
         savedVariablesFile4 = open("SavedVariables.txt", "r")
         ffxivtheme = "selectedTheme=theme_Final Fantasy 14"
         if (ffxivtheme in savedVariablesFile4.read()):
-            dh = pygame.image.load("images/theme_Final Fantasy 14/ffxivwallpaper.jpg")
-            window.blit(dh, (0, 0))    
+            bg = pygame.image.load("images/theme_Final Fantasy 14/ffxivwallpaper.jpg")
+        
+        bg = pygame.transform.scale(bg, (self.screenWidth, self.screenHeight))
+        window.blit(bg, (0,0))
         
         t = self.createTable()
 
