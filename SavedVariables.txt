@@ -12,4 +12,4 @@ difficulty=0
 
 gamemode=3
 
-fullscreen=False
+fullscreen=0

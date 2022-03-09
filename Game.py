@@ -16,6 +16,7 @@ from Player import Player
 from Teams import Team
 import random
 
+
 running = True
 cursorStrings = (
     "                ",
@@ -77,7 +78,7 @@ class Game():
         self.FPS = int(self.readSettingFromFile("SavedVariables.txt", "FPS"))
         self.screenWidth = int(self.readSettingFromFile("SavedVariables.txt", "screenWidth"))
         self.screenHeight = int(self.readSettingFromFile("SavedVariables.txt", "screenHeight"))
-        self.fullscreen = bool(self.readSettingFromFile("SavedVariables.txt", "fullscreen"))
+        self.fullscreen = int(self.readSettingFromFile("SavedVariables.txt", "fullscreen"))
         self.mainClock = pygame.time.Clock()
         self.animate = Animations(self.FPS)
         self.green = (0, 255, 0)
@@ -682,10 +683,10 @@ class Game():
             self.fullscreen = isFullscreen
             if self.fullscreen:
                 screen = pygame.display.set_mode((self.screenWidth, self.screenHeight), pygame.FULLSCREEN)
-                self.saveSettingToFile("SavedVariables.txt", "fullscreen", str(True))
+                self.saveSettingToFile("SavedVariables.txt", "fullscreen", str(1))
             else:
                 screen = pygame.display.set_mode((self.screenWidth, self.screenHeight), 0, 32)
-                self.saveSettingToFile("SavedVariables.txt", "fullscreen", str(False))
+                self.saveSettingToFile("SavedVariables.txt", "fullscreen", str(0))
 
         
         fullscreenToggle = menu.add.toggle_switch("Fullscreen", onchange = fullscreen, default=self.fullscreen)
