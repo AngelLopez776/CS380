@@ -16,7 +16,9 @@ from Player import Player
 from Teams import Team
 import random
 from pathlib import Path
-
+from Fireworks import Trail
+from Fireworks import Firework
+from Fireworks import Particle
 
 running = True
 cursorStrings = (
@@ -1421,6 +1423,11 @@ class Game():
                 self.draw_text("Score: " + str(t.score), self.lifeFont, white, 105, 0, window)
 
                 self.draw_text_center("You win!", self.endFont, green, self.screenWidth / 2, self.screenHeight / 4, window)
+                
+                
+                
+                
+                
                 
                 mixer.init()
                 if victory_path.is_file():
