@@ -393,7 +393,7 @@ class Game():
             teamSelector.update_items(teamCountList)
             self.tmpPlyCnt = playerCnt
             checkPlayerCountPerTeamOptions(None, None)
-            
+        
         #both sets the number of players per team and checks that they equal the number of total players
         def checkPlayerCountPerTeamOptions(playerCountStr, playerCnt, **kwargs):
             attemptedPlayerCnt = 0
@@ -513,6 +513,8 @@ class Game():
                 teamPlayerCountSelectors[-1 * (team - maxTeamsEver) - 1].hide()
         errorPlayerCountLable.add_self_to_kwargs()
         errorPlayerCountLable.hide()
+        
+        checkPlayerCountPerTeamOptions(None, None)
         #tmp vars are used so that if there is an error, it will not be saved; this method reverts the tmp vars to working variables upon exiting if there are errors
         def revertTmpVars():
             self.tmpTimeBT = self.timeBetweenTurns
