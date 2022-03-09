@@ -25,8 +25,9 @@ class Animations():
         string = string.replace("\n", "")
         file.close()
         return string
-    
+    #visually flips a card; first half the card is flipped then it is switch to either being shown or hidden then the last half of the card is flipped
     def flip(self, cards, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, showFront):
+        #half flips card so that it stops on being very thin
         def halfFlip(cards, timeToFlip, movedX, maxSize, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, firstHalf):
             global frames
             deltaTime = 1000/frames/1000

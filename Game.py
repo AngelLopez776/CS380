@@ -86,8 +86,7 @@ class Game():
         self.black = (0, 0, 0)
         self.buttonFont = pygame.font.SysFont('Times New Roman', 20)
         self.lifeFont = pygame.font.SysFont('Times New Roman', 20)
-        self.endFont = pygame.font.SysFont('Times New Roman', 32)
-        
+        self.endFont = pygame.font.SysFont('Times New Roman', 32) 
 
     def draw_text(self, text, font, color, x, y, window):
         img = font.render(text, True, color)
@@ -100,7 +99,9 @@ class Game():
         textRect = img.get_rect()
         textRect.center = (x, y)
         window.blit(img, textRect)
-
+        
+    #sets the scale of the cards depending on both the resolution and number of cards, available space, and the space between cacrds; 
+    #output is a float which is the amount to scale the cards by
     def setCardScale(self, minBorder, cols, rows, inBTween):
         screenWidth = self.screenWidth - minBorder * 2
         screenHeight = self.screenHeight - minBorder * 2
@@ -113,7 +114,9 @@ class Game():
             yLength = screenHeight / rows - inBTween
             dim = yLength / 350
         return dim
-
+    
+    #reads a setting froma  file based on file name and file variable name. Assumes that file is set up as "varName=val"
+    #ouputs "val"
     def readSettingFromFile(self, fName, sName):
         file = open(fName, 'r')
         string = None
@@ -125,7 +128,9 @@ class Game():
         string = string.replace("\n", "")
         file.close()
         return string
-
+    
+    #saves a setting to a file based on file name and file variable name. Assumes that file is set up as "varName=val"
+    #save "newVal" to "varName"
     def saveSettingToFile(self, fName, sName, sValue):
         file = open(fName, "r")
         settings = []
@@ -141,18 +146,21 @@ class Game():
         for setting in settings:
             file.write(setting + "\n")
         file.close()
-
+        
+    #uses the readFile to pick the card theme
     def readCardTheme(self):
         InitialCardSetting = self.readSettingFromFile("SavedVariables.txt", "selectedTheme")
         InitialCardSetting = InitialCardSetting.replace("theme_", "")
         print(InitialCardSetting)
         return InitialCardSetting
-
+    
+    #uses saveFile to save the card theme
     def saveInitialCardTheme(self, newTheme):
         self.selectedTheme = newTheme
         newTheme = "theme_" + newTheme
         self.saveSettingToFile("SavedVariables.txt", "selectedTheme", newTheme)
         
+    #an inbetween menu which allows the user to choose multiplayer or singleplayer  
     def sOrMOptions(self, screen):
         self.screen = screen
         textSize = 20
@@ -220,7 +228,8 @@ class Game():
             
             pygame.display.update()
             self.mainClock.tick(self.FPS)
-    
+            
+    #the options of the single player mode
     def singlePlayerOptions(self, screen):
        optionsMenu = screen
        menuTheme = pygame_menu.themes.Theme(
@@ -237,6 +246,7 @@ class Game():
        livesOn = int(self.gamemode) & 0x01
        timeOn = (int(self.gamemode) & 0x02) >> 1
        
+       #based off a switch, sets global lives on or off
        def setLivesOption(isLives, **kwargs):
            if(isLives):
                self.gamemode |= 0x1
@@ -245,7 +255,7 @@ class Game():
            self.saveSettingToFile('SavedVariables.txt', 'gamemode', str(self.gamemode))
            print(livesOn, " ", timeOn, " ", self.gamemode)
 
-
+       #based off a switch, set global time on or off
        def setTimeOption(isTime, **kwargs):
            if(isTime):
                self.gamemode |= 0x2
@@ -255,7 +265,8 @@ class Game():
            print(livesOn, " ", timeOn, " ", self.gamemode)
        livesSwitch = menu.add.toggle_switch("Lives", onchange=setLivesOption, default=livesOn)
        timeSwitch = menu.add.toggle_switch("Timer", onchange=setTimeOption, default=timeOn)
-
+       
+       #sets the difficulty as easy, medium or hard
        def setDifficulty(difficulty, difficultyIndex, **kwargs):
            value_tuple, index = difficulty
            self.difficulty = value_tuple[1]
@@ -306,6 +317,7 @@ class Game():
            pygame.display.update()
            self.mainClock.tick(self.FPS)
     
+    #options for the multiplayer mode
     def multiplayerOptions(self, screen):
         from pygame_menu.locals import INPUT_FLOAT, INPUT_INT, INPUT_TEXT #allows float, ints, texts to be used as an input type for text boxes
         
@@ -328,7 +340,7 @@ class Game():
         
         #reveals the number of teams based off the number of teams chosen; 
         """need to change so that the values are only saved once there is no user error"""
-        
+        #sets the number of teams and sets whehter global FFA and co_op should be true or false.
         def setTeamsOption(teamCountStr, teamCnt, **kwargs):
             self.tmpTeamCnt = teamCnt
             #print(self.teamCount)
@@ -361,6 +373,7 @@ class Game():
 
             if(teamCnt > 1):
                 checkPlayerCountPerTeamOptions(None, None)
+                
         #sets the number of total players
         def setPlayerCountOptions(playerCountStr, playerCnt, **kwargs):
             #print(teamCount)
@@ -408,13 +421,10 @@ class Game():
         #sets the time for the intro sequence        
         def setIntroSequenceTime(time, **kwargs):
             self.tmpIntSeq = time
-            #self.introSequenceTime = time
         
         #sets the time between turns
         def setTimeBetweenTurns(time, **kwargs):
             self.tmpTimeBT = time
-            #self.timeBetweenTurns = time
-        
         
         maxTeamsEver = 7 #since there are only allowed 8 possible players (because I think it would be too many after that), then there are only 7 possible teams. Otherwise it is a free for all, or complete co-op
         
@@ -464,7 +474,6 @@ class Game():
         
         timeBetweenTurnsText = menu.add.text_input("In seconds, time between turns: ", default=self.timeBetweenTurns, onchange=setTimeBetweenTurns, input_type=INPUT_FLOAT, align=pygame_menu.locals.ALIGN_LEFT)
             
-        
         introSequenceTimeText.add_self_to_kwargs()
         introSequenceSwitch.add_self_to_kwargs()
         if(not self.tmpShIntSeq):
@@ -485,6 +494,7 @@ class Game():
                 teamPlayerCountSelectors[-1 * (team - maxTeamsEver) - 1].hide()
         errorPlayerCountLable.add_self_to_kwargs()
         errorPlayerCountLable.hide()
+        #tmp vars are used so that if there is an error, it will not be saved; this method reverts the tmp vars to working variables upon exiting if there are errors
         def revertTmpVars():
             self.tmpTimeBT = self.timeBetweenTurns
             self.tmpIntSeq = self.introSequenceTime
@@ -496,6 +506,7 @@ class Game():
             self.tmpPlayersInTeam = self.playersInTeams
             self.error = False
             
+        #tmp vars are used so that if there is an error, it will not be saved; this method saves the tmp vars to the vars used in the multiplayer game variables upon exiting if there are error
         def applyTmpVars():
             self.timeBetweenTurns = self.tmpTimeBT 
             self.introSequenceTime = self.tmpIntSeq
@@ -508,8 +519,6 @@ class Game():
             
         while True:
             #print(self.playersInTeams)
-            
-
             optionsMenu.fill((202, 228, 241))
             mouse = pygame.mouse.get_pos()
             pygame_menu.widgets.core.widget.pygame.mouse.set_cursor((16, 16), (0, 0), *cursor)
@@ -545,6 +554,7 @@ class Game():
             pygame.display.update()
             self.mainClock.tick(self.FPS)
     
+    #sets the settings of the game: resolution; theme; FPS; volume; fullscreen
     def settingsOptions(self, screen):
         optionsMenu = screen
 
@@ -558,7 +568,8 @@ class Game():
             height=self.screenHeight,
             width=self.screenWidth,
             theme=menuTheme)
-
+        
+        #chooses the card theme to be saved and used
         def setCardTheme(newThemeName, newThemeNameButLike___Again, **kwargs):
             # global selectedTheme
             value_tuple, index = newThemeName
@@ -583,13 +594,18 @@ class Game():
             placeholder=self.selectedTheme,
             placeholder_add_to_selection_box=False
         )
-
+        
+        #saves the resolution values to be used
         def setResolution(newRes, resX, resY, **kwargs):
             global screen
             value_tuple, index = newRes
             self.screenWidth = resX
             self.screenHeight = resY
-            screen = pygame.display.set_mode((self.screenWidth, self.screenHeight), 0, 32)
+            if self.fullscreen:
+                screen = pygame.display.set_mode((self.screenWidth, self.screenHeight), pygame.FULLSCREEN)
+                #self.saveSettingToFile("SavedVariables.txt", "fullscreen", str(True))
+            else:
+                screen = pygame.display.set_mode((self.screenWidth, self.screenHeight), 0, 32)
             menu.resize(resX, resY)
             self.saveSettingToFile("SavedVariables.txt", "screenWidth", str(resX))
             self.saveSettingToFile("SavedVariables.txt", "screenHeight", str(resY))
@@ -616,7 +632,8 @@ class Game():
             placeholder= str(self.screenWidth) + " x " + str(self.screenHeight),
             placeholder_add_to_selection_box=False
         )
-
+        
+        #saves the FPS values to be used
         def setFPS(newFPSData, newFPSNum, **kwargs):
             # global selectedTheme
             value_tuple, index = newFPSData
@@ -644,7 +661,7 @@ class Game():
             placeholder_add_to_selection_box=False
         )
 
-
+        #sets the volume value to be used
         def set_vol(range, **kwargs):
             val = int(range)
             self.volume = int(val)
@@ -662,6 +679,7 @@ class Game():
            # command = set_vol()
         )
         
+        #decides whether fullscreen is being used or not
         def fullscreen(isFullscreen, **kwargs):
             global screen
             self.fullscreen = isFullscreen
@@ -679,7 +697,7 @@ class Game():
         resolutionSelector.add_self_to_kwargs()  
         fpsSelector.add_self_to_kwargs()  
         volumeSlider.add_self_to_kwargs()
-        
+        fullscreenToggle.add_self_to_kwargs()
 
         # running = True
         while True:
@@ -707,7 +725,11 @@ class Game():
             self.mainClock.tick(self.FPS)
 
     def main_menu(self):
-        screen = pygame.display.set_mode((self.screenWidth, self.screenHeight), 0, 32)
+        print("fullscreen" + str(self.fullscreen))
+        if self.fullscreen:
+            screen = pygame.display.set_mode((self.screenWidth, self.screenHeight), pygame.FULLSCREEN)
+        else:
+            screen = pygame.display.set_mode((self.screenWidth, self.screenHeight), 0, 32)
 
         titleFont = pygame.font.Font("assets/font.ttf", 50)
 
@@ -791,7 +813,7 @@ class Game():
         toXCenter = availableSpace - deckX
         toXCenter /= 2
         return toXCenter
-    
+    #same as sleep, but allows for parallel processes
     def stopAllFor(self, seconds):
         global running
         startTime = time.perf_counter()
@@ -835,7 +857,7 @@ class Game():
             team = Team(teamNum, self.lives)
             teamNum+=1
             teamsData.append(team)    
-            
+        #allows escape to be used at almost anytime
         def parallelEscape():
             global running
             while True:
@@ -881,7 +903,7 @@ class Game():
         
         if not self.co_op:
             random.shuffle(players)
-                
+
         def livesVisualUpdate(players):
             squareH = 40
             squareX = 40
@@ -937,7 +959,7 @@ class Game():
                     textYLoc = (squareY + squareH/2) + 25
                     window.fill(self.black, (squareX, textYLoc, 150, 15))  
                     self.draw_text("streak:" + str(streak),  pygame.font.Font("assets/font.ttf", 15), self.white, squareX, textYLoc, window)
-            
+        #visually indicates who's turn it is    
         def activePlayerVisualUpdate(activePlayer, prevActivePlayer):
             squareH = 10
             squareX = 100
@@ -947,7 +969,7 @@ class Game():
             activeSquare = pygame.Rect(squareX, squareY, squareH, squareH)
             pygame.draw.rect(window, (100,100,255), activeSquare)
             #pygame.display.update()
-
+        #sets up the players team colors, lives, and streak
         def setUpMPTable(players):
             def getTeamColor(team):
                 if team == 0:
@@ -1011,6 +1033,7 @@ class Game():
         activePlayerVisualUpdate(0, 0)
         quitG = False
         
+        #finds the next player who's turn it is; skips not alive players
         def findNextAlivePlayer(players, activePlayer):
             livesVisualUpdate(players)
             streakVisualUpdate(players)
@@ -1028,7 +1051,8 @@ class Game():
                     break
             activePlayerVisualUpdate(activePlayer, prevActivePlayer)
             return activePlayer
-                
+        
+        #either marks the player as not alive if they have 1 life or subtracts a life
         def playerIsOutOrRemoveLife(players, activePlayer):
             if(self.FFA):
                 players[activePlayer].lives -= 1
@@ -1048,7 +1072,8 @@ class Game():
                     teamsData[teamEffected].streak = 0
             activePlayer = findNextAlivePlayer(players, activePlayer)
             return activePlayer
-            
+         
+        #if a player has a streak of 3, a new life is added. The next active player is then found
         def playerGetsOneUpOrNextTurn(players, activePlayer):
             if(self.FFA):
                 players[activePlayer].streak += 1
@@ -1068,9 +1093,9 @@ class Game():
         
         while running:
             self.mainClock.tick(self.FPS)
-            
-            mouse = pygame.mouse.get_pos()
 
+            mouse = pygame.mouse.get_pos()
+ 
             #here, rather than checking for a win, this checks for a completed deck
             if t.checkWin():
                 activePlayer = playerGetsOneUpOrNextTurn(players, activePlayer)
@@ -1096,7 +1121,6 @@ class Game():
                         t.table[j][i].makeRect((minBorder + toXCenter) + xSize * i, minBorder + ySize * j)
                 pygame.display.update()
                 
-              
                 if len(t.selection) >= 1:
                     if t.checkBomb():
                         self.stopAllFor(1)
@@ -1133,7 +1157,7 @@ class Game():
                                             hidenCards.append(i)
                                     self.animate.flip(hidenCards, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, True)
                                     self.stopAllFor(0.5)
-                                    running, quitG, playAgain = self.endScreen(window, t.score)
+                                    running, playAgain, quitg = self.endScreen(window, t.score)
 
                         else:
                             if isMatch == 1:
@@ -1408,8 +1432,7 @@ class Game():
                             for event in pygame.event.get():
                                 if event.type == pygame.MOUSEBUTTONDOWN:
                                     cards = [c]
-                                    self.animate.flip(cards, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window,
-                                                      True)
+                                    self.animate.flip(cards, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window,True)
 
                                     t.selection.append(c)
                                     

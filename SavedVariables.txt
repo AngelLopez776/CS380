@@ -1,10 +1,11 @@
-selectedTheme=theme_Mario
+selectedTheme=theme_Pokemon
 
 FPS=360
 
-screenWidth=1920
+screenWidth=1024
 
-screenHeight=1080
+screenHeight=768
+
 volume=0
 
 difficulty=0
@@ -12,4 +13,3 @@ difficulty=0
 gamemode=3
 
 fullscreen=False
-
