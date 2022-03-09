@@ -15,6 +15,7 @@ from Score import Score
 from Player import Player
 from Teams import Team
 import random
+from pathlib import Path
 
 
 running = True
@@ -1368,6 +1369,11 @@ class Game():
 
         quitG = False
         
+        path_to_victory_file = 'Sounds/'+str(self.selectedTheme)+' Victory.mp3'
+        path_to_gameover_file = 'Sounds/'+str(self.selectedTheme)+' Gameover.mp3'
+        victory_path = Path(path_to_victory_file)
+        gameover_path = Path(path_to_gameover_file)
+        
         while running:
             self.mainClock.tick(self.FPS)
             mouse = pygame.mouse.get_pos()
@@ -1407,10 +1413,13 @@ class Game():
                 self.draw_text("Score: " + str(t.score), self.lifeFont, white, 105, 0, window)
 
                 self.draw_text_center("You win!", self.endFont, green, self.screenWidth / 2, self.screenHeight / 4, window)
-
+                
                 mixer.init()
-                mixer.music.load('Sounds/winner.mp3')
-                mixer.music.set_volume(self.volume/100)
+                if victory_path.is_file():
+                    mixer.music.load('Sounds/'+str(self.selectedTheme)+' Victory.mp3')
+                else: 
+                    mixer.music.load('Sounds/Mario Victory.mp3')
+                mixer.music.set_volume(self.volume/120)
                 mixer.music.play()
                                
                 running, playAgain = self.endScreen(window, t.score, True)
@@ -1434,9 +1443,15 @@ class Game():
                 self.animate.flip(hiddenTable, 1000, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, True)
 
                 self.draw_text_center("You lose!", self.endFont, red, self.screenWidth / 2, self.screenHeight / 4, window)
+                
                 mixer.init()
-                mixer.music.load('Sounds/gameover.mp3')
-                mixer.music.set_volume(self.volume/100)
+                
+                if gameover_path.is_file():
+                    mixer.music.load('Sounds/'+str(self.selectedTheme)+' Gameover.mp3')
+                else: 
+                    mixer.music.load('Sounds/Mario Gameover.mp3')
+                
+                mixer.music.set_volume(self.volume/120)
                 mixer.music.play()
 
                 running, playAgain = self.endScreen(window, t.score, True)
