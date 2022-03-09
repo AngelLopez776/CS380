@@ -8,7 +8,6 @@ fade_p = []
 
 GRAVITY_FIREWORK = vector2(0, 0.3)
 GRAVITY_PARTICLE = vector2(0, 0.07)
-DISPLAY_WIDTH = DISPLAY_HEIGHT = 800
 
 BACKGROUND_COLOR = (20, 20, 30) 
 FIREWORK_SPEED_MIN = 17
@@ -33,11 +32,13 @@ FADE_COLOURS = [(45, 45, 45), (60, 60, 60), (75, 75, 75), (125, 125, 125), (150,
 
 
 class Firework:
-    def __init__(self):
+    def __init__(self, screenWidth, screenHeight):
         self.colour = tuple(randint(0, 255) for _ in range(3))
         self.colours = tuple(tuple(randint(0, 255) for _ in range(3)) for _ in range(3))
+        self.DISPLAY_WIDTH = screenWidth
+        self.DISPLAY_HEIGHT = screenHeight
         # Creates the firework particle
-        self.firework = Particle(randint(0, DISPLAY_WIDTH), DISPLAY_HEIGHT, True, self.colour)
+        self.firework = Particle(randint(0, self.DISPLAY_WIDTH), self.DISPLAY_HEIGHT, True, self.colour)
         self.exploded = False
         self.particles = []
 
@@ -182,36 +183,3 @@ def update(win: pygame.Surface, fireworks: list, trails: list) -> None:
             fireworks.remove(fw)
 
     pygame.display.update()
-
-
-def main():
-    pygame.init()
-    pygame.display.set_caption("Fireworks in Pygame")
-    win = pygame.display.set_mode((DISPLAY_WIDTH, DISPLAY_HEIGHT))
-    clock = pygame.time.Clock()
-
-    fireworks = [Firework() for i in range(1)]  # create the first fireworks
-    running = True
-
-    while running:
-        clock.tick(1000000)
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_1:
-                    fireworks.append(Firework())
-                elif event.key == pygame.K_2:
-                    for i in range(10):
-                        fireworks.append(Firework())
-        win.fill(BACKGROUND_COLOR)  # draw background
-
-        if randint(0, 70) == 1:  # create new firework
-            fireworks.append(Firework())
-        
-        update(win, fireworks, trails)
-
-    pygame.quit()
-    quit()
-    
