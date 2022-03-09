@@ -633,7 +633,8 @@ class Game():
                          ('Pokemon', 'Pokemon'),
                          ('Mario', 'Mario'),
                          ('Poker', 'Poker'),
-                         ('Final Fantasy 14', 'Final Fantasy 14')]
+                         ('Final Fantasy 14', 'Final Fantasy 14'),
+                         ('Developer', 'Developer')]
         themeSelector = menu.add.dropselect(
             title="Deck Theme",
             items=allCardThemes,
@@ -1330,8 +1331,15 @@ class Game():
         toXCenter = self.centerDeckX(xSize, t.x, self.screenWidth, minBorder)
         timeToFlip = int(3000 * scale)  # can't be too fast or frames don't register
         
+        path_to_background_music_file = 'Sounds/'+str(self.selectedTheme)+' Victory.mp3'
+        background_music_path = Path(path_to_background_music_file)
+       
+        
         mixer.init()
-        mixer.music.load('Sounds/'+str(self.selectedTheme)+'.mp3')
+        if background_music_path.is_file():
+            mixer.music.load('Sounds/'+str(self.selectedTheme)+'.mp3')
+        else: 
+            mixer.music.load('Sounds/Mario.mp3')
         mixer.music.set_volume(self.volume/100)
         mixer.music.play(-1)
         
