@@ -633,7 +633,8 @@ class Game():
                          ('Pokemon', 'Pokemon'),
                          ('Mario', 'Mario'),
                          ('Poker', 'Poker'),
-                         ('Final Fantasy 14', 'Final Fantasy 14')]
+                         ('Final Fantasy 14', 'Final Fantasy 14'),
+                         ('Developer', 'Developer')]
         themeSelector = menu.add.dropselect(
             title="Deck Theme",
             items=allCardThemes,

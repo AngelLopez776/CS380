@@ -1,5 +1,4 @@
-selectedTheme=theme_Pokemon
-
+selectedTheme=theme_Developer
 FPS=360
 
 screenWidth=1024
@@ -13,3 +12,4 @@ difficulty=0
 gamemode=3
 
 fullscreen=0
+
