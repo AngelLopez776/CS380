@@ -67,6 +67,8 @@ class Game():
         self.tmpShIntSeq = self.showIntroSequence
         self.tmpIntSeq = self.introSequenceTime
         self.tmpTimeBT = self.timeBetweenTurns
+        self.tmpLives = self.lives
+        self.tmpStreakToOneUp = self.streakToOneUp
 
         #singlePlayer-----------
         self.difficulty = int(self.readSettingFromFile("SavedVariables.txt", "difficulty"))
@@ -426,6 +428,15 @@ class Game():
         #sets the time between turns
         def setTimeBetweenTurns(time, **kwargs):
             self.tmpTimeBT = time
+            
+        #sets the lives
+        def setLives(lives, **kwargs):
+            if(lives == 0): lives += 1
+            self.tmpLives = abs(lives)
+            
+        def setStreakToOneUp(streakToOneUp, **kwargs):
+            if(streakToOneUp == 0): streakToOneUp += 1
+            self.tmpStreakToOneUp = abs(streakToOneUp)
         
         maxTeamsEver = 7 #since there are only allowed 8 possible players (because I think it would be too many after that), then there are only 7 possible teams. Otherwise it is a free for all, or complete co-op
         
@@ -438,6 +449,9 @@ class Game():
         
         #needed: deck count selector: columns and rows; cannot go above 8 rows or 12 columns
         
+        livesPerTextBox = menu.add.text_input("Lives Per Player: ", default=self.lives, onchange=setLives, input_type=INPUT_INT, align=pygame_menu.locals.ALIGN_LEFT)
+        streakPerTextBox = menu.add.text_input("streak to one-up: ", default=self.streakToOneUp, onchange=setLives, input_type=INPUT_INT, align=pygame_menu.locals.ALIGN_LEFT)
+
         playerCountList = [("2", 2),("3", 3),("4", 4),("5", 5),("6", 6),("7", 7), ("8", 8)]
         playerCountSelector = menu.add.selector("Total Player Count", 
                                                 items=playerCountList, 
@@ -445,6 +459,8 @@ class Game():
                                                 style=pygame_menu.widgets.SELECTOR_STYLE_FANCY, 
                                                 align=pygame_menu.locals.ALIGN_LEFT
                                                 )
+        
+        
         teamCountList = []
 
         for players in range(self.playerCount):
@@ -474,7 +490,9 @@ class Game():
         errorPlayerCountLable = menu.add.label("The Added Player Count of Individual Teams needs to match the Total Player Count", font_size=10, align=pygame_menu.locals.ALIGN_LEFT)
         
         timeBetweenTurnsText = menu.add.text_input("In seconds, time between turns: ", default=self.timeBetweenTurns, onchange=setTimeBetweenTurns, input_type=INPUT_FLOAT, align=pygame_menu.locals.ALIGN_LEFT)
-            
+        
+        streakPerTextBox.add_self_to_kwargs()
+        livesPerTextBox.add_self_to_kwargs()
         introSequenceTimeText.add_self_to_kwargs()
         introSequenceSwitch.add_self_to_kwargs()
         if(not self.tmpShIntSeq):
@@ -505,6 +523,8 @@ class Game():
             self.tmpCoop = self.co_op
             self.tmpFFA = self.FFA
             self.tmpPlayersInTeam = self.playersInTeams
+            self.tmpLives = self.lives
+            self.tmpStreakToOneUp = self.streakToOneUp
             self.error = False
             
         #tmp vars are used so that if there is an error, it will not be saved; this method saves the tmp vars to the vars used in the multiplayer game variables upon exiting if there are error
@@ -517,6 +537,10 @@ class Game():
             self.co_op = self.tmpCoop
             self.FFA = self.tmpFFA
             self.playersInTeams = self.tmpPlayersInTeam
+            self.lives = self.tmpLives
+            self.streakToOneUp = self.tmpStreakToOneUp
+
+
             
         while True:
             #print(self.playersInTeams)
@@ -874,7 +898,34 @@ class Game():
         
         es = threading.Thread(target=parallelEscape)
         es.start()
-        window.fill(self.black)
+        #window.fill(self.black)
+        
+        bg = pygame.image.load("images/theme_Developer/defaultbg.jpg")
+        
+        savedVariablesFile = open("SavedVariables.txt", "r")
+        mariotheme = "selectedTheme=theme_Mario"
+        if (mariotheme in savedVariablesFile.read()):
+            bg = pygame.image.load("images/theme_Mario/mariowallpaper.jpg")
+        savedVariablesFile2 = open("SavedVariables.txt", "r")
+        tarottheme = "selectedTheme=theme_Tarot"
+        if (tarottheme in savedVariablesFile2.read()):
+            bg = pygame.image.load("images/theme_Tarot/tarotwallpaper.jpg")
+        savedVariablesFile3 = open("SavedVariables.txt", "r")
+        pokemontheme = "selectedTheme=theme_Pokemon"
+        if (pokemontheme in savedVariablesFile3.read()):
+            bg = pygame.image.load("images/theme_Pokemon/pokemonwallpaper.jpg")
+        savedVariablesFile4 = open("SavedVariables.txt", "r")
+        pokertheme = "selectedTheme=theme_Poker"
+        if (pokertheme in savedVariablesFile4.read()):
+            bg = pygame.image.load("images/theme_Poker/pokerwallpaper.jpg")
+        savedVariablesFile4 = open("SavedVariables.txt", "r")
+        ffxivtheme = "selectedTheme=theme_Final Fantasy 14"
+        if (ffxivtheme in savedVariablesFile4.read()):
+            bg = pygame.image.load("images/theme_Final Fantasy 14/ffxivwallpaper.jpg")
+        
+        bg = pygame.transform.scale(bg, (self.screenWidth, self.screenHeight))
+        window.blit(bg, (0,0))
+        
         t = Table(self.col, self.row, self.selectedTheme, 5, 0, self.FPS)
 
         green = (0, 255, 0)
@@ -1207,7 +1258,7 @@ class Game():
         
         es = threading.Thread(target=parallelEscape)
         es.start()
-        window.fill(self.black)
+        #window.fill(self.black)
         
         bg = pygame.image.load("images/theme_Developer/defaultbg.jpg")
         
