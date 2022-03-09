@@ -460,6 +460,27 @@ class Game():
                                                 align=pygame_menu.locals.ALIGN_LEFT
                                                 )
         
+        def setXCards(strX, x, **kwargs):
+            self.col = x
+        
+        def setYCards(strY, y, **kwargs):
+            self.row = y
+        
+        numCards = [("3", 3), ("4", 4), ("5", 5)]
+        
+        xSelector = menu.add.selector("Cards x dimension",
+                                      items=numCards,
+                                      onchange=setXCards,
+                                      style=pygame_menu.widgets.SELECTOR_STYLE_FANCY,
+                                      align=pygame_menu.locals.ALIGN_LEFT
+                                      )
+        
+        ySelector = menu.add.selector("Cards y dimension",
+                                      items=numCards,
+                                      onchange=setYCards,
+                                      style=pygame_menu.widgets.SELECTOR_STYLE_FANCY,
+                                      align=pygame_menu.locals.ALIGN_LEFT
+                                      )
         
         teamCountList = []
 
@@ -471,6 +492,8 @@ class Game():
         teamSelector = menu.add.selector("Teams", items=teamCountList, onchange=setTeamsOption, style=pygame_menu.widgets.SELECTOR_STYLE_FANCY, align=pygame_menu.locals.ALIGN_LEFT)
         teamPlayerCountList = [("1", 1),("2", 2),("3", 3),("4", 4),("5", 5),("6", 6),("7", 7)]
         teamPlayerCountSelectors = [] #the number of players per team
+        xSelector.set_default_value(self.col)
+        ySelector.set_default_value(self.row)
         playerCountSelector.set_default_value(self.playerCount - 2) #this ensures that the default value is correct; if the default in the parameters, it crashes.
         playerCountSelector.reset_value()
         teamSelector.set_default_value(self.teamCount) #this ensures that the default value is correct; if the default in the parameters, it crashes.
@@ -500,6 +523,8 @@ class Game():
         #else:introSequenceTimeText.show()
         timeBetweenTurnsText.add_self_to_kwargs()
         playerCountSelector.add_self_to_kwargs()
+        xSelector.add_self_to_kwargs()
+        ySelector.add_self_to_kwargs()
         teamSelector.add_self_to_kwargs()
         for team in range(maxTeamsEver):
             teamPlayerCountSelectors[team].add_self_to_kwargs()
@@ -1082,7 +1107,6 @@ class Game():
         self.draw_text_center("round: " + str(roundsComplete + 1), pygame.font.Font("assets/font.ttf", 15), self.white, self.screenWidth/2, self.screenHeight/12, window)
         setUpMPTable(players)
         activePlayerVisualUpdate(0, 0)
-        quitG = False
         
         #finds the next player who's turn it is; skips not alive players
         def findNextAlivePlayer(players, activePlayer):
@@ -1190,7 +1214,7 @@ class Game():
                                     hidenCards.append(i)
                             self.animate.flip(hidenCards, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, True)
                             self.stopAllFor(0.5)
-                            running, quitG, playAgain = self.endScreen(window, t.score)
+                            running, playAgain = self.endScreen(window, t.score, False)
 
                     if len(t.selection) >= 2:
                         isMatch = t.checkMatch()
@@ -1208,7 +1232,7 @@ class Game():
                                             hidenCards.append(i)
                                     self.animate.flip(hidenCards, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, True)
                                     self.stopAllFor(0.5)
-                                    running, playAgain, quitg = self.endScreen(window, t.score)
+                                    running, playAgain = self.endScreen(window, t.score, False)
 
                         else:
                             if isMatch == 1:
@@ -1240,7 +1264,7 @@ class Game():
                     sys.exit()  
             
         es.join(0)
-        return quitG
+        return
         
     def game(self, window):
         def parallelEscape():
@@ -1389,7 +1413,7 @@ class Game():
                 mixer.music.set_volume(self.volume/100)
                 mixer.music.play()
                                
-                running, quitG, playAgain = self.endScreen(window, t.score)
+                running, playAgain = self.endScreen(window, t.score, True)
 
                 if playAgain:
                     mixer.init()
@@ -1397,6 +1421,9 @@ class Game():
                     mixer.music.set_volume(self.volume/100)
                     mixer.music.play(-1)
                     return Game.game(self, window)
+                
+                else:
+                    return
 
             elif (t.lives == 0 or timeLeft <= 0):
                 hiddenTable = []
@@ -1412,7 +1439,7 @@ class Game():
                 mixer.music.set_volume(self.volume/100)
                 mixer.music.play()
 
-                running, quitG, playAgain = self.endScreen(window, t.score)
+                running, playAgain = self.endScreen(window, t.score, True)
 
                 if playAgain:
                     mixer.init()
@@ -1420,6 +1447,9 @@ class Game():
                     mixer.music.set_volume(self.volume/100)
                     mixer.music.play(-1)
                     return Game.game(self, window)
+                
+                else:
+                    return
 
             else:
                 t.update()
@@ -1495,10 +1525,13 @@ class Game():
         es.join(0)
         return quitG
         
-    def endScreen(self, window, score):
+    def endScreen(self, window, score, sp):
         retryButton = Button(pygame.image.load("Assets/ButtonBG.jpg"), (self.screenWidth/2, self.screenHeight * 3/7), "Restart", self.buttonFont, "White", "#d7fcd4")
-        scoresButton = Button(pygame.image.load("Assets/ButtonBG.jpg"), (self.screenWidth/2, (self.screenHeight * 3/7) + 110), "High scores", self.buttonFont, "White", "#d7fcd4")
-        mmButton = Button(pygame.image.load("Assets/ButtonBG.jpg"), (self.screenWidth/2, (self.screenHeight * 3/7) + 220), "Return to mode select", self.buttonFont, "White", "#d7fcd4")
+        if sp:
+            scoresButton = Button(pygame.image.load("Assets/ButtonBG.jpg"), (self.screenWidth/2, (self.screenHeight * 3/7) + 110), "High scores", self.buttonFont, "White", "#d7fcd4")
+            mmButton = Button(pygame.image.load("Assets/ButtonBG.jpg"), (self.screenWidth/2, (self.screenHeight * 3/7) + 220), "Return to mode select", self.buttonFont, "White", "#d7fcd4")
+        else:
+            mmButton = Button(pygame.image.load("Assets/ButtonBG.jpg"), (self.screenWidth/2, (self.screenHeight * 3/7) + 110), "Return to mode select", self.buttonFont, "White", "#d7fcd4")
         
         Score.saveScore(str(score))
 
@@ -1506,37 +1539,44 @@ class Game():
             self.mainClock.tick(self.FPS)
             mouse = pygame.mouse.get_pos()
             
-            for button in [retryButton, scoresButton, mmButton]:
-                button.changeColor(mouse)
-                button.update(window)
+            if sp:
+                for button in [retryButton, scoresButton, mmButton]:
+                    button.changeColor(mouse)
+                    button.update(window)
+            
+            else:
+                for button in [retryButton, mmButton]:
+                    button.changeColor(mouse)
+                    button.update(window)
             
             pygame.display.update()
             
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    return [False, True, False]  # [Running, quitgame, playagain]
+                    return [False, False]
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         mixer.init()
                         mixer.music.load('Sounds/loading.mp3')
                         mixer.music.set_volume(self.volume/100)
                         mixer.music.play()
-                        return [False, False, False]
+                        return [False, False]
                     if event.key == pygame.K_r:
                         window.fill(self.black)  # so cards show during lose screen
-                        return [False, False, True]
+                        return [False, True]
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     if retryButton.checkForInput(mouse):
                         window.fill(self.black)
-                        return [False, False, True]
-                    elif scoresButton.checkForInput(mouse):
-                        self.showScores(window, str(score))
+                        return [False, True]
+                    elif sp:
+                        if scoresButton.checkForInput(mouse):
+                            self.showScores(window, str(score))
                     elif mmButton.checkForInput(mouse):
                         mixer.init()
                         mixer.music.load('Sounds/loading.mp3')
                         mixer.music.set_volume(self.volume/100)
                         mixer.music.play()
-                        return [False, False, False]
+                        return [False, False]
                     
     def createTable(self):
         if self.difficulty == 0:
