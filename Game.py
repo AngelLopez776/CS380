@@ -1383,10 +1383,10 @@ class Game():
                 self.draw_text("Score: " + str(t.score), self.lifeFont, white, 105, 0, window)
 
                 self.draw_text_center("You win!", self.endFont, green, self.screenWidth / 2, self.screenHeight / 4, window)
-
+                
                 mixer.init()
-                mixer.music.load('Sounds/winner.mp3')
-                mixer.music.set_volume(self.volume/100)
+                mixer.music.load('Sounds/'+str(self.selectedTheme)+' Victory.mp3')
+                mixer.music.set_volume(self.volume/120)
                 mixer.music.play()
                                
                 running, quitG, playAgain = self.endScreen(window, t.score)
@@ -1407,9 +1407,10 @@ class Game():
                 self.animate.flip(hiddenTable, 1000, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, True)
 
                 self.draw_text_center("You lose!", self.endFont, red, self.screenWidth / 2, self.screenHeight / 4, window)
+                
                 mixer.init()
-                mixer.music.load('Sounds/gameover.mp3')
-                mixer.music.set_volume(self.volume/100)
+                mixer.music.load('Sounds/'+str(self.selectedTheme)+' Gameover.mp3')
+                mixer.music.set_volume(self.volume/120)
                 mixer.music.play()
 
                 running, quitG, playAgain = self.endScreen(window, t.score)
