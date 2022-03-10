@@ -1329,7 +1329,7 @@ class Game():
         toXCenter = self.centerDeckX(xSize, t.x, self.screenWidth, minBorder)
         timeToFlip = int(3000 * scale)  # can't be too fast or frames don't register
         
-        path_to_background_music_file = 'Sounds/'+str(self.selectedTheme)+' Victory.mp3'
+        path_to_background_music_file = 'Sounds/'+str(self.selectedTheme)+'.mp3'
         background_music_path = Path(path_to_background_music_file)
        
         
@@ -1609,7 +1609,7 @@ class Game():
                     elif sp:
                         if scoresButton.checkForInput(mouse):
                             self.showScores(window, str(score))
-                    elif mmButton.checkForInput(mouse):
+                    if mmButton.checkForInput(mouse):
                         mixer.init()
                         mixer.music.load('Sounds/loading.mp3')
                         mixer.music.set_volume(self.volume/100)
