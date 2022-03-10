@@ -15,8 +15,9 @@ from Score import Score
 from Player import Player
 from Teams import Team
 import random
+from random import randint
 from pathlib import Path
-
+from Fireworks import Firework, update
 
 running = True
 cursorStrings = (
@@ -670,9 +671,7 @@ class Game():
         allResolutions = [('2560 x 1440', 2560, 1440),
                           ('1920 x 1080', 1920, 1080),
                           ('1600 x 900', 1600, 900),
-                          ('1280 x 720', 1280, 720),
-                          ('854 x 480', 852, 480),
-                          ('640 x 360', 640, 360)]
+                          ('1280 x 720', 1280, 720)]
         resolutionSelector = menu.add.dropselect(
             title="Resolution",
             items=allResolutions,
@@ -696,8 +695,7 @@ class Game():
             self.animate.frames = newFPSNum
             self.saveSettingToFile("SavedVariables.txt", "FPS", value_tuple[0])
 
-        allFPS = [('360', 360),
-                  ('140', 140),
+        allFPS = [('140', 140),
                   ('60', 60),
                   ('30', 30),
                   ('Custom', 360)]
@@ -1219,7 +1217,7 @@ class Game():
                                     hidenCards.append(i)
                             self.animate.flip(hidenCards, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, True)
                             self.stopAllFor(0.5)
-                            running, playAgain = self.endScreen(window, t.score, False)
+                            running, playAgain = self.endScreen(window, t.score, False, False)
 
                     if len(t.selection) >= 2:
                         isMatch = t.checkMatch()
@@ -1237,7 +1235,7 @@ class Game():
                                             hidenCards.append(i)
                                     self.animate.flip(hidenCards, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, True)
                                     self.stopAllFor(0.5)
-                                    running, playAgain = self.endScreen(window, t.score, False)
+                                    running, playAgain = self.endScreen(window, t.score, False, False)
 
                         else:
                             if isMatch == 1:
@@ -1424,6 +1422,7 @@ class Game():
                 self.draw_text("Score: " + str(t.score), self.lifeFont, white, 105, 0, window)
 
                 self.draw_text_center("You win!", self.endFont, green, self.screenWidth / 2, self.screenHeight / 4, window)
+                pygame.display.update()
                 
                 mixer.init()
                 if victory_path.is_file():
@@ -1432,8 +1431,11 @@ class Game():
                     mixer.music.load('Sounds/Mario Victory.mp3')
                 mixer.music.set_volume(self.volume/120)
                 mixer.music.play()
-                               
-                running, playAgain = self.endScreen(window, t.score, True)
+                
+                time.sleep(1)
+                window.fill(black)
+                
+                running, playAgain = self.endScreen(window, t.score, True, True)
 
                 if playAgain:
                     mixer.init()
@@ -1465,7 +1467,7 @@ class Game():
                 mixer.music.set_volume(self.volume/120)
                 mixer.music.play()
 
-                running, playAgain = self.endScreen(window, t.score, True)
+                running, playAgain = self.endScreen(window, t.score, True, False)
 
                 if playAgain:
                     mixer.init()
@@ -1551,7 +1553,7 @@ class Game():
         es.join(0)
         return quitG
         
-    def endScreen(self, window, score, sp):
+    def endScreen(self, window, score, sp, win):
         retryButton = Button(pygame.image.load("Assets/ButtonBG.jpg"), (self.screenWidth/2, self.screenHeight * 3/7), "Restart", self.buttonFont, "White", "#d7fcd4")
         if sp:
             scoresButton = Button(pygame.image.load("Assets/ButtonBG.jpg"), (self.screenWidth/2, (self.screenHeight * 3/7) + 110), "High scores", self.buttonFont, "White", "#d7fcd4")
@@ -1561,9 +1563,14 @@ class Game():
         
         Score.saveScore(str(score))
 
+        trails = []
+        fireworks = [Firework(self.screenWidth, self.screenHeight) for i in range(1)]
+        
         while True:
             self.mainClock.tick(self.FPS)
             mouse = pygame.mouse.get_pos()
+            
+            window.fill(self.black)
             
             if sp:
                 for button in [retryButton, scoresButton, mmButton]:
@@ -1575,7 +1582,15 @@ class Game():
                     button.changeColor(mouse)
                     button.update(window)
             
-            pygame.display.update()
+            if win:
+                self.draw_text_center("You win!", self.endFont, self.green, self.screenWidth / 2, self.screenHeight / 4, window)
+                if randint(0, 70) == 1:  # create new firework
+                    fireworks.append(Firework(self.screenWidth, self.screenHeight))
+                
+                update(window, fireworks, trails)
+            
+            else:
+                pygame.display.update()
             
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:

@@ -1,10 +1,10 @@
 selectedTheme=theme_Developer
-FPS=360
 
-screenWidth=1024
+FPS=140
 
-screenHeight=768
+screenWidth=2560
 
+screenHeight=1440
 volume=0
 
 difficulty=0
