@@ -450,16 +450,8 @@ class Game():
         
         #needed: deck count selector: columns and rows; cannot go above 8 rows or 12 columns
         
-        livesPerTextBox = menu.add.text_input("Lives Per Player: ", default=self.lives, onchange=setLives, input_type=INPUT_INT, align=pygame_menu.locals.ALIGN_LEFT)
-        streakPerTextBox = menu.add.text_input("streak to one-up: ", default=self.streakToOneUp, onchange=setLives, input_type=INPUT_INT, align=pygame_menu.locals.ALIGN_LEFT)
 
-        playerCountList = [("2", 2),("3", 3),("4", 4),("5", 5),("6", 6),("7", 7), ("8", 8)]
-        playerCountSelector = menu.add.selector("Total Player Count", 
-                                                items=playerCountList, 
-                                                onchange=setPlayerCountOptions, 
-                                                style=pygame_menu.widgets.SELECTOR_STYLE_FANCY, 
-                                                align=pygame_menu.locals.ALIGN_LEFT
-                                                )
+       
         
         def setXCards(strX, x, **kwargs):
             self.col = x
@@ -482,6 +474,17 @@ class Game():
                                       style=pygame_menu.widgets.SELECTOR_STYLE_FANCY,
                                       align=pygame_menu.locals.ALIGN_LEFT
                                       )
+        
+        livesPerTextBox = menu.add.text_input("Lives Per Player: ", default=self.lives, onchange=setLives, input_type=INPUT_INT, align=pygame_menu.locals.ALIGN_LEFT)
+        streakPerTextBox = menu.add.text_input("streak to one-up: ", default=self.streakToOneUp, onchange=setLives, input_type=INPUT_INT, align=pygame_menu.locals.ALIGN_LEFT)
+        
+        playerCountList = [("2", 2),("3", 3),("4", 4),("5", 5),("6", 6),("7", 7), ("8", 8)]
+        playerCountSelector = menu.add.selector("Total Player Count", 
+                                                items=playerCountList, 
+                                                onchange=setPlayerCountOptions, 
+                                                style=pygame_menu.widgets.SELECTOR_STYLE_FANCY, 
+                                                align=pygame_menu.locals.ALIGN_LEFT
+                                                )
         
         teamCountList = []
 
