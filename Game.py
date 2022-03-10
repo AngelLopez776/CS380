@@ -18,6 +18,7 @@ import random
 from random import randint
 from pathlib import Path
 from Fireworks import Firework, update
+import boxColor
 
 running = True
 cursorStrings = (
@@ -91,8 +92,8 @@ class Game():
         self.black = (0, 0, 0)
         self.buttonFont = pygame.font.SysFont('Times New Roman', 20)
         self.lifeFont = pygame.font.SysFont('Times New Roman', 20)
-        self.endFont = pygame.font.SysFont('Times New Roman', 32) 
-
+        self.endFont = pygame.font.SysFont('Times New Roman', 32)
+        self.boxColor = boxColor.boxColor
     def draw_text(self, text, font, color, x, y, window):
         img = font.render(text, True, color)
         textRect = img.get_rect()
@@ -299,7 +300,7 @@ class Game():
        
        # running = True
        while True:
-           optionsMenu.fill(self.black)
+           optionsMenu.fill(self.boxColor)
            pygame_menu.widgets.core.widget.pygame.mouse.set_cursor((16, 16), (0, 0), *cursor)
            self.draw_text_center(
                "Press escape to go back to main menu",
@@ -753,7 +754,7 @@ class Game():
 
         # running = True
         while True:
-            optionsMenu.fill(self.black)
+            optionsMenu.fill(self.boxColor)
             pygame_menu.widgets.core.widget.pygame.mouse.set_cursor((16, 16), (0, 0), *cursor)
             self.draw_text_center(
                 "Press escape to go back to main menu",
@@ -838,11 +839,12 @@ class Game():
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     # Button events when specific buttons are clicked
                     if START_BUTTON.checkForInput(MENU_MOUSE_POS):
+                        self.chooseBoxColor()
                         mixer.init()
                         mixer.music.load('Sounds/loading.mp3')
                         mixer.music.set_volume(self.volume/100)
                         mixer.music.play()
-                        screen.fill(black)
+                        screen.fill(self.boxColor)
                         self.sOrMOptions(screen)
 
                     if OPTIONS_BUTTON.checkForInput(MENU_MOUSE_POS):
@@ -876,6 +878,27 @@ class Game():
             time.sleep(0.05)
         pygame.event.clear()
     
+    def chooseBoxColor(self):
+        savedVariablesFile = open("SavedVariables.txt", "r")
+        mariotheme = "selectedTheme=theme_Mario"
+        if (mariotheme in savedVariablesFile.read()):
+            self.boxColor = (255, 0,0)
+        savedVariablesFile2 = open("SavedVariables.txt", "r")
+        tarottheme = "selectedTheme=theme_Tarot"
+        if (tarottheme in savedVariablesFile2.read()):
+            self.boxColor = (0, 255,0)
+        savedVariablesFile3 = open("SavedVariables.txt", "r")
+        pokemontheme = "selectedTheme=theme_Pokemon"
+        if (pokemontheme in savedVariablesFile3.read()):
+            self.boxColor = (0, 0,255)
+        savedVariablesFile4 = open("SavedVariables.txt", "r")
+        pokertheme = "selectedTheme=theme_Poker"
+        if (pokertheme in savedVariablesFile4.read()):
+            self.boxColor = (255, 0,255)
+        savedVariablesFile4 = open("SavedVariables.txt", "r")
+        ffxivtheme = "selectedTheme=theme_Final Fantasy 14"
+        if (ffxivtheme in savedVariablesFile4.read()):
+            self.boxColor = (255, 255,0)
         
     #while this will be very similar to the game method, it's different enough I feel to where a new method is warrented. 
     def multiPlayerGame(self, window):
@@ -994,7 +1017,7 @@ class Game():
                     if(lives == 0):
                         lives = "--"
                     textYLoc = (squareY + squareH/2) + 40
-                    window.fill(self.black, (squareX, textYLoc, 150, 15))  
+                    window.fill(self.boxColor, (squareX, textYLoc, 150, 15))  
                     self.draw_text("lives:" + str(lives),  pygame.font.Font("assets/font.ttf", 15), self.white, squareX, textYLoc, window)
             elif(not (self.FFA)):
                 cnt = 0
@@ -1010,7 +1033,7 @@ class Game():
                     if(lives == 0):
                         lives = "--"
                     textYLoc = (squareY + squareH/2) + 40
-                    window.fill(self.black, (squareX, textYLoc, 150, 15))  
+                    window.fill(self.boxColor, (squareX, textYLoc, 150, 15))  
                     self.draw_text("lives:" + str(lives),  pygame.font.Font("assets/font.ttf", 15), self.white, squareX, textYLoc, window)
             
         def streakVisualUpdate(players):
@@ -1021,7 +1044,7 @@ class Game():
                     squareY = (i * 80) + playerMinBorder
                     streak = players[i].streak
                     textYLoc = (squareY + squareH/2) + 25
-                    window.fill(self.black, (squareX, textYLoc, 150, 15))  
+                    window.fill(self.boxColor, (squareX, textYLoc, 150, 15))  
                     self.draw_text("streak:" + str(streak),  pygame.font.Font("assets/font.ttf", 15), self.white, squareX, textYLoc, window)
                 #pygame.display.update()
             elif(not (self.FFA)):
@@ -1036,7 +1059,7 @@ class Game():
                     streak = teamsData[teamNum].streak
                     teamNum += 1
                     textYLoc = (squareY + squareH/2) + 25
-                    window.fill(self.black, (squareX, textYLoc, 150, 15))  
+                    window.fill(self.boxColor, (squareX, textYLoc, 150, 15))  
                     self.draw_text("streak:" + str(streak),  pygame.font.Font("assets/font.ttf", 15), self.white, squareX, textYLoc, window)
         #visually indicates who's turn it is    
         def activePlayerVisualUpdate(activePlayer, prevActivePlayer):
@@ -1044,7 +1067,7 @@ class Game():
             squareX = 100
             squareY = (activePlayer * 80) + playerMinBorder + 15
             prevSquareY = (prevActivePlayer * 80) + playerMinBorder + 15
-            window.fill(self.black, (squareX, prevSquareY , squareH, squareH))
+            window.fill(self.boxColor, (squareX, prevSquareY , squareH, squareH))
             activeSquare = pygame.Rect(squareX, squareY, squareH, squareH)
             pygame.draw.rect(window, (100,100,255), activeSquare)
             #pygame.display.update()
@@ -1106,6 +1129,8 @@ class Game():
                     pygame.event.clear()
                     return False
                 self.animate.flip(tempTable, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, False)
+                
+        window.fill(self.boxColor, (self.screenWidth/2 - 70, self.screenHeight/12 - 10, 140, 18))
         roundsComplete = 0
         self.draw_text_center("round: " + str(roundsComplete + 1), pygame.font.Font("assets/font.ttf", 15), self.white, self.screenWidth/2, self.screenHeight/12, window)
         setUpMPTable(players)
@@ -1185,7 +1210,7 @@ class Game():
                         break
                 self.animate.flip(tempTable, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, False)
                 t = Table(self.col, self.row, self.selectedTheme, 5, 0, self.FPS)
-                window.fill(self.black, (self.screenWidth/2 - 70, self.screenHeight/12 - 10, 140, 18))
+                window.fill(self.boxColor, (self.screenWidth/2 - 70, self.screenHeight/12 - 10, 140, 18))
                 roundsComplete += 1 
                 self.draw_text_center("round: " + str(roundsComplete + 1), pygame.font.Font("assets/font.ttf", 15), self.white, self.screenWidth/2, self.screenHeight/12, window)
                 setUpMPTable(players)
@@ -1270,6 +1295,19 @@ class Game():
         return
         
     def game(self, window):
+        def updateLivesStreakTimeScoreVisual(t, textCol, timeLeft, window):
+            #window.fill(self.boxColor, (0, 0, 400, 40))  # so cards show during lose screen
+            window.fill(self.boxColor, (0, 0, self.screenWidth, 40))  # so cards show during lose screen
+            if self.gamemode == 1:
+                self.draw_text("Lives: " + str(t.lives), self.lifeFont, textCol, 5, 0, window)
+            elif self.gamemode == 2:
+                self.draw_text("Time: " + str(timeLeft) + "s", self.lifeFont, textCol, 5, 0, window)
+            elif self.gamemode == 3:
+                self.draw_text("Lives: " + str(t.lives), self.lifeFont, textCol, 5, 0, window)
+                self.draw_text("Time: " + str(timeLeft) + "s", self.lifeFont, textCol, 5, 20, window)
+
+            self.draw_text("Score: " + str(t.score), self.lifeFont, textCol, 105, 0, window)
+            
         def parallelEscape():
             global running
             while True:
@@ -1314,13 +1352,22 @@ class Game():
         
         bg = pygame.transform.scale(bg, (self.screenWidth, self.screenHeight))
         window.blit(bg, (0,0))
-        
-        t = self.createTable()
-
         green = (0, 255, 0)
         red = (255, 0, 0)
         white = (255, 255, 255)
         black = (0, 0, 0)
+        
+        if self.difficulty == 0:
+            matchTime = 30
+        elif self.difficulty == 1:
+            matchTime = 60
+        else:
+            matchTime = 45
+            
+        t = self.createTable()
+        updateLivesStreakTimeScoreVisual(t, white, matchTime, window)
+
+       
 
         minBorder = 70
         inBTween = 10
@@ -1362,12 +1409,6 @@ class Game():
             return False
         self.animate.flip(tempTable, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, False)
         
-        if self.difficulty == 0:
-            matchTime = 30
-        elif self.difficulty == 1:
-            matchTime = 60
-        else:
-            matchTime = 45
 
         timer = matchTime
         sTime = time.time()
@@ -1386,24 +1427,14 @@ class Game():
         while running:
             self.mainClock.tick(self.FPS)
             mouse = pygame.mouse.get_pos()
-
-            window.fill(black, (0, 0, 400, 40))  # so cards show during lose screen
-            if self.gamemode == 1:
-                self.draw_text("Lives: " + str(t.lives), self.lifeFont, white, 5, 0, window)
-            elif self.gamemode == 2:
-                self.draw_text("Time: " + str(timeLeft) + "s", self.lifeFont, white, 5, 0, window)
-            elif self.gamemode == 3:
-                self.draw_text("Lives: " + str(t.lives), self.lifeFont, white, 5, 0, window)
-                self.draw_text("Time: " + str(timeLeft) + "s", self.lifeFont, white, 5, 20, window)
-
-            self.draw_text("Score: " + str(t.score), self.lifeFont, white, 105, 0, window)
+            updateLivesStreakTimeScoreVisual(t, white, timeLeft, window)
 
             if t.checkWin():
                 for card in tempTable:
                     if not card.shown:
                         c = [card]
                         self.animate.flip(c, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, True)
-                window.fill(black, (0, 0, 400, 40))
+                window.fill(self.boxColor, (0, 0, 400, 40))
 
                 if len(t.selection) >= 2:
                     t.score = t.score + 100 + (50 * streak)
@@ -1433,7 +1464,7 @@ class Game():
                 mixer.music.play()
                 
                 time.sleep(1)
-                window.fill(black)
+                window.fill(self.boxColor)
                 
                 running, playAgain = self.endScreen(window, t.score, True, True)
 
@@ -1570,7 +1601,7 @@ class Game():
             self.mainClock.tick(self.FPS)
             mouse = pygame.mouse.get_pos()
             
-            window.fill(self.black)
+            window.fill(self.boxColor)
             
             if sp:
                 for button in [retryButton, scoresButton, mmButton]:
@@ -1603,11 +1634,11 @@ class Game():
                         mixer.music.play()
                         return [False, False]
                     if event.key == pygame.K_r:
-                        window.fill(self.black)  # so cards show during lose screen
+                        window.fill(self.boxColor)  # so cards show during lose screen
                         return [False, True]
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     if retryButton.checkForInput(mouse):
-                        window.fill(self.black)
+                        window.fill(self.boxColor)
                         return [False, True]
                     elif sp:
                         if scoresButton.checkForInput(mouse):
