@@ -997,8 +997,15 @@ class Game():
         toXCenter = self.centerDeckX(xSize, t.x, self.screenWidth, minBorder)
         timeToFlip = int(3000 * scale)  # can't be too fast or frames don't register
         
+        path_to_background_music_file = 'Sounds/'+str(self.selectedTheme)+'.mp3'
+        background_music_path = Path(path_to_background_music_file)
+       
+        
         mixer.init()
-        mixer.music.load('Sounds/'+str(self.selectedTheme)+'.mp3')
+        if background_music_path.is_file():
+            mixer.music.load('Sounds/'+str(self.selectedTheme)+'.mp3')
+        else: 
+            mixer.music.load('Sounds/Mario.mp3')
         mixer.music.set_volume(self.volume/100)
         mixer.music.play(-1)
         tempTable = []
@@ -1069,7 +1076,7 @@ class Game():
             prevSquareY = (prevActivePlayer * 80) + playerMinBorder + 15
             window.fill(self.boxColor, (squareX, prevSquareY , squareH, squareH))
             activeSquare = pygame.Rect(squareX, squareY, squareH, squareH)
-            pygame.draw.rect(window, (100,100,255), activeSquare)
+            pygame.draw.rect(window, (100, 100, 255), activeSquare)
             #pygame.display.update()
         #sets up the players team colors, lives, and streak
         def setUpMPTable(players):
@@ -1243,6 +1250,15 @@ class Game():
                             self.animate.flip(hidenCards, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, True)
                             self.stopAllFor(0.5)
                             running, playAgain = self.endScreen(window, t.score, False, False)
+                            if playAgain:
+                                mixer.init()
+                                mixer.music.load('Sounds/'+str(self.selectedTheme)+'.mp3')
+                                mixer.music.set_volume(self.volume/100)
+                                mixer.music.play(-1)
+                                return Game.multiPlayerGame(self, window)
+                            
+                            else:
+                                return
 
                     if len(t.selection) >= 2:
                         isMatch = t.checkMatch()
