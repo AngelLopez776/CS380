@@ -639,6 +639,7 @@ class Game():
                          ('Mario', 'Mario'),
                          ('Poker', 'Poker'),
                          ('Final Fantasy 14', 'Final Fantasy 14'),
+                         ('NFL', 'NFL'),
                          ('Developer', 'Developer')]
         themeSelector = menu.add.dropselect(
             title="Deck Theme",
@@ -880,40 +881,45 @@ class Game():
     
     def chooseBoxColor(self):
         savedVariablesFile = open("SavedVariables.txt", "r")
+        selTheme = savedVariablesFile.read()
         mariotheme = "selectedTheme=theme_Mario"
-        if (mariotheme in savedVariablesFile.read()):
+        if (mariotheme in selTheme):
             self.boxColor.setCol(255, 0, 0)
             self.animate.boxColor.x = 255
             self.animate.boxColor.y = 0
             self.animate.boxColor.z = 0
-        savedVariablesFile2 = open("SavedVariables.txt", "r")
         tarottheme = "selectedTheme=theme_Tarot"
-        if (tarottheme in savedVariablesFile2.read()):
-            self.boxColor.setCol(0, 255, 0)
+        if (tarottheme in selTheme):
+            self.boxColor.setCol(0, 0, 0)
             self.animate.boxColor.x = 0
-            self.animate.boxColor.y = 255
+            self.animate.boxColor.y = 0
             self.animate.boxColor.z = 0
-        savedVariablesFile3 = open("SavedVariables.txt", "r")
         pokemontheme = "selectedTheme=theme_Pokemon"
-        if (pokemontheme in savedVariablesFile3.read()):
-            self.boxColor.setCol(0, 0, 255)
+        if (pokemontheme in selTheme):
+            self.boxColor.setCol(0, 160, 255)
             self.animate.boxColor.x = 0
             self.animate.boxColor.y = 0
             self.animate.boxColor.z = 255
-        savedVariablesFile4 = open("SavedVariables.txt", "r")
         pokertheme = "selectedTheme=theme_Poker"
-        if (pokertheme in savedVariablesFile4.read()):
+        if (pokertheme in selTheme):
             self.boxColor.setCol(255, 0, 255)
             self.animate.boxColor.x = 255
             self.animate.boxColor.y = 0
             self.animate.boxColor.z = 255
-        savedVariablesFile4 = open("SavedVariables.txt", "r")
         ffxivtheme = "selectedTheme=theme_Final Fantasy 14"
-        if (ffxivtheme in savedVariablesFile4.read()):
+        if (ffxivtheme in selTheme):
             self.boxColor.setCol(255, 255, 0)
             self.animate.boxColor.x = 255
             self.animate.boxColor.y = 255
             self.animate.boxColor.z = 0
+        nfltheme = "selectedTheme=theme_NFL"
+        if (nfltheme in selTheme):
+            self.boxColor.setCol(0, 150, 0)
+            self.animate.boxColor.x = 0
+            self.animate.boxColor.y = 150
+            self.animate.boxColor.z = 0
+
+        
         
     #while this will be very similar to the game method, it's different enough I feel to where a new method is warrented. 
     def multiPlayerGame(self, window):
@@ -971,25 +977,26 @@ class Game():
         bg = pygame.image.load("images/theme_Developer/defaultbg.jpg")
         
         savedVariablesFile = open("SavedVariables.txt", "r")
+        selTheme = savedVariablesFile.read()
         mariotheme = "selectedTheme=theme_Mario"
-        if (mariotheme in savedVariablesFile.read()):
+        if (mariotheme in selTheme):
             bg = pygame.image.load("images/theme_Mario/mariowallpaper.jpg")
-        savedVariablesFile2 = open("SavedVariables.txt", "r")
         tarottheme = "selectedTheme=theme_Tarot"
-        if (tarottheme in savedVariablesFile2.read()):
+        if (tarottheme in selTheme):
             bg = pygame.image.load("images/theme_Tarot/tarotwallpaper.jpg")
-        savedVariablesFile3 = open("SavedVariables.txt", "r")
         pokemontheme = "selectedTheme=theme_Pokemon"
-        if (pokemontheme in savedVariablesFile3.read()):
+        if (pokemontheme in selTheme):
             bg = pygame.image.load("images/theme_Pokemon/pokemonwallpaper.jpg")
-        savedVariablesFile4 = open("SavedVariables.txt", "r")
         pokertheme = "selectedTheme=theme_Poker"
-        if (pokertheme in savedVariablesFile4.read()):
+        if (pokertheme in selTheme):
             bg = pygame.image.load("images/theme_Poker/pokerwallpaper.jpg")
-        savedVariablesFile4 = open("SavedVariables.txt", "r")
         ffxivtheme = "selectedTheme=theme_Final Fantasy 14"
-        if (ffxivtheme in savedVariablesFile4.read()):
+        if (ffxivtheme in selTheme):
             bg = pygame.image.load("images/theme_Final Fantasy 14/ffxivwallpaper.jpg")
+        nfltheme = "selectedTheme=theme_NFL"
+        if (nfltheme in selTheme):
+            bg = pygame.image.load("images/theme_NFL/nflwallpaper.jpg")
+        
         
         bg = pygame.transform.scale(bg, (self.screenWidth, self.screenHeight))
         window.blit(bg, (0,0))
@@ -1349,25 +1356,25 @@ class Game():
         bg = pygame.image.load("images/theme_Developer/defaultbg.jpg")
         
         savedVariablesFile = open("SavedVariables.txt", "r")
+        selTheme = savedVariablesFile.read()
         mariotheme = "selectedTheme=theme_Mario"
-        if (mariotheme in savedVariablesFile.read()):
+        if (mariotheme in selTheme):
             bg = pygame.image.load("images/theme_Mario/mariowallpaper.jpg")
-        savedVariablesFile2 = open("SavedVariables.txt", "r")
         tarottheme = "selectedTheme=theme_Tarot"
-        if (tarottheme in savedVariablesFile2.read()):
+        if (tarottheme in selTheme):
             bg = pygame.image.load("images/theme_Tarot/tarotwallpaper.jpg")
-        savedVariablesFile3 = open("SavedVariables.txt", "r")
         pokemontheme = "selectedTheme=theme_Pokemon"
-        if (pokemontheme in savedVariablesFile3.read()):
+        if (pokemontheme in selTheme):
             bg = pygame.image.load("images/theme_Pokemon/pokemonwallpaper.jpg")
-        savedVariablesFile4 = open("SavedVariables.txt", "r")
         pokertheme = "selectedTheme=theme_Poker"
-        if (pokertheme in savedVariablesFile4.read()):
+        if (pokertheme in selTheme):
             bg = pygame.image.load("images/theme_Poker/pokerwallpaper.jpg")
-        savedVariablesFile4 = open("SavedVariables.txt", "r")
         ffxivtheme = "selectedTheme=theme_Final Fantasy 14"
-        if (ffxivtheme in savedVariablesFile4.read()):
+        if (ffxivtheme in selTheme):
             bg = pygame.image.load("images/theme_Final Fantasy 14/ffxivwallpaper.jpg")
+        nfltheme = "selectedTheme=theme_NFL"
+        if (nfltheme in selTheme):
+            bg = pygame.image.load("images/theme_NFL/nflwallpaper.jpg")
         
         bg = pygame.transform.scale(bg, (self.screenWidth, self.screenHeight))
         window.blit(bg, (0,0))
@@ -1677,28 +1684,39 @@ class Game():
         else:
             return Table(5, 5, self.selectedTheme, 6, self.difficulty, self.FPS)
         
-    def showScores(self, window, pScore):
-        window.fill(self.boxColor.getCol(), (0, 40, self.screenWidth, self.screenHeight))
+    def showScores(self, window, pScore):        
+        #self.draw_text_center("High scores", pygame.font.SysFont("Times New Roman", 40), self.white, self.screenWidth / 2, self.screenHeight / 10, window)
         
-        self.draw_text_center("High scores", pygame.font.SysFont("Times New Roman", 40), self.white, self.screenWidth / 2, self.screenHeight / 10, window)
+        posX = self.screenWidth - 370
+        hsimg = pygame.image.load("images/theme_Developer/thehighscores.png")        
         
         scores = Score.readScores()
         textArea = ((self.screenHeight / 10) * 8) / 10
-        pos = (self.screenHeight / 10) + 40
-        
-        for score in scores:
-            if score == pScore:
-                self.draw_text_center(score, self.buttonFont, self.green, self.screenWidth / 2, pos, window)
-            else:
-                self.draw_text_center(score, self.buttonFont, self.white, self.screenWidth / 2, pos, window)
-                
-            pos = pos + textArea
         
         while True:
             self.mainClock.tick(self.FPS)
             
             pygame.display.update()
             
+            
+            if posX > self.screenWidth / 10:
+                posX = posX - 5
+                window.fill(self.boxColor.getCol())
+                window.blit(hsimg, (posX, self.screenHeight / 10))
+        
+            else:
+                window.fill(self.boxColor.getCol())
+                window.blit(hsimg, (self.screenWidth / 10, self.screenHeight / 10))
+            
+            pos = (self.screenHeight / 10) + 40
+            for score in scores:
+                if score == pScore:
+                    self.draw_text_center(score, self.buttonFont, self.green, self.screenWidth / 2, pos, window)
+                else:
+                    self.draw_text_center(score, self.buttonFont, self.white, self.screenWidth / 2, pos, window)
+                    
+                pos = pos + textArea
+                
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     return
