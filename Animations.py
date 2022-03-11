@@ -3,7 +3,7 @@
 import pygame
 from pygame import mixer
 import time
-import boxColor
+from BoxColor import BoxColor
 
 mainClock = pygame.time.Clock()
 
@@ -14,7 +14,7 @@ class Animations():
         global frames
         self.fps = fps
         frames = self.fps
-        self.boxColor = boxColor.boxColor
+        self.boxColor = BoxColor
     
     def readSettingFromFile(self, fName, sName):
         file = open(fName, 'r')
@@ -46,7 +46,7 @@ class Animations():
                 xDim -= timeToFlip * deltaTime
                 movedX += timeToFlip/2 * deltaTime
                 for card in cards:
-                    window.fill(self.boxColor,rect[i])
+                    window.fill((self.boxColor.x, self.boxColor.y, self.boxColor.z),rect[i])
                     surface = card.image.convert()
                     surface = pygame.transform.smoothscale(surface, (int(xDim), int(yDim)))       
                     window.blit(surface, ((minBorder + toXCenter) + xSize * card.col + movedX, minBorder + ySize * card.row))  
