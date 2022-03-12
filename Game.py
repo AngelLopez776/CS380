@@ -1040,7 +1040,7 @@ class Game():
         black = (0, 0, 0)
         
         playerMinBorder = 40
-        minBorder = 80
+        minBorder = 120
         inBTween = 5
         scale = self.setCardScale(minBorder, t.x, t.y, inBTween)
         xDim = int(250 * scale)
@@ -1254,7 +1254,23 @@ class Game():
                     teamsData[teamEffected].streak = 0
             activePlayer = findNextAlivePlayer(players, activePlayer)
             return activePlayer
-         
+        def winOrLoseMusicAndScreen():
+            win = False
+            if(self.co_op):
+                if gameover_path.is_file():
+                    mixer.music.load('Sounds/'+str(self.selectedTheme)+' Gameover.mp3')
+                else: 
+                    mixer.music.load('Sounds/Mario Gameover.mp3')
+            else:
+                if victory_path.is_file():
+                    mixer.music.load('Sounds/'+str(self.selectedTheme)+' Victory.mp3')
+                else: 
+                    mixer.music.load('Sounds/Mario Victory.mp3')
+                win = True
+            return win
+            
+            mixer.music.set_volume(self.volume/120)
+            mixer.music.play()
         #if a player has a streak of 3, a new life is added. The next active player is then found
         def playerGetsOneUpOrNextTurn(players, activePlayer):
             if(self.FFA):
@@ -1325,15 +1341,11 @@ class Game():
                                 if not i.shown:
                                     hidenCards.append(i)
                             self.animate.flip(hidenCards, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, True)
-                            if victory_path.is_file():
-                                mixer.music.load('Sounds/'+str(self.selectedTheme)+' Victory.mp3')
-                            else: 
-                                mixer.music.load('Sounds/Mario Victory.mp3')
-                            
+                            win = winOrLoseMusicAndScreen()
                             mixer.music.set_volume(self.volume/120)
                             mixer.music.play()
                             self.stopAllFor(3.0)
-                            running, playAgain = self.endScreen(window, t.score, False, True)
+                            running, playAgain = self.endScreen(window, t.score, False, win)
 
                     if len(t.selection) >= 2:
                         isMatch = t.checkMatch()
@@ -1350,15 +1362,11 @@ class Game():
                                         if not i.shown:
                                             hidenCards.append(i)
                                     self.animate.flip(hidenCards, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, True)
-                                    if victory_path.is_file():
-                                        mixer.music.load('Sounds/'+str(self.selectedTheme)+' Victory.mp3')
-                                    else: 
-                                        mixer.music.load('Sounds/Mario Victory.mp3')
-                                    
+                                    win = winOrLoseMusicAndScreen()
                                     mixer.music.set_volume(self.volume/120)
                                     mixer.music.play()
                                     self.stopAllFor(3.0)
-                                    running, playAgain = self.endScreen(window, t.score, False, True)
+                                    running, playAgain = self.endScreen(window, t.score, False, win)
 
                         else:
                             if isMatch == 1:
