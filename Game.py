@@ -1731,6 +1731,7 @@ class Game():
                 update(window, fireworks, trails)
             
             else:
+                self.draw_text_center("Game Over...", self.endFont, self.black, self.screenWidth / 2, self.screenHeight / 4, window)
                 pygame.display.update()
             
             for event in pygame.event.get():

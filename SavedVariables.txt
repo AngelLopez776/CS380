@@ -1,10 +1,10 @@
-selectedTheme=theme_Pokemon
-
+selectedTheme=theme_Developer
 FPS=140
 
 screenWidth=1920
 
 screenHeight=1080
+
 volume=22
 
 difficulty=0
