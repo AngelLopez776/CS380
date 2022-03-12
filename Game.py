@@ -388,7 +388,13 @@ class Game():
             #print(teamCount)
             teamCountList.clear()
             for players in range(playerCnt):
-                stringPC = str(players)
+                stringPC = None
+                if(players == 0):
+                    stringPC = "FFA"
+                elif(players == 1):
+                    stringPC = "co-op"
+                else:
+                    stringPC = str(players)
                 intPC = players
                 teamCountList.append((stringPC, intPC))
             #print(playerCnt <= self.teamCount)
@@ -478,7 +484,7 @@ class Game():
                                       align=pygame_menu.locals.ALIGN_LEFT
                                       )
         
-        livesPerTextBox = menu.add.text_input("Lives Per Player: ", default=self.lives, onchange=setLives, input_type=INPUT_INT, align=pygame_menu.locals.ALIGN_LEFT)
+        livesPerTextBox = menu.add.text_input("Lives: ", default=self.lives, onchange=setLives, input_type=INPUT_INT, align=pygame_menu.locals.ALIGN_LEFT)
         streakPerTextBox = menu.add.text_input("streak to one-up: ", default=self.streakToOneUp, onchange=setLives, input_type=INPUT_INT, align=pygame_menu.locals.ALIGN_LEFT)
         
         playerCountList = [("2", 2),("3", 3),("4", 4),("5", 5),("6", 6),("7", 7), ("8", 8)]
@@ -493,7 +499,12 @@ class Game():
 
         for players in range(self.playerCount):
             stringPC = None
-            stringPC = str(players)
+            if(players == 0):
+                stringPC = "FFA"
+            elif(players == 1):
+                stringPC = "co-op"
+            else:
+                stringPC = str(players)
             intPC = players
             teamCountList.append((stringPC, intPC))
         teamSelector = menu.add.selector("Teams", items=teamCountList, onchange=setTeamsOption, style=pygame_menu.widgets.SELECTOR_STYLE_FANCY, align=pygame_menu.locals.ALIGN_LEFT)
@@ -1029,8 +1040,8 @@ class Game():
         black = (0, 0, 0)
         
         playerMinBorder = 40
-        minBorder = 120
-        inBTween = 10
+        minBorder = 80
+        inBTween = 5
         scale = self.setCardScale(minBorder, t.x, t.y, inBTween)
         xDim = int(250 * scale)
         yDim = int(350 * scale)
@@ -1039,10 +1050,17 @@ class Game():
         toXCenter = self.centerDeckX(xSize, t.x, self.screenWidth, minBorder)
         timeToFlip = int(3000 * scale)  # can't be too fast or frames don't register
         
+        path_to_background_music_file = 'Sounds/'+str(self.selectedTheme)+'.mp3'
+        background_music_path = Path(path_to_background_music_file)
+        
         mixer.init()
-        mixer.music.load('Sounds/'+str(self.selectedTheme)+'.mp3')
+        if background_music_path.is_file():
+            mixer.music.load('Sounds/'+str(self.selectedTheme)+'.mp3')
+        else: 
+            mixer.music.load('Sounds/Mario.mp3')
         mixer.music.set_volume(self.volume/100)
         mixer.music.play(-1)
+        
         tempTable = []
         
 
@@ -1255,6 +1273,10 @@ class Game():
         activePlayer = playerOrder[0].ID - 1
         self.turnIter = 0
         self.turnIter += 1  
+        path_to_victory_file = 'Sounds/'+str(self.selectedTheme)+' Victory.mp3'
+        path_to_gameover_file = 'Sounds/'+str(self.selectedTheme)+' Gameover.mp3'
+        victory_path = Path(path_to_victory_file)
+        gameover_path = Path(path_to_gameover_file)
         #findNextAlivePlayer(players, activePlayer)
         while running:
             self.mainClock.tick(self.FPS)
@@ -1303,7 +1325,14 @@ class Game():
                                 if not i.shown:
                                     hidenCards.append(i)
                             self.animate.flip(hidenCards, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, True)
-                            self.stopAllFor(0.5)
+                            if victory_path.is_file():
+                                mixer.music.load('Sounds/'+str(self.selectedTheme)+' Victory.mp3')
+                            else: 
+                                mixer.music.load('Sounds/Mario Victory.mp3')
+                            
+                            mixer.music.set_volume(self.volume/120)
+                            mixer.music.play()
+                            self.stopAllFor(3.0)
                             running, playAgain = self.endScreen(window, t.score, False, True)
 
                     if len(t.selection) >= 2:
@@ -1321,8 +1350,14 @@ class Game():
                                         if not i.shown:
                                             hidenCards.append(i)
                                     self.animate.flip(hidenCards, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, True)
-                                    #activePlayer = findNextAlivePlayer(players, activePlayer)
-                                    self.stopAllFor(1.0)
+                                    if victory_path.is_file():
+                                        mixer.music.load('Sounds/'+str(self.selectedTheme)+' Victory.mp3')
+                                    else: 
+                                        mixer.music.load('Sounds/Mario Victory.mp3')
+                                    
+                                    mixer.music.set_volume(self.volume/120)
+                                    mixer.music.play()
+                                    self.stopAllFor(3.0)
                                     running, playAgain = self.endScreen(window, t.score, False, True)
 
                         else:
