@@ -241,6 +241,7 @@ class Game():
     #the options of the single player mode
     def singlePlayerOptions(self, screen):
        optionsMenu = screen
+       goBackButton = Button(pygame.image.load("Assets/ButtonBG.jpg"), (self.screenWidth/2, self.screenHeight /6), "Go Back:", self.buttonFont, "White", "#d7fcd4")
        menuTheme = pygame_menu.themes.Theme(
            background_color=(202, 228, 241),
            title_background_color=(0, 0, 0, 0),
@@ -248,7 +249,7 @@ class Game():
 
        menu = pygame_menu.Menu(
            title="",
-           height=self.screenHeight,
+           height=self.screenHeight/2,
            width=self.screenWidth,
            theme=menuTheme)
        
@@ -303,19 +304,21 @@ class Game():
        
        # running = True
        while True:
-           optionsMenu.fill(self.boxColor.getCol())
+           optionsMenu.fill((202, 228, 241))
+           mouse = pygame.mouse.get_pos()
+           for button in [goBackButton]:
+               button.changeColor(mouse)
+               button.update(optionsMenu)
            pygame_menu.widgets.core.widget.pygame.mouse.set_cursor((16, 16), (0, 0), *cursor)
-           self.draw_text_center(
-               "Press escape to go back to main menu",
-               self.lifeFont, self.white,
-               self.screenWidth / 2, self.screenHeight / 6,
-               optionsMenu
-           )
+           
            events = pygame.event.get()
            # events2 = pygame.event.get()
            menu.draw(optionsMenu)
            menu.update(events)
            for event in events:
+               if event.type == pygame.MOUSEBUTTONDOWN:
+                   if goBackButton.checkForInput(mouse):
+                       return
                if event.type == pygame.KEYDOWN:
                    if event.key == pygame.K_ESCAPE:
                        mixer.init()
@@ -622,16 +625,17 @@ class Game():
     
     #sets the settings of the game: resolution; theme; FPS; volume; fullscreen
     def settingsOptions(self, screen):
-        optionsMenu = screen
 
+        optionsMenu = screen
         menuTheme = pygame_menu.themes.Theme(
             background_color=(202, 228, 241),
-            title_background_color=(0, 0, 0, 0),
+            title_background_color=(202, 228, 241),
         )
+        goBackButton = Button(pygame.image.load("Assets/ButtonBG.jpg"), (self.screenWidth/2, self.screenHeight /6), "Go Back:", self.buttonFont, "White", "#d7fcd4")
 
         menu = pygame_menu.Menu(
             title="",
-            height=self.screenHeight,
+            height=self.screenHeight/2,
             width=self.screenWidth,
             theme=menuTheme)
         
@@ -695,32 +699,6 @@ class Game():
             placeholder= str(self.screenWidth) + " x " + str(self.screenHeight),
             placeholder_add_to_selection_box=False
         )
-        
-        #saves the FPS values to be used
-        def setFPS(newFPSData, newFPSNum, **kwargs):
-            # global selectedTheme
-            value_tuple, index = newFPSData
-            # selectedTheme = value_tuple[0]
-            self.FPS = newFPSNum
-            self.animate.frames = newFPSNum
-            self.saveSettingToFile("SavedVariables.txt", "FPS", value_tuple[0])
-
-        allFPS = [('140', 140),
-                  ('60', 60),
-                  ('30', 30),]
-        fpsSelector = menu.add.dropselect(
-            title="Frame Rate",
-            items=allFPS,
-            # placeholder=allThemes[defaultCardTheme][0],
-            onchange=setFPS,
-            scrollbar_thick=5,
-            selection_option_font=self.lifeFont,
-            # selection_box_border_color=(0,0,0,0),
-            selection_box_width=250,
-            selection_box_height=250,
-            placeholder=str(self.FPS),
-            placeholder_add_to_selection_box=False
-        )
 
         #sets the volume value to be used
         def set_vol(range, **kwargs):
@@ -756,25 +734,25 @@ class Game():
         
         themeSelector.add_self_to_kwargs()  
         resolutionSelector.add_self_to_kwargs()  
-        fpsSelector.add_self_to_kwargs()  
         volumeSlider.add_self_to_kwargs()
         fullscreenToggle.add_self_to_kwargs()
 
         # running = True
         while True:
-            optionsMenu.fill(self.boxColor.getCol())
+            optionsMenu.fill((202, 228, 241))
+            mouse = pygame.mouse.get_pos()
+            for button in [goBackButton]:
+                button.changeColor(mouse)
+                button.update(optionsMenu)
             pygame_menu.widgets.core.widget.pygame.mouse.set_cursor((16, 16), (0, 0), *cursor)
-            self.draw_text_center(
-                "Press escape to go back to main menu",
-                self.lifeFont, self.white,
-                self.screenWidth / 2, self.screenHeight / 6,
-                optionsMenu
-            )
             events = pygame.event.get()
             # events2 = pygame.event.get()
             menu.draw(optionsMenu)
             menu.update(events)
             for event in events:
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if goBackButton.checkForInput(mouse):
+                        return
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         mixer.init()
