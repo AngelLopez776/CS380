@@ -60,6 +60,8 @@ class Game():
         self.timeBetweenTurns = 1 #time between turns for players
         self.col = 3 #how many columns in the multiplayer table
         self.row = 3 #how many rows in the multiplayer table
+        self.randomOrder = False
+        self.turnIter = 0 #The number which marks how many of the players have already played before going back to the first activeplayer
         
         #for variables which should not be saved after exiting the menu; a little messy, I know
         self.tmpTeamCnt = self.teamCount
@@ -72,7 +74,8 @@ class Game():
         self.tmpTimeBT = self.timeBetweenTurns
         self.tmpLives = self.lives
         self.tmpStreakToOneUp = self.streakToOneUp
-
+        self.tmpRandOrder = self.randomOrder
+       
         #singlePlayer-----------
         self.difficulty = int(self.readSettingFromFile("SavedVariables.txt", "difficulty"))
         self.gamemode = int(self.readSettingFromFile("SavedVariables.txt", "gamemode"))
@@ -450,16 +453,14 @@ class Game():
         introSequenceSwitch = menu.add.toggle_switch("Intro Sequence", onchange=setIntroSequence, state_text=("Skip", "Play"), default=self.showIntroSequence, align=pygame_menu.locals.ALIGN_LEFT)
         introSequenceTimeText = menu.add.text_input("In seconds, show Cards for: ", default=self.introSequenceTime, onchange=setIntroSequenceTime, input_type=INPUT_FLOAT, align=pygame_menu.locals.ALIGN_RIGHT)
         
-        #needed: deck count selector: columns and rows; cannot go above 8 rows or 12 columns
-        
-
-       
-        
         def setXCards(strX, x, **kwargs):
             self.col = x
         
         def setYCards(strY, y, **kwargs):
             self.row = y
+        
+        def setRandomOrder(isRand, **kwargs):
+            self.tmpRandOrder = isRand
         
         numCards = [("3", 3), ("4", 4), ("5", 5)]
         
@@ -520,6 +521,9 @@ class Game():
         
         timeBetweenTurnsText = menu.add.text_input("In seconds, time between turns: ", default=self.timeBetweenTurns, onchange=setTimeBetweenTurns, input_type=INPUT_FLOAT, align=pygame_menu.locals.ALIGN_LEFT)
         
+        randomOrderSwitch = menu.add.toggle_switch("Random Turn Order", onchange=setRandomOrder, state_text=("Off", "On"), default=self.randomOrder, align=pygame_menu.locals.ALIGN_LEFT)
+        
+        randomOrderSwitch.add_self_to_kwargs()
         streakPerTextBox.add_self_to_kwargs()
         livesPerTextBox.add_self_to_kwargs()
         introSequenceTimeText.add_self_to_kwargs()
@@ -558,6 +562,7 @@ class Game():
             self.tmpPlayersInTeam = self.playersInTeams
             self.tmpLives = self.lives
             self.tmpStreakToOneUp = self.streakToOneUp
+            self.tmpRandOrder = self.randomOrder
             self.error = False
             
         #tmp vars are used so that if there is an error, it will not be saved; this method saves the tmp vars to the vars used in the multiplayer game variables upon exiting if there are error
@@ -572,6 +577,7 @@ class Game():
             self.playersInTeams = self.tmpPlayersInTeam
             self.lives = self.tmpLives
             self.streakToOneUp = self.tmpStreakToOneUp
+            self.randomOrder = self.tmpRandOrder
 
 
             
@@ -882,6 +888,12 @@ class Game():
     def chooseBoxColor(self):
         savedVariablesFile = open("SavedVariables.txt", "r")
         selTheme = savedVariablesFile.read()
+        developerTheme = "selectedTheme=theme_Mario"
+        if(developerTheme in selTheme):
+            self.boxColor.setCol(0, 0, 0)
+            self.animate.boxColor.x = 0
+            self.animate.boxColor.y = 0
+            self.animate.boxColor.z = 0
         mariotheme = "selectedTheme=theme_Mario"
         if (mariotheme in selTheme):
             self.boxColor.setCol(255, 0, 0)
@@ -890,7 +902,7 @@ class Game():
             self.animate.boxColor.z = 0
         tarottheme = "selectedTheme=theme_Tarot"
         if (tarottheme in selTheme):
-            self.boxColor.setCol(0, 0, 0)
+            self.boxColor.setCol(0, 0, 20)
             self.animate.boxColor.x = 0
             self.animate.boxColor.y = 0
             self.animate.boxColor.z = 0
@@ -898,7 +910,7 @@ class Game():
         if (pokemontheme in selTheme):
             self.boxColor.setCol(0, 160, 255)
             self.animate.boxColor.x = 0
-            self.animate.boxColor.y = 0
+            self.animate.boxColor.y = 160
             self.animate.boxColor.z = 255
         pokertheme = "selectedTheme=theme_Poker"
         if (pokertheme in selTheme):
@@ -908,10 +920,10 @@ class Game():
             self.animate.boxColor.z = 255
         ffxivtheme = "selectedTheme=theme_Final Fantasy 14"
         if (ffxivtheme in selTheme):
-            self.boxColor.setCol(255, 255, 0)
-            self.animate.boxColor.x = 255
-            self.animate.boxColor.y = 255
-            self.animate.boxColor.z = 0
+            self.boxColor.setCol(50, 0, 100)
+            self.animate.boxColor.x = 210
+            self.animate.boxColor.y = 180
+            self.animate.boxColor.z = 140
         nfltheme = "selectedTheme=theme_NFL"
         if (nfltheme in selTheme):
             self.boxColor.setCol(0, 150, 0)
@@ -924,7 +936,9 @@ class Game():
     #while this will be very similar to the game method, it's different enough I feel to where a new method is warrented. 
     def multiPlayerGame(self, window):
         #print(self.FFA)   
+        print("randomOrder: ", self.randomOrder)
         players = []
+        playerOrder = []
         if(self.FFA):
             self.tempPlayerCnt = self.playerCount
         elif(not (self.co_op)):
@@ -933,7 +947,13 @@ class Game():
             player = Player(i + 1, self.lives, -1)
             players.append(player)
             players[i].ID = i + 1
-         
+            playerOrder.append(player)
+            playerOrder[i].ID = i + 1
+        if(self.randomOrder):
+            random.shuffle(playerOrder)
+        for i in playerOrder:
+            print(i.ID)
+
         if(self.co_op):
             self.tempPlayerCnt = 2 #this really should be one, but the game crashes if it's 1 so...
             self.playersInTeams[0] = self.playerCount
@@ -1055,7 +1075,15 @@ class Game():
                     textYLoc = (squareY + squareH/2) + 40
                     window.fill(self.boxColor.getCol(), (squareX, textYLoc, 150, 15))  
                     self.draw_text("lives:" + str(lives),  pygame.font.Font("assets/font.ttf", 15), self.white, squareX, textYLoc, window)
-            
+        def turnFrame(players):
+            squareH = 40
+            squareX = 40
+            for i in range(self.playerCount):
+                squareY = (i * 80) + playerMinBorder
+                textYLoc = (squareY + squareH/2) + 25
+                window.fill(self.boxColor.getCol(), (squareX + 50, textYLoc - 40, 30, 30))
+        turnFrame(players)
+                
         def streakVisualUpdate(players):
             squareH = 40
             squareX = 40
@@ -1064,7 +1092,7 @@ class Game():
                     squareY = (i * 80) + playerMinBorder
                     streak = players[i].streak
                     textYLoc = (squareY + squareH/2) + 25
-                    window.fill(self.boxColor.getCol(), (squareX, textYLoc, 150, 15))  
+                    window.fill(self.boxColor.getCol(), (squareX, textYLoc, 150, 15))
                     self.draw_text("streak:" + str(streak),  pygame.font.Font("assets/font.ttf", 15), self.white, squareX, textYLoc, window)
                 #pygame.display.update()
             elif(not (self.FFA)):
@@ -1083,6 +1111,7 @@ class Game():
                     self.draw_text("streak:" + str(streak),  pygame.font.Font("assets/font.ttf", 15), self.white, squareX, textYLoc, window)
         #visually indicates who's turn it is    
         def activePlayerVisualUpdate(activePlayer, prevActivePlayer):
+            print(str(activePlayer + 1))
             squareH = 10
             squareX = 100
             squareY = (activePlayer * 80) + playerMinBorder + 15
@@ -1160,7 +1189,7 @@ class Game():
         roundsComplete = 0
         self.draw_text_center("round: " + str(roundsComplete + 1), pygame.font.Font("assets/font.ttf", 15), self.white, self.screenWidth/2, self.screenHeight/12, window)
         setUpMPTable(players)
-        activePlayerVisualUpdate(0, 0)
+        activePlayerVisualUpdate(playerOrder[0].ID - 1, playerOrder[0].ID - 1)
         
         #finds the next player who's turn it is; skips not alive players
         def findNextAlivePlayer(players, activePlayer):
@@ -1168,17 +1197,23 @@ class Game():
             streakVisualUpdate(players)
             prevActivePlayer = activePlayer
             self.stopAllFor(self.timeBetweenTurns)
-            if(self.tempPlayerCnt <= 1):
+            if(self.co_op and self.tempPlayerCnt <= 1):
                 return activePlayer
             while True:
-                if(activePlayer == self.playerCount - 1):
-                    activePlayer = -1
-                activePlayer +=1
+                print("playerCount", str(self.playerCount))
+                print("turnIter ", self.turnIter)
+                if(self.turnIter == self.playerCount):
+                    self.turnIter = -1
+                    random.shuffle(playerOrder)
+                print("ID ", playerOrder[self.turnIter].ID)
+                activePlayer = playerOrder[self.turnIter].ID - 1
+                self.turnIter +=1
                 if(players[activePlayer].alive == True):
                     if(not self.FFA and teamsData[players[activePlayer].teamNum].alive == False):
                         continue
-                    break
+                break
             activePlayerVisualUpdate(activePlayer, prevActivePlayer)
+            
             return activePlayer
         
         #either marks the player as not alive if they have 1 life or subtracts a life
@@ -1217,9 +1252,10 @@ class Game():
                     teamsData[teamEffected].streak = 0
             activePlayer = findNextAlivePlayer(players, activePlayer)
             return activePlayer
-        
-        activePlayer = 0
-        
+        activePlayer = playerOrder[0].ID - 1
+        self.turnIter = 0
+        self.turnIter += 1  
+        #findNextAlivePlayer(players, activePlayer)
         while running:
             self.mainClock.tick(self.FPS)
 
@@ -1268,7 +1304,7 @@ class Game():
                                     hidenCards.append(i)
                             self.animate.flip(hidenCards, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, True)
                             self.stopAllFor(0.5)
-                            running, playAgain = self.endScreen(window, t.score, False, False)
+                            running, playAgain = self.endScreen(window, t.score, False, True)
 
                     if len(t.selection) >= 2:
                         isMatch = t.checkMatch()
@@ -1285,8 +1321,9 @@ class Game():
                                         if not i.shown:
                                             hidenCards.append(i)
                                     self.animate.flip(hidenCards, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, True)
-                                    self.stopAllFor(0.5)
-                                    running, playAgain = self.endScreen(window, t.score, False, False)
+                                    #activePlayer = findNextAlivePlayer(players, activePlayer)
+                                    self.stopAllFor(1.0)
+                                    running, playAgain = self.endScreen(window, t.score, False, True)
 
                         else:
                             if isMatch == 1:
@@ -1523,6 +1560,7 @@ class Game():
                 
                 mixer.music.set_volume(self.volume/120)
                 mixer.music.play()
+                self.stopAllFor(2)
 
                 running, playAgain = self.endScreen(window, t.score, True, False)
 
@@ -1611,8 +1649,8 @@ class Game():
         return quitG
         
     def endScreen(self, window, score, sp, win):
-        retryButton = Button(pygame.image.load("Assets/ButtonBG.jpg"), (self.screenWidth/2, self.screenHeight * 3/7), "Restart", self.buttonFont, "White", "#d7fcd4")
         if sp:
+            retryButton = Button(pygame.image.load("Assets/ButtonBG.jpg"), (self.screenWidth/2, self.screenHeight * 3/7), "Restart", self.buttonFont, "White", "#d7fcd4")
             scoresButton = Button(pygame.image.load("Assets/ButtonBG.jpg"), (self.screenWidth/2, (self.screenHeight * 3/7) + 110), "High scores", self.buttonFont, "White", "#d7fcd4")
             mmButton = Button(pygame.image.load("Assets/ButtonBG.jpg"), (self.screenWidth/2, (self.screenHeight * 3/7) + 220), "Return to mode select", self.buttonFont, "White", "#d7fcd4")
         else:
@@ -1635,12 +1673,15 @@ class Game():
                     button.update(window)
             
             else:
-                for button in [retryButton, mmButton]:
+                for button in [mmButton]:
                     button.changeColor(mouse)
                     button.update(window)
             
             if win:
-                self.draw_text_center("You win!", self.endFont, self.green, self.screenWidth / 2, self.screenHeight / 4, window)
+                if sp:
+                    self.draw_text_center("You win!", self.endFont, self.green, self.screenWidth / 2, self.screenHeight / 4, window)
+                else:
+                    self.draw_text_center("Game Over!", self.endFont, self.green, self.screenWidth / 2, self.screenHeight / 4, window)
                 if randint(0, 70) == 1:  # create new firework
                     fireworks.append(Firework(self.screenWidth, self.screenHeight))
                 
@@ -1663,12 +1704,13 @@ class Game():
                         window.fill(self.boxColor.getCol())  # so cards show during lose screen
                         return [False, True]
                 elif event.type == pygame.MOUSEBUTTONDOWN:
-                    if retryButton.checkForInput(mouse):
-                        window.fill(self.boxColor.getCol())
-                        return [False, True]
-                    elif sp:
+                   
+                    if sp:
                         if scoresButton.checkForInput(mouse):
                             self.showScores(window, str(score))
+                        if retryButton.checkForInput(mouse):
+                            window.fill(self.boxColor.getCol())
+                            return [False, True]
                     if mmButton.checkForInput(mouse):
                         mixer.init()
                         mixer.music.load('Sounds/loading.mp3')
