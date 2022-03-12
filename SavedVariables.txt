@@ -1,9 +1,10 @@
 selectedTheme=theme_Developer
+
 FPS=140
 
-screenWidth=1920
+screenWidth=1280
 
-screenHeight=1080
+screenHeight=720
 
 volume=22
 
@@ -11,5 +12,4 @@ difficulty=0
 
 gamemode=1
 
-fullscreen=1
-
+fullscreen=0

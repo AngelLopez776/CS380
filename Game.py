@@ -389,12 +389,7 @@ class Game():
             teamCountList.clear()
             for players in range(playerCnt):
                 stringPC = None
-                if(players == 0):
-                    stringPC = "FFA"
-                elif(players == 1):
-                    stringPC = "co-op"
-                else:
-                    stringPC = str(players)
+                stringPC = str(players)
                 intPC = players
                 teamCountList.append((stringPC, intPC))
             #print(playerCnt <= self.teamCount)
@@ -444,6 +439,7 @@ class Game():
         #sets the lives
         def setLives(lives, **kwargs):
             if(lives == 0): lives += 1
+            elif(lives > 1000): lives = 1000
             self.tmpLives = abs(lives)
             
         def setStreakToOneUp(streakToOneUp, **kwargs):
@@ -499,12 +495,7 @@ class Game():
 
         for players in range(self.playerCount):
             stringPC = None
-            if(players == 0):
-                stringPC = "FFA"
-            elif(players == 1):
-                stringPC = "co-op"
-            else:
-                stringPC = str(players)
+            stringPC = str(players)
             intPC = players
             teamCountList.append((stringPC, intPC))
         teamSelector = menu.add.selector("Teams", items=teamCountList, onchange=setTeamsOption, style=pygame_menu.widgets.SELECTOR_STYLE_FANCY, align=pygame_menu.locals.ALIGN_LEFT)
@@ -716,8 +707,7 @@ class Game():
 
         allFPS = [('140', 140),
                   ('60', 60),
-                  ('30', 30),
-                  ('Custom', 360)]
+                  ('30', 30),]
         fpsSelector = menu.add.dropselect(
             title="Frame Rate",
             items=allFPS,
