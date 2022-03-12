@@ -889,7 +889,7 @@ class Game():
     def chooseBoxColor(self):
         savedVariablesFile = open("SavedVariables.txt", "r")
         selTheme = savedVariablesFile.read()
-        developerTheme = "selectedTheme=theme_Mario"
+        developerTheme = "selectedTheme=theme_Developer"
         if(developerTheme in selTheme):
             self.boxColor.setCol(0, 0, 0)
             self.animate.boxColor.x = 0
@@ -903,10 +903,10 @@ class Game():
             self.animate.boxColor.z = 0
         tarottheme = "selectedTheme=theme_Tarot"
         if (tarottheme in selTheme):
-            self.boxColor.setCol(0, 0, 20)
-            self.animate.boxColor.x = 0
-            self.animate.boxColor.y = 0
-            self.animate.boxColor.z = 0
+            self.boxColor.setCol(22, 26, 43)
+            self.animate.boxColor.x = 22
+            self.animate.boxColor.y = 26
+            self.animate.boxColor.z = 43
         pokemontheme = "selectedTheme=theme_Pokemon"
         if (pokemontheme in selTheme):
             self.boxColor.setCol(0, 160, 255)
@@ -915,10 +915,10 @@ class Game():
             self.animate.boxColor.z = 255
         pokertheme = "selectedTheme=theme_Poker"
         if (pokertheme in selTheme):
-            self.boxColor.setCol(255, 0, 255)
+            self.boxColor.setCol(100, 100, 100)
             self.animate.boxColor.x = 255
             self.animate.boxColor.y = 0
-            self.animate.boxColor.z = 255
+            self.animate.boxColor.z = 0
         ffxivtheme = "selectedTheme=theme_Final Fantasy 14"
         if (ffxivtheme in selTheme):
             self.boxColor.setCol(50, 0, 100)
@@ -1548,7 +1548,7 @@ class Game():
 
                 self.draw_text("Score: " + str(t.score), self.lifeFont, white, 105, 0, window)
 
-                self.draw_text_center("You win!", self.endFont, green, self.screenWidth / 2, self.screenHeight / 4, window)
+               #self.draw_text_center("You win!", self.endFont, green, self.screenWidth / 2, self.screenHeight / 4, window)
                 pygame.display.update()
                 
                 mixer.init()
