@@ -478,7 +478,7 @@ class Game():
                                       align=pygame_menu.locals.ALIGN_LEFT
                                       )
         
-        livesPerTextBox = menu.add.text_input("Lives: ", default=self.lives, onchange=setLives, input_type=INPUT_INT, align=pygame_menu.locals.ALIGN_LEFT)
+        livesPerTextBox = menu.add.text_input("Lives Per Player: ", default=self.lives, onchange=setLives, input_type=INPUT_INT, align=pygame_menu.locals.ALIGN_LEFT)
         streakPerTextBox = menu.add.text_input("streak to one-up: ", default=self.streakToOneUp, onchange=setLives, input_type=INPUT_INT, align=pygame_menu.locals.ALIGN_LEFT)
         
         playerCountList = [("2", 2),("3", 3),("4", 4),("5", 5),("6", 6),("7", 7), ("8", 8)]
@@ -1190,53 +1190,30 @@ class Game():
         self.draw_text_center("round: " + str(roundsComplete + 1), pygame.font.Font("assets/font.ttf", 15), self.white, self.screenWidth/2, self.screenHeight/12, window)
         setUpMPTable(players)
         activePlayerVisualUpdate(playerOrder[0].ID - 1, playerOrder[0].ID - 1)
-        """
+        
         #finds the next player who's turn it is; skips not alive players
         def findNextAlivePlayer(players, activePlayer):
             livesVisualUpdate(players)
             streakVisualUpdate(players)
             prevActivePlayer = activePlayer
             self.stopAllFor(self.timeBetweenTurns)
-            if(self.tempPlayerCnt <= 1):
+            if(self.co_op and self.tempPlayerCnt <= 1):
                 return activePlayer
-            while True:
-                if(activePlayer == self.playerCount - 1):
-                    activePlayer = -1
-                activePlayer +=1
-                if(players[activePlayer].alive == True):
-                    if(not self.FFA and teamsData[players[activePlayer].teamNum].alive == False):
-                        continue
-                    break
-            activePlayerVisualUpdate(activePlayer, prevActivePlayer)
-            return activePlayer
-        """
-        #finds the next player who's turn it is; skips not alive players
-        def findNextAlivePlayer(players, activePlayer):
-            livesVisualUpdate(players)
-            streakVisualUpdate(players)
-            prevActivePlayer = activePlayer
-            self.stopAllFor(self.timeBetweenTurns)
-            if(self.co_op and self.tempPlayerCnt == 1):
-                return activePlayer
-           
             while True:
                 print("playerCount", str(self.playerCount))
                 print("turnIter ", self.turnIter)
-                if(self.turnIter == self.playerCount - 1):
+                if(self.turnIter == self.playerCount):
                     self.turnIter = -1
-                    if(self.randomOrder):
-                        random.shuffle(playerOrder)
-                self.turnIter +=1
+                    random.shuffle(playerOrder)
                 print("ID ", playerOrder[self.turnIter].ID)
                 activePlayer = playerOrder[self.turnIter].ID - 1
-                print(str(activePlayer) + " is " + str(players[activePlayer].alive))
+                self.turnIter +=1
                 if(players[activePlayer].alive == True):
                     if(not self.FFA and teamsData[players[activePlayer].teamNum].alive == False):
                         continue
-                else:
-                    continue
                 break
             activePlayerVisualUpdate(activePlayer, prevActivePlayer)
+            
             return activePlayer
         
         #either marks the player as not alive if they have 1 life or subtracts a life
@@ -1276,7 +1253,9 @@ class Game():
             activePlayer = findNextAlivePlayer(players, activePlayer)
             return activePlayer
         activePlayer = playerOrder[0].ID - 1
-
+        self.turnIter = 0
+        self.turnIter += 1  
+        #findNextAlivePlayer(players, activePlayer)
         while running:
             self.mainClock.tick(self.FPS)
 
@@ -1324,8 +1303,7 @@ class Game():
                                 if not i.shown:
                                     hidenCards.append(i)
                             self.animate.flip(hidenCards, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, True)
-                            activePlayer = findNextAlivePlayer(players, activePlayer)
-                            self.stopAllFor(3)
+                            self.stopAllFor(0.5)
                             running, playAgain = self.endScreen(window, t.score, False, True)
 
                     if len(t.selection) >= 2:
@@ -1343,8 +1321,8 @@ class Game():
                                         if not i.shown:
                                             hidenCards.append(i)
                                     self.animate.flip(hidenCards, timeToFlip, xDim, yDim, minBorder, xSize, ySize, toXCenter, window, True)
-                                    activePlayer = findNextAlivePlayer(players, activePlayer)
-                                    self.stopAllFor(3)
+                                    #activePlayer = findNextAlivePlayer(players, activePlayer)
+                                    self.stopAllFor(1.0)
                                     running, playAgain = self.endScreen(window, t.score, False, True)
 
                         else:
