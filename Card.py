@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-
 import pygame
-
 
 class Card():
     def __init__(self, theme, ID):

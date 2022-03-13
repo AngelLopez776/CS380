@@ -1,20 +1,12 @@
-# -*- coding: utf-8 -*-
-
-import pygame
-import sys
+import pygame, sys, random, time, threading, pygame_menu, keyboard #must be installed: pip install keyboard in anaconda cmd
 from Table import Table
-import time
 from Animations import Animations
 from Button import Button
-import pygame_menu
 from pygame.locals import *
 from pygame import mixer
-import threading
-import keyboard #must be installed: pip install keyboard in anaconda cmd
 from Score import Score
 from Player import Player
 from Teams import Team
-import random
 from random import randint
 from pathlib import Path
 from Fireworks import Firework, update
@@ -752,6 +744,10 @@ class Game():
             for event in events:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if goBackButton.checkForInput(mouse):
+                        mixer.init()
+                        mixer.music.load('Sounds/mainmenu.mp3')
+                        mixer.music.set_volume(self.volume/100)
+                        mixer.music.play(-1)
                         return
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:

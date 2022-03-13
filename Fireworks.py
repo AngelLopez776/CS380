@@ -1,6 +1,5 @@
-import pygame
+import pygame, math
 from random import randint, uniform, choice
-import math
 
 vector2 = pygame.math.Vector2
 trails = []

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from Card import Card
 import random
 

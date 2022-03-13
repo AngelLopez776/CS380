@@ -1,4 +1,4 @@
-selectedTheme=theme_Final Fantasy 14
+selectedTheme=theme_Developer
 FPS=140
 
 screenWidth=1280

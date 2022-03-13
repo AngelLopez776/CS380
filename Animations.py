@@ -1,8 +1,5 @@
-# -*- coding: utf-8 -*-
-
-import pygame
+import pygame, time
 from pygame import mixer
-import time
 from BoxColor import BoxColor
 
 mainClock = pygame.time.Clock()
